@@ -1,5 +1,5 @@
 ﻿using FurnitureShop.Application.DTOs.Auth;
-using FurnitureShop.Application.Interface;
+using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using BCrypt.Net;
 using System;

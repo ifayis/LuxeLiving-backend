@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FurnitureShop.Application\FurnitureShop.Application.csproj" />
+    <ProjectReference Include="..\FurnitureShop.Infrastructure\FurnitureShop.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
