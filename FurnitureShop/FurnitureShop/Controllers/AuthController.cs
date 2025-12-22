@@ -25,12 +25,13 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
-            var isValid = await _authService.LoginAsync(request);
+            var result = await _authService.LoginAsync(request);
 
-            if (!isValid)
+            if (result == null)
                 return Unauthorized("Invalid email or password");
 
-            return Ok("Login successful");
+            return Ok(result);
         }
+
     }
 }
