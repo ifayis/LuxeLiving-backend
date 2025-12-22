@@ -15,5 +15,7 @@ namespace FurnitureShop.Infrastructure.Data
         {
         }
         public DbSet<User> Users => Set<User>();
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Product> Products => Set<Product>();
     }
 }
