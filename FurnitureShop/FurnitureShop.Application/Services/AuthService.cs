@@ -13,10 +13,14 @@ namespace FurnitureShop.Application.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(
+     IUserRepository userRepository,
+     ITokenService tokenService)
         {
             _userRepository = userRepository;
+            _tokenService = tokenService;
         }
 
         public async Task RegisterAsync(RegisterRequestDto request)
@@ -40,18 +44,25 @@ namespace FurnitureShop.Application.Services
             await _userRepository.AddAsync(user);
         }
 
-        public async Task<bool> LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
-            if (user == null)
-            {
-                return false;
-            }
 
-            return BCrypt.Net.BCrypt.Verify(
-                request.Password,
-                user.PasswordHash
-            );
+            if (user == null)
+                return null;
+
+            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+
+            if (!isPasswordValid)
+                return null;
+
+            var token = _tokenService.GenerateToken(user);
+
+            return new LoginResponseDto
+            {
+                Token = token
+            };
         }
+
     }
 }
