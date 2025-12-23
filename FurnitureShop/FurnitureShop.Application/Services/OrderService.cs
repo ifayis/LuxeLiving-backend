@@ -50,5 +50,43 @@ namespace FurnitureShop.Application.Services
             if (order.Status == "Paid")
                 await _cartRepository.ClearCartAsync(cart.Id);
         }
+        public async Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId)
+        {
+            var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);
+
+            return orders.Select(o => new OrderResponseDto
+            {
+                OrderId = o.Id,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status,
+                CreatedAt = o.CreatedAt,
+                Items = o.Items.Select(i => new OrderItemResponseDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            }).ToList();
+        }
+
+        public async Task<OrderResponseDto?> GetMyOrderByIdAsync(Guid userId, Guid orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
+            if (order == null) return null;
+
+            return new OrderResponseDto
+            {
+                OrderId = order.Id,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status,
+                CreatedAt = order.CreatedAt,
+                Items = order.Items.Select(i => new OrderItemResponseDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+        }
     }
 }

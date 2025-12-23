@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,22 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Order>> GetOrdersByUserIdAsync(Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
         }
     }
 }

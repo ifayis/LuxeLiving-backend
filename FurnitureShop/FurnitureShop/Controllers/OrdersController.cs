@@ -25,4 +25,23 @@ public class OrdersController : ControllerBase
         await _orderService.CheckoutAsync(userId, request);
         return Ok("Order placed successfully");
     }
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyOrders()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var orders = await _orderService.GetMyOrdersAsync(userId);
+        return Ok(orders);
+    }
+
+    [HttpGet("my/{orderId}")]
+    public async Task<IActionResult> GetMyOrder(Guid orderId)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var order = await _orderService.GetMyOrderByIdAsync(userId, orderId);
+
+        if (order == null)
+            return NotFound("Order not found");
+
+        return Ok(order);
+    }
 }

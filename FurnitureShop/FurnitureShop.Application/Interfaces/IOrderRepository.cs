@@ -10,5 +10,8 @@ namespace FurnitureShop.Application.Interfaces
     public interface IOrderRepository
     {
         Task AddAsync(Order order);
+        Task<List<Order>> GetOrdersByUserIdAsync(Guid userId);
+        Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId);
+
     }
 }
