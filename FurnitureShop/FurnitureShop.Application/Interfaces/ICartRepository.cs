@@ -12,5 +12,7 @@ namespace FurnitureShop.Application.Interfaces
         Task<Cart?> GetByUserIdAsync(Guid userId);
         Task AddAsync(Cart cart);
         Task UpdateAsync(Cart cart);
+        Task ClearCartAsync(Guid cartId);
+
     }
 }

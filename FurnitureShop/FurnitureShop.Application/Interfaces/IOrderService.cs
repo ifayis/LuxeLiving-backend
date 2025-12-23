@@ -1,4 +1,4 @@
-﻿using FurnitureShop.Domain.Enitities;
+﻿using FurnitureShop.Application.DTOs.Order;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces
 {
-    public interface ICategoryRepository
+    public interface IOrderService
     {
-        Task<Category?> GetByIdAsync(int id);
-
+        Task CheckoutAsync(Guid userId, CheckoutRequestDto request);
     }
 }

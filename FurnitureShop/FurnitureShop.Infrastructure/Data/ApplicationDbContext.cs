@@ -18,6 +18,9 @@ namespace FurnitureShop.Infrastructure.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
         public  DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
     }
 }

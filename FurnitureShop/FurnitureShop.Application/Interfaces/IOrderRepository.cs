@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces
 {
-    public interface ICategoryRepository
+    public interface IOrderRepository
     {
-        Task<Category?> GetByIdAsync(int id);
-
+        Task AddAsync(Order order);
     }
 }

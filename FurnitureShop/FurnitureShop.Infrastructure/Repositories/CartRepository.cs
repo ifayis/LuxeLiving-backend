@@ -37,5 +37,13 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.Carts.Update(cart);
             await _context.SaveChangesAsync();
         }
+        public async Task ClearCartAsync(Guid cartId)
+        {
+            var items = _context.CartItems.Where(i => i.CartId == cartId);
+            _context.CartItems.RemoveRange(items);
+            await _context.SaveChangesAsync();
+        }
+
     }
+
 }
