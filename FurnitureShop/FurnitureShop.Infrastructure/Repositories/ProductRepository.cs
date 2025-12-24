@@ -33,5 +33,11 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .Include(p => p.Category)
                 .ToListAsync();
         }
+
+        public async Task AddAsync(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+        }
     }
 }

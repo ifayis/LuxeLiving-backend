@@ -11,5 +11,6 @@ namespace FurnitureShop.Application.Interfaces
     {
         Task<Product?> GetByIdAsync(int id);
         Task<IEnumerable<Product>> GetByCategoryIdAsync(int categoryId);
+        Task AddAsync(Product product);
     }
 }

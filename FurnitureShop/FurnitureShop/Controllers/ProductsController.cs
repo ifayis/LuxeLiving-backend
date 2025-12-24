@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Interfaces;
+﻿using FurnitureShop.Application.DTOs.Product;
+using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FurnitureShop.API.Controllers
@@ -14,7 +15,13 @@ namespace FurnitureShop.API.Controllers
             _productService = productService;
         }
 
-        // GET: api/products/{id}
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductRequestDto request)
+        {
+            await _productService.CreateAsync(request);
+            return Ok("Product created successfully");
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -26,7 +33,6 @@ namespace FurnitureShop.API.Controllers
             return Ok(product);
         }
 
-        // GET: api/products/category/{categoryId}
         [HttpGet("category/{categoryId:int}")]
         public async Task<IActionResult> GetByCategory(int categoryId)
         {
