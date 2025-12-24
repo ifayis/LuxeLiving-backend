@@ -18,12 +18,12 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<Product?> GetProductByIdAsync(int id)
+        public async Task<Product?> GetProductByIdAsync(Guid id)
         {
             return await _productRepository.GetByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId)
         {
             return await _productRepository.GetByCategoryIdAsync(categoryId);
         }

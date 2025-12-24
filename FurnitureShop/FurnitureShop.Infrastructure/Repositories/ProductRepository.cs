@@ -19,14 +19,14 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Product?> GetByIdAsync(int id)
+        public async Task<Product?> GetByIdAsync(Guid id)
         {
             return await _context.Products
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Product>> GetByCategoryIdAsync(int categoryId)
+        public async Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid categoryId)
         {
             return await _context.Products
                 .Where(p => p.CategoryId == categoryId)

@@ -23,7 +23,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetProductByIdAsync(id);
 
@@ -34,7 +34,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [HttpGet("category/{categoryId:int}")]
-        public async Task<IActionResult> GetByCategory(int categoryId)
+        public async Task<IActionResult> GetByCategory(Guid categoryId)
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
             return Ok(products);

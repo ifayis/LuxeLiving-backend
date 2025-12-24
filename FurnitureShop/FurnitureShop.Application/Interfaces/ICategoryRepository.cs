@@ -9,7 +9,7 @@ namespace FurnitureShop.Application.Interfaces
 {
     public interface ICategoryRepository
     {
-        Task<Category?> GetByIdAsync(int id);
+        Task<Category?> GetByIdAsync(Guid id);
 
     }
 }
