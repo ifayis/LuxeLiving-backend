@@ -22,7 +22,7 @@ namespace FurnitureShop.API.Controllers
             return Ok("Product created successfully");
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:Guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetProductByIdAsync(id);
@@ -33,7 +33,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(product);
         }
 
-        [HttpGet("category/{categoryId:int}")]
+        [HttpGet("category/{categoryId:Guid}")]
         public async Task<IActionResult> GetByCategory(Guid categoryId)
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);

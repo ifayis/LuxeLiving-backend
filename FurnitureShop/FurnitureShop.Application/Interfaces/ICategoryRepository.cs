@@ -9,6 +9,7 @@ namespace FurnitureShop.Application.Interfaces
 {
     public interface ICategoryRepository
     {
+        Task AddAsync(Category category);
         Task<Category?> GetByIdAsync(Guid id);
 
     }

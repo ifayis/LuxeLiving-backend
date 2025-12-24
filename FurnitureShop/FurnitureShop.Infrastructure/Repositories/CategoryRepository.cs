@@ -19,10 +19,15 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task AddAsync(Category category)
+        {
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Category?> GetByIdAsync(Guid id)
         {
             return await _context.Categories
-                .Include(c => c.Products)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
     }
