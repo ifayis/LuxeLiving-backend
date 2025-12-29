@@ -1,5 +1,4 @@
-﻿using FurnitureShop.API.Common;
-using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -21,24 +20,47 @@ public class CartController : ControllerBase
     }
 
     [HttpPost("add")]
-    [Authorize]
-    public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
+    public async Task<IActionResult> AddToCart(AddToCartRequestDto request)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(
-                ApiResponse<object>.Fail(
-                    "Validation failed",
-                    ModelState.ToErrorDictionary(),
-                    400
-                )
-            );
-        }
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-
-        await _cartService.AddToCartAsync(userId, request);
-        return Ok(ApiResponse<string>.Success("Item added to cart"));
+        var userId = GetUserId();
+        var result = await _cartService.AddToCartAsync(userId, request);
+        return StatusCode(result.StatusCode, result);
     }
 
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyCart()
+    {
+        var userId = GetUserId();
+        var result = await _cartService.GetMyCartAsync(userId);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateItem(UpdateCartItemDto request)
+    {
+        var userId = GetUserId();
+        var result = await _cartService.UpdateItemAsync(userId, request);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    [HttpDelete("remove/{itemId}")]
+    public async Task<IActionResult> RemoveItem(Guid itemId)
+    {
+        var userId = GetUserId();
+        var result = await _cartService.RemoveItemAsync(userId, itemId);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    [HttpDelete("clear")]
+    public async Task<IActionResult> ClearCart()
+    {
+        var userId = GetUserId();
+        var result = await _cartService.ClearCartAsync(userId);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    private Guid GetUserId()
+    {
+        return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    }
 }

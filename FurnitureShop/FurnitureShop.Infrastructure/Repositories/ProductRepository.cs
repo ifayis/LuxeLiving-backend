@@ -34,6 +34,12 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> GetAll()
+        {
+            return await _context.Products
+                .ToListAsync();
+        }
+
         public async Task AddAsync(Product product)
         {
             _context.Products.Add(product);

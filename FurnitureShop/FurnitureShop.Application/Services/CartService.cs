@@ -1,10 +1,9 @@
-﻿using FurnitureShop.Application.DTOs.Cart;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Services
@@ -18,7 +17,7 @@ namespace FurnitureShop.Application.Services
             _cartRepository = cartRepository;
         }
 
-        public async Task AddToCartAsync(Guid userId, AddToCartRequestDto request)
+        public async Task<ApiResponse<string>> AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
@@ -27,18 +26,9 @@ namespace FurnitureShop.Application.Services
                 cart = new Cart
                 {
                     Id = Guid.NewGuid(),
-                    UserId = userId
+                    UserId = userId,
+                    Items = new List<CartItem>()
                 };
-
-                cart.Items.Add(new CartItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductId = request.ProductId,
-                    Quantity = request.Quantity
-                });
-
-                await _cartRepository.AddAsync(cart);
-                return;
             }
 
             var existingItem = cart.Items
@@ -58,7 +48,85 @@ namespace FurnitureShop.Application.Services
                 });
             }
 
+            if (cart.Id == Guid.Empty)
+                await _cartRepository.AddAsync(cart);
+            else
+                await _cartRepository.UpdateAsync(cart);
+
+            return ApiResponse<string>.Success("Item added to cart");
+        }
+
+        public async Task<ApiResponse<CartResponseDto>> GetMyCartAsync(Guid userId)
+        {
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+
+            if (cart == null || !cart.Items.Any())
+            {
+                return ApiResponse<CartResponseDto>.Fail("Cart is empty", 404);
+            }
+
+            var response = new CartResponseDto
+            {
+                CartId = cart.Id,
+                Items = cart.Items.Select(i => new CartItemResponseDto
+                {
+                    CartItemId = i.Id,
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity
+                }).ToList()
+            };
+
+            return ApiResponse<CartResponseDto>.Success(response);
+        }
+
+        public async Task<ApiResponse<string>> UpdateItemAsync(Guid userId, UpdateCartItemDto request)
+        {
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+
+            if (cart == null)
+                return ApiResponse<string>.Fail("Cart not found", 404);
+
+            var item = cart.Items.FirstOrDefault(i => i.Id == request.CartItemId);
+
+            if (item == null)
+                return ApiResponse<string>.Fail("Item not found", 404);
+
+            item.Quantity = request.Quantity;
+
             await _cartRepository.UpdateAsync(cart);
+
+            return ApiResponse<string>.Success("Cart item updated");
+        }
+
+        public async Task<ApiResponse<string>> RemoveItemAsync(Guid userId, Guid itemId)
+        {
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+
+            if (cart == null)
+                return ApiResponse<string>.Fail("Cart not found", 404);
+
+            var item = cart.Items.FirstOrDefault(i => i.Id == itemId);
+
+            if (item == null)
+                return ApiResponse<string>.Fail("Item not found", 404);
+
+            cart.Items.Remove(item);
+
+            await _cartRepository.UpdateAsync(cart);
+
+            return ApiResponse<string>.Success("Item removed from cart");
+        }
+
+        public async Task<ApiResponse<string>> ClearCartAsync(Guid userId)
+        {
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+
+            if (cart == null || !cart.Items.Any())
+                return ApiResponse<string>.Fail("Cart already empty", 400);
+
+            await _cartRepository.ClearCartAsync(cart.Id);
+
+            return ApiResponse<string>.Success("Cart cleared");
         }
     }
 }

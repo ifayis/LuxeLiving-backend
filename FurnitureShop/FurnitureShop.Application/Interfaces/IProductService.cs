@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Product;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Domain.Enitities;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace FurnitureShop.Application.Interfaces
         Task<ProductResponseDto?> GetProductByIdAsync(Guid id);
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId);
         Task CreateAsync(CreateProductRequestDto request);
+        Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProducts();
     }
 }

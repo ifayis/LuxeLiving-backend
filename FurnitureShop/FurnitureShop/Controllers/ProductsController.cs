@@ -40,5 +40,13 @@ namespace FurnitureShop.API.Controllers
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
             return Ok(products);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _productService.GetAllProducts();
+            return StatusCode(result.StatusCode, result);
+        }
+
     }
 }

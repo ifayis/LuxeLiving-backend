@@ -1,14 +1,17 @@
-﻿using FurnitureShop.Application.DTOs.Cart;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Cart;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace FurnitureShop.Application.Interfaces
+public interface ICartService
 {
-    public interface ICartService
-    {
-        Task AddToCartAsync(Guid userId, AddToCartRequestDto request);
-    }
+    Task<ApiResponse<string>> AddToCartAsync(Guid userId, AddToCartRequestDto request);
+
+    Task<ApiResponse<CartResponseDto>> GetMyCartAsync(Guid userId);
+
+    Task<ApiResponse<string>> UpdateItemAsync(Guid userId, UpdateCartItemDto request);
+
+    Task<ApiResponse<string>> RemoveItemAsync(Guid userId, Guid itemId);
+
+    Task<ApiResponse<string>> ClearCartAsync(Guid userId);
 }

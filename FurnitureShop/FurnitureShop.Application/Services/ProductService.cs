@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Product;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using System;
@@ -53,5 +54,30 @@ namespace FurnitureShop.Application.Services
 
             await _productRepository.AddAsync(product);
         }
+
+        public async Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProducts()
+        {
+            var products = await _productRepository.GetAll();
+
+            if (products == null || !products.Any())
+            {
+                return ApiResponse<IEnumerable<ProductResponseDto>>
+                    .Fail("No products found", 404);
+            }
+
+            var productDtos = products.Select(p => new ProductResponseDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description,
+                CategoryId = p.CategoryId,
+                ImageUrl = p.ImageUrl
+            });
+
+            return ApiResponse<IEnumerable<ProductResponseDto>>
+                .Success(productDtos, "Products retrieved successfully");
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Interfaces;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,11 @@ namespace FurnitureShop.Infrastructure.Repositories
             var items = _context.CartItems.Where(i => i.CartId == cartId);
             _context.CartItems.RemoveRange(items);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Cart>> getall()
+        {
+           return await _context.Carts.ToListAsync();
         }
 
     }

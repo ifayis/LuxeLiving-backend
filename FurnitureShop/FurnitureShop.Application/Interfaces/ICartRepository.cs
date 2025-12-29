@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Domain.Enitities;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Domain.Enitities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace FurnitureShop.Application.Interfaces
         Task AddAsync(Cart cart);
         Task UpdateAsync(Cart cart);
         Task ClearCartAsync(Guid cartId);
+        Task <IEnumerable<Cart>>getall();
 
     }
 }
