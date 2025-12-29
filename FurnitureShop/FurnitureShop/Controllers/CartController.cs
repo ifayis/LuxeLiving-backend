@@ -1,4 +1,6 @@
-﻿using FurnitureShop.Application.DTOs.Cart;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +21,24 @@ public class CartController : ControllerBase
     }
 
     [HttpPost("add")]
-    public async Task<IActionResult> AddToCart(AddToCartRequestDto request)
+    [Authorize]
+    public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(
+                ApiResponse<object>.Fail(
+                    "Validation failed",
+                    ModelState.ToErrorDictionary(),
+                    400
+                )
+            );
+        }
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
 
         await _cartService.AddToCartAsync(userId, request);
-
-        return Ok("Product added to cart");
+        return Ok(ApiResponse<string>.Success("Item added to cart"));
     }
+
 }
