@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Product;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,9 +29,9 @@ namespace FurnitureShop.API.Controllers
             var product = await _productService.GetProductByIdAsync(id);
 
             if (product == null)
-                return NotFound("Product not found");
+                return NotFound(ApiResponse<string>.Fail("Product not found", 404));
 
-            return Ok(product);
+            return Ok(ApiResponse<ProductResponseDto>.Success(product));
         }
 
         [HttpGet("category/{categoryId:Guid}")]

@@ -44,7 +44,7 @@ namespace FurnitureShop.Application.Services
             await _userRepository.AddAsync(user);
         }
 
-        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+        public async Task<string?> LoginAsync(LoginRequestDto request)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
 
@@ -58,10 +58,7 @@ namespace FurnitureShop.Application.Services
 
             var token = _tokenService.GenerateToken(user);
 
-            return new LoginResponseDto
-            {
-                Token = token
-            };
+            return token;
         }
 
     }

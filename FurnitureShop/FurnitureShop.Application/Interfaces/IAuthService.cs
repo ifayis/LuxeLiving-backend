@@ -10,6 +10,6 @@ namespace FurnitureShop.Application.Interfaces
     public interface IAuthService
     {
         Task RegisterAsync(RegisterRequestDto request);
-        Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
+        Task<string?> LoginAsync(LoginRequestDto request);
     }
 }

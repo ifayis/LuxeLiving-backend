@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Auth;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Auth;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,12 +26,21 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
-            var result = await _authService.LoginAsync(request);
+            var token = await _authService.LoginAsync(request);
 
-            if (result == null)
-                return Unauthorized("Invalid email or password");
+            if (token == null)
+            {
+                return Unauthorized(
+                    ApiResponse<string>.Fail("Invalid credentials", 401)
+                );
+            }
 
-            return Ok(result);
+            var response = ApiResponse<LoginResponseDto>.Success(
+                new LoginResponseDto { Token = token },
+                "Login successful"
+            );
+
+            return Ok(response);
         }
 
     }
