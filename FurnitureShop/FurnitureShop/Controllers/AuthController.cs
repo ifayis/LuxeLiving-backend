@@ -2,6 +2,7 @@
 using FurnitureShop.Application.DTOs.Auth;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using FurnitureShop.API.Common;
 
 namespace FurnitureShop.API.Controllers
 {
@@ -19,8 +20,21 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                     ApiResponse<object>.Fail(
+                     "Validation failed",
+                     ModelState.ToErrorDictionary(),
+                     400
+                     )
+                );
+
+            }
+
             await _authService.RegisterAsync(request);
-            return Ok("User registered successfully");
+
+            return Ok(ApiResponse<string>.Success("User registered successfully"));
         }
 
         [HttpPost("login")]

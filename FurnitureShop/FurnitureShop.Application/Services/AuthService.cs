@@ -35,8 +35,9 @@ namespace FurnitureShop.Application.Services
 
             var user = new User
             {
-                FullName = request.FullName,
-                Email = request.Email,
+                Id = Guid.NewGuid(),
+                FullName = request.FullName.Trim(),
+                Email = request.Email.ToLower().Trim(),
                 PasswordHash = passwordHash,
                 Role = "User"
             };
