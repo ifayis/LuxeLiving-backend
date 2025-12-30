@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.DTOs.Order;
-using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
 using System;
 using System.Collections.Generic;

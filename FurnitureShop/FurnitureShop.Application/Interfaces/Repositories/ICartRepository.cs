@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FurnitureShop.Domain.Entities;
 
-namespace FurnitureShop.Application.Interfaces
+namespace FurnitureShop.Application.Interfaces.Repositories
 {
     public interface ICartRepository
     {

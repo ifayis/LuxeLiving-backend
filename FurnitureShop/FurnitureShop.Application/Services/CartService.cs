@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.DTOs.Cart;
-using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 using System;

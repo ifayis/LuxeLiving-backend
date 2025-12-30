@@ -1,5 +1,5 @@
 ﻿using FurnitureShop.Application.DTOs.Category;
-using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FurnitureShop.API.Controllers;

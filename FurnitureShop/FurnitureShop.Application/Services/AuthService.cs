@@ -1,5 +1,4 @@
 ﻿using FurnitureShop.Application.DTOs.Auth;
-using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Enitities;
 using BCrypt.Net;
 using System;
@@ -7,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 
 namespace FurnitureShop.Application.Services
 {

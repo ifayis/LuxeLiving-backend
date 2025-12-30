@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FurnitureShop.Application.DTOs.Cart;
-using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

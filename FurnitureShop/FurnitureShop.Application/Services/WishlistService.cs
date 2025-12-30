@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.DTOs.Wishlist;
-using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Services

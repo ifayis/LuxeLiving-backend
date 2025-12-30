@@ -1,4 +1,3 @@
-using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Application.Services;
 using FurnitureShop.Infrastructure.Data;
 using FurnitureShop.Infrastructure.Repositories;
@@ -7,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

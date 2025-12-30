@@ -1,8 +1,8 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Auth;
-using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FurnitureShop.API.Common;
+using FurnitureShop.Application.Interfaces.Services;
 
 namespace FurnitureShop.API.Controllers
 {

@@ -1,4 +1,4 @@
-﻿using FurnitureShop.Application.Interfaces;
+﻿using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

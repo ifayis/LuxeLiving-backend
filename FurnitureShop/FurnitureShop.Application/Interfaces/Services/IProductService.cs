@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FurnitureShop.Application.Interfaces
+namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IProductService
     {

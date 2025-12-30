@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FurnitureShop.Application.DTOs.Cart;
 
-namespace FurnitureShop.Application.Interfaces
+namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface ICartService
     {

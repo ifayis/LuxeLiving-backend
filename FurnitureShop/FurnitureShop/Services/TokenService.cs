@@ -1,4 +1,4 @@
-﻿using FurnitureShop.Application.Interfaces;
+﻿using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

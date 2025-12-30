@@ -1,6 +1,6 @@
 ﻿using FurnitureShop.Application.DTOs.Wishlist;
 
-namespace FurnitureShop.Application.Interfaces
+namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IWishlistService
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FurnitureShop.Application.Interfaces
+namespace FurnitureShop.Application.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
