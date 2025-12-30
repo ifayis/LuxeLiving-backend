@@ -1,14 +1,15 @@
 ﻿using FurnitureShop.Application.Interfaces;
 using FurnitureShop.Domain.Entities;
+using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
     public class WishlistRepository : IWishlistRepository
     {
-        private readonly FurnitureShopDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public WishlistRepository(FurnitureShopDbContext context)
+        public WishlistRepository(ApplicationDbContext context)
         {
             _context = context;
         }
