@@ -29,7 +29,7 @@ namespace FurnitureShop.Application.Services
             if (cart == null || !cart.Items.Any())
                 throw new Exception("Cart is empty");
 
-            var total = cart.Items.Sum(i => i.Quantity * 100); // dummy price logic
+            var total = cart.Items.Sum(i => i.Quantity * 100);
 
             var order = new Order
             {
@@ -42,14 +42,15 @@ namespace FurnitureShop.Application.Services
                     Id = Guid.NewGuid(),
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
-                    Price = 100 // dummy price
+                    Price = 0
                 }).ToList()
             };
 
             await _orderRepository.AddAsync(order);
 
             if (order.Status == "Paid")
-                await _cartRepository.ClearCartAsync(cart.Id);
+                await _cartRepository.ClearCartAsync(userId);
+
         }
         public async Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId)
         {
