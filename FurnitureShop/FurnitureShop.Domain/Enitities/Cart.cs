@@ -1,10 +1,8 @@
-﻿using System;
+﻿using FurnitureShop.Domain.Enitities;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FurnitureShop.Domain.Enitities
+namespace FurnitureShop.Domain.Entities
 {
     public class Cart
     {
