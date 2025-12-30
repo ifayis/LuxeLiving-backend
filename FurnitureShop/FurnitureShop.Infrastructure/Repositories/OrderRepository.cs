@@ -40,5 +40,18 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
         }
+
+        public async Task UpdateAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

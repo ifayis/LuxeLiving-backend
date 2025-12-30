@@ -90,5 +90,41 @@ namespace FurnitureShop.Application.Services
                 }).ToList()
             };
         }
+
+        public async Task<OrderResponseDto?> CancelOrderAsync(Guid userId, Guid orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
+
+            if (order == null)
+                return null;
+
+            // Business rule
+            if (order.Status == "Cancelled")
+                throw new Exception("Order already cancelled");
+
+            if (order.Status == "Paid")
+                throw new Exception("Paid orders cannot be cancelled");
+
+            order.Status = "Cancelled";
+
+            await _orderRepository.UpdateAsync(order);
+
+            return new OrderResponseDto
+            {
+                OrderId = order.Id,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status,
+                CreatedAt = order.CreatedAt,
+                Items = order.Items.Select(i => new OrderItemResponseDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+        }
+
+
+
     }
 }
