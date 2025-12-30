@@ -1,0 +1,53 @@
+﻿using FurnitureShop.Application.Interfaces;
+using FurnitureShop.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace FurnitureShop.Infrastructure.Repositories
+{
+    public class WishlistRepository : IWishlistRepository
+    {
+        private readonly FurnitureShopDbContext _context;
+
+        public WishlistRepository(FurnitureShopDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Wishlist?> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Wishlists
+                .Include(w => w.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(w => w.UserId == userId);
+        }
+
+        public async Task<Wishlist?> GetByIdAsync(Guid id)
+        {
+            return await _context.Wishlists
+                .Include(w => w.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(w => w.Id == id);
+        }
+
+        public async Task AddAsync(Wishlist wishlist)
+        {
+            _context.Wishlists.Add(wishlist);
+            await _context.SaveChangesAsync();
+        }
+
+        public void RemoveItem(WishlistItem item)
+        {
+            _context.WishlistItems.Remove(item);
+        }
+
+        public void RemoveAll(Wishlist wishlist)
+        {
+            _context.WishlistItems.RemoveRange(wishlist.Items);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
+}
