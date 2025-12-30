@@ -120,6 +120,8 @@ app.UseCors("FrontendPolicy");
 
 app.UseAuthentication();
 
+app.UseMiddleware<FurnitureShop.API.Middlewares.ExceptionHandlingMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();

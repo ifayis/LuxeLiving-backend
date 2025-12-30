@@ -61,6 +61,6 @@ public class CartController : ControllerBase
 
     private Guid GetUserId()
     {
-        return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Guid.Parse(User.FindFirstValue("userid")!);
     }
 }
