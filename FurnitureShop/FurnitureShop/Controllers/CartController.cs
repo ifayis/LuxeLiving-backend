@@ -1,66 +1,68 @@
-﻿using FurnitureShop.Application.Common;
+﻿using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
-namespace FurnitureShop.API.Controllers;
-
-[ApiController]
-[Route("api/cart")]
-[Authorize]
-public class CartController : ControllerBase
+namespace FurnitureShop.API.Controllers
 {
-    private readonly ICartService _cartService;
-
-    public CartController(ICartService cartService)
+    [ApiController]
+    [Route("api/cart")]
+    [Authorize]
+    public class CartController : ControllerBase
     {
-        _cartService = cartService;
-    }
+        private readonly ICartService _cartService;
 
-    [HttpPost("add")]
-    public async Task<IActionResult> AddToCart(AddToCartRequestDto request)
-    {
-        var userId = GetUserId();
-        var result = await _cartService.AddToCartAsync(userId, request);
-        return StatusCode(result.StatusCode, result);
-    }
+        public CartController(ICartService cartService)
+        {
+            _cartService = cartService;
+        }
 
-    [HttpGet("my")]
-    public async Task<IActionResult> GetMyCart()
-    {
-        var userId = GetUserId();
-        var result = await _cartService.GetMyCartAsync(userId);
-        return StatusCode(result.StatusCode, result);
-    }
+        private Guid GetUserId()
+        {
+            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        }
 
-    [HttpPut("update")]
-    public async Task<IActionResult> UpdateItem(UpdateCartItemDto request)
-    {
-        var userId = GetUserId();
-        var result = await _cartService.UpdateItemAsync(userId, request);
-        return StatusCode(result.StatusCode, result);
-    }
+        // POST
+        [HttpPost("add")]
+        public async Task<IActionResult> Add(AddToCartRequestDto request)
+        {
+            await _cartService.AddToCartAsync(GetUserId(), request);
+            return Ok("Item added to cart");
+        }
 
-    [HttpDelete("remove/{itemId}")]
-    public async Task<IActionResult> RemoveItem(Guid itemId)
-    {
-        var userId = GetUserId();
-        var result = await _cartService.RemoveItemAsync(userId, itemId);
-        return StatusCode(result.StatusCode, result);
-    }
+        // GET ALL
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyCart()
+        {
+            var cart = await _cartService.GetMyCartAsync(GetUserId());
+            return Ok(cart);
+        }
 
-    [HttpDelete("clear")]
-    public async Task<IActionResult> ClearCart()
-    {
-        var userId = GetUserId();
-        var result = await _cartService.ClearCartAsync(userId);
-        return StatusCode(result.StatusCode, result);
-    }
+        // GET BY ID
+        [HttpGet("{cartId:guid}")]
+        public async Task<IActionResult> GetById(Guid cartId)
+        {
+            var cart = await _cartService.GetCartByIdAsync(cartId);
+            return cart == null ? NotFound() : Ok(cart);
+        }
 
-    private Guid GetUserId()
-    {
-        return Guid.Parse(User.FindFirstValue("userid")!);
+        // DELETE ITEM
+        [HttpDelete("remove/{productId:guid}")]
+        public async Task<IActionResult> Remove(Guid productId)
+        {
+            await _cartService.RemoveItemAsync(GetUserId(), productId);
+            return Ok("Item removed");
+        }
+
+        // CLEAR ALL
+        [HttpDelete("clear")]
+        public async Task<IActionResult> Clear()
+        {
+            await _cartService.ClearCartAsync(GetUserId());
+            return Ok("Cart cleared");
+        }
     }
 }

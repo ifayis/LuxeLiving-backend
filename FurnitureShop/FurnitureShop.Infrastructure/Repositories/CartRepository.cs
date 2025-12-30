@@ -1,13 +1,9 @@
-﻿using FurnitureShop.Application.Common;
+﻿using System;
+using System.Threading.Tasks;
 using FurnitureShop.Application.Interfaces;
-using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Entities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -27,29 +23,22 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
 
+        public async Task<Cart?> GetByIdAsync(Guid cartId)
+        {
+            return await _context.Carts
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+        }
+
         public async Task AddAsync(Cart cart)
         {
             _context.Carts.Add(cart);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Cart cart)
+        public async Task SaveChangesAsync()
         {
-            _context.Carts.Update(cart);
             await _context.SaveChangesAsync();
         }
-        public async Task ClearCartAsync(Guid cartId)
-        {
-            var items = _context.CartItems.Where(i => i.CartId == cartId);
-            _context.CartItems.RemoveRange(items);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<IEnumerable<Cart>> getall()
-        {
-           return await _context.Carts.ToListAsync();
-        }
-
     }
-
 }
