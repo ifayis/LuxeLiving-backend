@@ -1,8 +1,8 @@
-﻿using FurnitureShop.Application.Common;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Auth;
-using Microsoft.AspNetCore.Mvc;
-using FurnitureShop.API.Common;
 using FurnitureShop.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FurnitureShop.API.Controllers
 {
@@ -22,13 +22,12 @@ namespace FurnitureShop.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState.ToErrorDictionary());
+                return BadRequest(ApiResponse<object>.Fail(ErrorMessages.ValidationFailed,ModelState.ToErrorDictionary(),400));
             }
 
             await _authService.RegisterAsync(request);
 
-            return Ok("User registered successfully");
-            ;
+            return Ok(ApiResponse<object>.Success(null,ResponseMessages.UserRegistered));
         }
 
         [HttpPost("login")]
@@ -38,10 +37,10 @@ namespace FurnitureShop.API.Controllers
 
             if (token == null)
             {
-                throw new UnauthorizedAccessException("Invalid credentials");
+                throw new UnauthorizedAccessException( ErrorMessages.InvalidCredentials);
             }
 
-            return Ok(new LoginResponseDto { Token = token });
+            return Ok( ApiResponse<LoginResponseDto>.Success(new LoginResponseDto { Token = token }, ResponseMessages.LoginSuccess));
         }
     }
 }
