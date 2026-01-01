@@ -23,5 +23,6 @@
         public const string LoginSuccess = "Login successful";
         public const string InvalidCredentials = "Invalid credentials";
         public const string UserRegistered = "User registered successfully";
+        public const string Unauthorized = "Unauthorized access";
     }
 }
