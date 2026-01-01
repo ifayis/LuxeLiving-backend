@@ -5,63 +5,86 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace FurnitureShop.API.Controllers;
-
-[ApiController]
-[Route("api/orders")]
-[Authorize]
-public class OrdersController : ControllerBase
+namespace FurnitureShop.API.Controllers
 {
-    private readonly IOrderService _orderService;
-    private Guid GetUserId()
+    [ApiController]
+    [Route("api/orders")]
+    [Authorize]
+    public class OrdersController : ControllerBase
     {
-        return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        private readonly IOrderService _orderService;
+
+        public OrdersController(IOrderService orderService)
+        {
+            _orderService = orderService;
+        }
+
+        private Guid GetUserId()
+        {
+            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        }
+
+        [HttpPost("add")]
+        public async Task<IActionResult> Checkout(CheckoutRequestDto request)
+        {
+            await _orderService.CheckoutAsync(GetUserId(), request);
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.Success
+                )
+            );
+        }
+
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyOrders()
+        {
+            var orders = await _orderService.GetMyOrdersAsync(GetUserId());
+
+            return Ok(
+                ApiResponse<List<OrderResponseDto>>.Success(orders)
+            );
+        }
+
+        [HttpGet("my/{orderId:guid}")]
+        public async Task<IActionResult> GetMyOrder(Guid orderId)
+        {
+            var order = await _orderService.GetMyOrderByIdAsync(GetUserId(), orderId);
+
+            if (order == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<OrderResponseDto>.Success(order)
+            );
+        }
+
+        [HttpPut("cancel/{orderId:guid}")]
+        public async Task<IActionResult> CancelOrder(Guid orderId)
+        {
+            var order = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+
+            if (order == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<OrderResponseDto>.Success(order)
+            );
+        }
     }
-
-    public OrdersController(IOrderService orderService)
-    {
-        _orderService = orderService;
-    }
-
-    [HttpPost("Add")]
-    public async Task<IActionResult> Checkout(CheckoutRequestDto request)
-    {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        await _orderService.CheckoutAsync(userId, request);
-        return Ok("Order placed successfully");
-    }
-    [HttpGet("my")]
-    public async Task<IActionResult> GetMyOrders()
-    {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var orders = await _orderService.GetMyOrdersAsync(userId);
-        return Ok(orders);
-    }
-
-    [HttpGet("my/{orderId}")]
-    public async Task<IActionResult> GetMyOrder(Guid orderId)
-    {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var order = await _orderService.GetMyOrderByIdAsync(userId, orderId);
-
-        if (order == null)
-            return NotFound("Order not found");
-
-        return Ok(order);
-    }
-
-    [HttpPut("cancel/{orderId}")]
-    public async Task<IActionResult> CancelOrder(Guid orderId)
-    {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-        var order = await _orderService.CancelOrderAsync(userId, orderId);
-
-        if (order == null)
-            return NotFound("Order not found");
-
-        return Ok(order);
-    }
-
-
 }
