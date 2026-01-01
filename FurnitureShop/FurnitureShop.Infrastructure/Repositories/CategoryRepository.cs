@@ -21,14 +21,32 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            await _context.Categories.AddAsync(category);
+        }
+
+        public async Task<List<Category>> GetAllAsync()
+        {
+            return await _context.Categories.ToListAsync();
         }
 
         public async Task<Category?> GetByIdAsync(Guid id)
         {
-            return await _context.Categories
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public async Task DeleteAsync(Category category)
+        {
+            _context.Categories.Remove(category);
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            _context.Categories.RemoveRange(_context.Categories);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }
