@@ -22,19 +22,13 @@ namespace FurnitureShop.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(
-                     ApiResponse<object>.Fail(
-                     "Validation failed",
-                     ModelState.ToErrorDictionary(),
-                     400
-                     )
-                );
-
+                return BadRequest(ModelState.ToErrorDictionary());
             }
 
             await _authService.RegisterAsync(request);
 
-            return Ok(ApiResponse<string>.Success("User registered successfully"));
+            return Ok("User registered successfully");
+            ;
         }
 
         [HttpPost("login")]
@@ -44,18 +38,10 @@ namespace FurnitureShop.API.Controllers
 
             if (token == null)
             {
-                return Unauthorized(
-                    ApiResponse<string>.Fail("Invalid credentials", 401)
-                );
+                throw new UnauthorizedAccessException("Invalid credentials");
             }
 
-            var response = ApiResponse<LoginResponseDto>.Success(
-                new LoginResponseDto { Token = token },
-                "Login successful"
-            );
-
-            return Ok(response);
+            return Ok(new LoginResponseDto { Token = token });
         }
-
     }
 }

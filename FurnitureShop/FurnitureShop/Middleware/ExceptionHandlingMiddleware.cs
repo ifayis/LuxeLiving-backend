@@ -39,10 +39,13 @@ namespace FurnitureShop.API.Middlewares
                     Message = ex.Message
                 });
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await WriteResponse(context, "Unauthorized access");
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                await context.Response.WriteAsJsonAsync(
+                    ApiResponse<object>.Fail(ex.Message, 401)
+                );
             }
             catch (Exception ex)
             {
