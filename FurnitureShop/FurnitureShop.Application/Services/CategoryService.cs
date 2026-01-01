@@ -19,8 +19,13 @@ namespace FurnitureShop.Application.Services
             _categoryRepository = categoryRepository;
         }
 
-        public async Task CreateAsync(CreateCategoryRequestDto request)
+        public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
         {
+            if (await _categoryRepository.ExistsByNameAsync(request.Name))
+            {
+                throw new InvalidOperationException("Category already exists");
+            }
+
             var category = new Category
             {
                 Id = Guid.NewGuid(),
@@ -28,12 +33,15 @@ namespace FurnitureShop.Application.Services
                 IsActive = true
             };
 
-            if (await _categoryRepository.ExistsByNameAsync(request.Name))
-            {
-                throw new InvalidOperationException("Category already exists");
-            }
-
+            await _categoryRepository.AddAsync(category);
             await _categoryRepository.SaveChangesAsync();
+
+            return new CategoryResponseDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                IsActive = category.IsActive
+            };
         }
 
         public async Task<List<CategoryResponseDto>> GetAllAsync()
