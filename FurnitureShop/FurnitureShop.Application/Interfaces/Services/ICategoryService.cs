@@ -1,10 +1,4 @@
-﻿using FurnitureShop.Application.DTOs.Product;
-using FurnitureShop.Application.DTOs.Category;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Application.DTOs.Category;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {

@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Category;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Category;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,43 +21,58 @@ namespace FurnitureShop.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryRequestDto request)
         {
-            await _categoryService.CreateAsync(request);
-            return Ok("Category created successfully");
+            var category = await _categoryService.CreateAsync(request);
+
+            return Ok( ApiResponse<CategoryResponseDto>.Success(category,ResponseMessages.CategoryCreated)
+            );
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var categories = await _categoryService.GetAllAsync();
-            return Ok(categories);
+
+            return Ok(ApiResponse<List<CategoryResponseDto>>.Success(categories)
+            );
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var category = await _categoryService.GetByIdAsync(id);
-            if (category == null)
-                return NotFound("Category not found");
 
-            return Ok(category);
+            if (category == null)
+            {
+                return NotFound(ApiResponse<object>.Fail(ResponseMessages.NotFound, 404)
+                );
+            }
+
+            return Ok(ApiResponse<CategoryResponseDto>.Success(category)
+            );
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteById(Guid id)
         {
             var deleted = await _categoryService.DeleteByIdAsync(id);
-            if (!deleted)
-                return NotFound("Category not found");
 
-            return Ok("Category deleted successfully");
+            if (!deleted)
+            {
+                return NotFound(ApiResponse<object>.Fail(ResponseMessages.NotFound,404)
+                );
+            }
+
+            return Ok(ApiResponse<object>.Success(null,ResponseMessages.CategoryDeleted)
+            );
         }
 
-        [HttpDelete]
+        [HttpDelete("clear")]
         public async Task<IActionResult> DeleteAll()
         {
             await _categoryService.DeleteAllAsync();
-            return Ok("All categories deleted successfully");
+
+            return Ok(ApiResponse<object>.Success(null, ResponseMessages.CategoriesDeleted)
+            );
         }
     }
-
 }

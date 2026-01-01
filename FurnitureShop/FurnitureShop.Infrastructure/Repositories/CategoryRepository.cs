@@ -2,11 +2,6 @@
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -43,12 +38,12 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             _context.Categories.RemoveRange(_context.Categories);
         }
+
         public async Task<bool> ExistsByNameAsync(string name)
         {
             return await _context.Categories
                 .AnyAsync(c => c.Name.ToLower() == name.ToLower());
         }
-
 
         public async Task SaveChangesAsync()
         {
