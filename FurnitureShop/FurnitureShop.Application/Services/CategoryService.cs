@@ -28,7 +28,11 @@ namespace FurnitureShop.Application.Services
                 IsActive = true
             };
 
-            await _categoryRepository.AddAsync(category);
+            if (await _categoryRepository.ExistsByNameAsync(request.Name))
+            {
+                throw new InvalidOperationException("Category already exists");
+            }
+
             await _categoryRepository.SaveChangesAsync();
         }
 

@@ -43,6 +43,12 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             _context.Categories.RemoveRange(_context.Categories);
         }
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.Categories
+                .AnyAsync(c => c.Name.ToLower() == name.ToLower());
+        }
+
 
         public async Task SaveChangesAsync()
         {

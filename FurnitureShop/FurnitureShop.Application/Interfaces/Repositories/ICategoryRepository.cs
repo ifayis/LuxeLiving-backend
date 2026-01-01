@@ -14,6 +14,8 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<Category?> GetByIdAsync(Guid id);
         Task DeleteAsync(Category category);
         Task DeleteAllAsync();
+        Task<bool> ExistsByNameAsync(string name);
+
         Task SaveChangesAsync();
 
     }
