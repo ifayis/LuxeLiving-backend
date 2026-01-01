@@ -43,7 +43,7 @@ namespace FurnitureShop.API.Controllers
 
             if (category == null)
             {
-                return NotFound(ApiResponse<object>.Fail(ResponseMessages.NotFound, 404)
+                return NotFound(ApiResponse<object>.Fail(ErrorMessages.NotFound, 404)
                 );
             }
 
@@ -58,7 +58,7 @@ namespace FurnitureShop.API.Controllers
 
             if (!deleted)
             {
-                return NotFound(ApiResponse<object>.Fail(ResponseMessages.NotFound,404)
+                return NotFound(ApiResponse<object>.Fail(ErrorMessages.NotFound,404)
                 );
             }
 

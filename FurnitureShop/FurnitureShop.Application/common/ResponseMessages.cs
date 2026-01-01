@@ -4,9 +4,6 @@
     {
         // Common
         public const string Success = "Success";
-        public const string NotFound = "Resource not found";
-        public const string ValidationFailed = "Validation failed";
-        public const string AlreadyExists = "Resource already exists";
 
         // Category
         public const string CategoryCreated = "Category created successfully";
@@ -21,8 +18,6 @@
 
         // Auth
         public const string LoginSuccess = "Login successful";
-        public const string InvalidCredentials = "Invalid credentials";
         public const string UserRegistered = "User registered successfully";
-        public const string Unauthorized = "Unauthorized access";
     }
 }
