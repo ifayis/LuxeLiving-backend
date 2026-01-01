@@ -23,7 +23,11 @@ namespace FurnitureShop.API.Controllers
         {
             var category = await _categoryService.CreateAsync(request);
 
-            return Ok( ApiResponse<CategoryResponseDto>.Success(category,ResponseMessages.CategoryCreated)
+            return Ok(
+                ApiResponse<CategoryResponseDto>.Success(
+                    category,
+                    ResponseMessages.CategoryCreated
+                )
             );
         }
 
@@ -32,7 +36,8 @@ namespace FurnitureShop.API.Controllers
         {
             var categories = await _categoryService.GetAllAsync();
 
-            return Ok(ApiResponse<List<CategoryResponseDto>>.Success(categories)
+            return Ok(
+                ApiResponse<List<CategoryResponseDto>>.Success(categories)
             );
         }
 
@@ -43,11 +48,16 @@ namespace FurnitureShop.API.Controllers
 
             if (category == null)
             {
-                return NotFound(ApiResponse<object>.Fail(ErrorMessages.NotFound, 404)
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
                 );
             }
 
-            return Ok(ApiResponse<CategoryResponseDto>.Success(category)
+            return Ok(
+                ApiResponse<CategoryResponseDto>.Success(category)
             );
         }
 
@@ -58,11 +68,19 @@ namespace FurnitureShop.API.Controllers
 
             if (!deleted)
             {
-                return NotFound(ApiResponse<object>.Fail(ErrorMessages.NotFound,404)
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
                 );
             }
 
-            return Ok(ApiResponse<object>.Success(null,ResponseMessages.CategoryDeleted)
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.CategoryDeleted
+                )
             );
         }
 
@@ -71,7 +89,11 @@ namespace FurnitureShop.API.Controllers
         {
             await _categoryService.DeleteAllAsync();
 
-            return Ok(ApiResponse<object>.Success(null, ResponseMessages.CategoriesDeleted)
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.CategoriesDeleted
+                )
             );
         }
     }
