@@ -46,6 +46,13 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsAsync(string name, Guid categoryId)
+        {
+            return await _context.Products
+                .AnyAsync(p => p.Name == name && p.CategoryId == categoryId);
+        }
+
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

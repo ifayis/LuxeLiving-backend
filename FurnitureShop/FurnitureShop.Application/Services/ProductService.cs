@@ -43,6 +43,14 @@ namespace FurnitureShop.Application.Services
         }
         public async Task CreateAsync(CreateProductRequestDto request)
         {
+            var exists = await _productRepository.ExistsAsync(
+                request.Name,
+                request.CategoryId
+            );
+
+            if (exists)
+                throw new InvalidOperationException("Product already exists");
+
             var product = new Product
             {
                 Id = Guid.NewGuid(),
@@ -50,10 +58,12 @@ namespace FurnitureShop.Application.Services
                 Description = request.Description,
                 Price = request.Price,
                 ImageUrl = request.ImageUrl,
-                CategoryId = request.CategoryId
+                CategoryId = request.CategoryId,
+                IsActive = true
             };
 
             await _productRepository.AddAsync(product);
+            await _productRepository.SaveChangesAsync();
         }
 
         public async Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProducts()

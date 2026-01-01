@@ -30,6 +30,15 @@ namespace FurnitureShop.API.Middlewares
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await WriteResponse(context, "Invalid input", ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    StatusCode = 409,
+                    Message = ex.Message
+                });
+            }
             catch (UnauthorizedAccessException)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;

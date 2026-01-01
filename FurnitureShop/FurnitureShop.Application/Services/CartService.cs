@@ -18,7 +18,6 @@ namespace FurnitureShop.Application.Services
             _cartRepository = cartRepository;
         }
 
-        // POST
         public async Task AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
@@ -62,21 +61,18 @@ namespace FurnitureShop.Application.Services
             await _cartRepository.SaveChangesAsync();
         }
 
-        // GET ALL (my cart)
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
             return Map(cart);
         }
 
-        // GET BY ID
         public async Task<CartResponseDto?> GetCartByIdAsync(Guid cartId)
         {
             var cart = await _cartRepository.GetByIdAsync(cartId);
             return Map(cart);
         }
 
-        // DELETE ITEM
         public async Task RemoveItemAsync(Guid userId, Guid productId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
@@ -89,7 +85,6 @@ namespace FurnitureShop.Application.Services
             await _cartRepository.SaveChangesAsync();
         }
 
-        // CLEAR ALL
         public async Task ClearCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
