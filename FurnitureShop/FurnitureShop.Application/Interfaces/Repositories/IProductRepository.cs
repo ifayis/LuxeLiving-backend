@@ -13,5 +13,6 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid categoryId);
         Task AddAsync(Product product);
         Task<IEnumerable<Product>> GetAll();
+        Task SaveChangesAsync();
     }
 }

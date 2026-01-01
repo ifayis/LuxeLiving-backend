@@ -48,5 +48,20 @@ namespace FurnitureShop.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
+        [HttpPut("activate/{id}")]
+        public async Task<IActionResult> Activate(Guid id)
+        {
+            await _productService.ActivateProductAsync(id);
+            return Ok("Product activated");
+        }
+
+        [HttpPut("deactivate/{id}")]
+        public async Task<IActionResult> Deactivate(Guid id)
+        {
+            await _productService.DeactivateProductAsync(id);
+            return Ok("Product deactivated");
+        }
+
+
     }
 }

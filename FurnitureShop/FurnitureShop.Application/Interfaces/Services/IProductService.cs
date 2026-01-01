@@ -15,5 +15,8 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId);
         Task CreateAsync(CreateProductRequestDto request);
         Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProducts();
+        Task ActivateProductAsync(Guid productId);
+        Task DeactivateProductAsync(Guid productId);
+
     }
 }

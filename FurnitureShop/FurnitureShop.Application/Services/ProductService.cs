@@ -80,5 +80,26 @@ namespace FurnitureShop.Application.Services
                 .Success(productDtos, "Products retrieved successfully");
         }
 
+        public async Task ActivateProductAsync(Guid productId)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+                throw new Exception("Product not found");
+
+            product.IsActive = true;
+            await _productRepository.SaveChangesAsync();
+        }
+
+        public async Task DeactivateProductAsync(Guid productId)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+                throw new Exception("Product not found");
+
+            product.IsActive = false;
+            await _productRepository.SaveChangesAsync();
+        }
+
+
     }
 }

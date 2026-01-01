@@ -45,5 +45,11 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+
+        }
     }
 }

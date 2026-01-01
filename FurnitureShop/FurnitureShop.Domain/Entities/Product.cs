@@ -14,6 +14,7 @@ namespace FurnitureShop.Domain.Enitities
         public decimal Price { get; set; }
         public string? ImageUrl { get; set; }
         public Guid CategoryId { get; set; }
+        public bool IsActive { get; set; } = true;
         public Category? Category { get; set; }
     }
 }
