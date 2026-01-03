@@ -16,6 +16,12 @@
         public const string ProductActivated = "Product activated";
         public const string ProductDeactivated = "Product deactivated";
 
+        // Wishlist
+        public const string WishlistItemAdded = "Item adde to Wishlist";
+        public const string WishlistFetched = "Wishlist items fetched Successfully";
+        public const string WishlistCleared = "Wishlist successfully cleared";
+
+
         // Auth
         public const string LoginSuccess = "Login successful";
         public const string UserRegistered = "User registered successfully";
