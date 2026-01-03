@@ -1,6 +1,4 @@
-﻿using FurnitureShop.Domain.Enitities;
-using FurnitureShop.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using FurnitureShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
