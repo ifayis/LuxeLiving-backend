@@ -25,20 +25,15 @@ namespace FurnitureShop.API.Controllers
                 return BadRequest(
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
-                        ModelState.ToErrorDictionary(),
-                        400
+                        400,
+                        ModelState.ToErrorDictionary()
                     )
                 );
             }
 
             await _authService.RegisterAsync(request);
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.UserRegistered
-                )
-            );
+            return Ok(ResponseMessages.UserRegistered);
         }
 
         [HttpPost("login")]
@@ -53,12 +48,10 @@ namespace FurnitureShop.API.Controllers
                 );
             }
 
-            return Ok(
-                ApiResponse<LoginResponseDto>.Success(
-                    new LoginResponseDto { Token = token },
-                    ResponseMessages.LoginSuccess
-                )
-            );
+            return Ok(new LoginResponseDto
+            {
+                Token = token
+            });
         }
     }
 }
