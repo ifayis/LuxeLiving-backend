@@ -15,7 +15,6 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        // CREATE
         public async Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request)
         {
             if (await _productRepository.ExistsByNameAsync(request.Name))
@@ -36,28 +35,24 @@ namespace FurnitureShop.Application.Services
             return MapToDto(product);
         }
 
-        // GET BY ID
         public async Task<ProductResponseDto?> GetProductByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
             return product == null ? null : MapToDto(product);
         }
 
-        // GET BY CATEGORY
         public async Task<List<ProductResponseDto>> GetProductsByCategoryAsync(Guid categoryId)
         {
             var products = await _productRepository.GetByCategoryAsync(categoryId);
             return products.Select(MapToDto).ToList();
         }
 
-        // GET ALL
         public async Task<List<ProductResponseDto>> GetAllProducts()
         {
             var products = await _productRepository.GetAllAsync();
             return products.Select(MapToDto).ToList();
         }
 
-        // ACTIVATE
         public async Task ActivateProductAsync(Guid productId)
         {
             var product = await _productRepository.GetByIdAsync(productId)
@@ -67,7 +62,6 @@ namespace FurnitureShop.Application.Services
             await _productRepository.SaveChangesAsync();
         }
 
-        // DEACTIVATE
         public async Task DeactivateProductAsync(Guid productId)
         {
             var product = await _productRepository.GetByIdAsync(productId)
@@ -77,7 +71,6 @@ namespace FurnitureShop.Application.Services
             await _productRepository.SaveChangesAsync();
         }
 
-        // MAPPER (PRIVATE, CLEAN)
         private static ProductResponseDto MapToDto(Product product) =>
             new()
             {
