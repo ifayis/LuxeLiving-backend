@@ -11,12 +11,11 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IProductService
     {
+        Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request);
         Task<ProductResponseDto?> GetProductByIdAsync(Guid id);
-        Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId);
-        Task CreateAsync(CreateProductRequestDto request);
-        Task<ApiResponse<IEnumerable<ProductResponseDto>>> GetAllProducts();
+        Task<List<ProductResponseDto>> GetProductsByCategoryAsync(Guid categoryId);
+        Task<List<ProductResponseDto>> GetAllProducts();
         Task ActivateProductAsync(Guid productId);
         Task DeactivateProductAsync(Guid productId);
-
     }
 }

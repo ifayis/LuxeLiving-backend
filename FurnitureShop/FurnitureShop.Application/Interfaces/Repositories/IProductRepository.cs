@@ -9,12 +9,11 @@ namespace FurnitureShop.Application.Interfaces.Repositories
 {
     public interface IProductRepository
     {
-        Task<Product?> GetByIdAsync(Guid id);
-        Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid categoryId);
         Task AddAsync(Product product);
-        Task<IEnumerable<Product>> GetAll();
-        Task<bool> ExistsAsync(string name, Guid categoryId);
-
+        Task<Product?> GetByIdAsync(Guid id);
+        Task<List<Product>> GetAllAsync();
+        Task<List<Product>> GetByCategoryAsync(Guid categoryId);
+        Task<bool> ExistsByNameAsync(string name);
         Task SaveChangesAsync();
     }
 }

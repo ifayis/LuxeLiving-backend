@@ -2,11 +2,6 @@
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -19,44 +14,37 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Product?> GetByIdAsync(Guid id)
+        public async Task AddAsync(Product product)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            await _context.Products.AddAsync(product);
         }
 
-        public async Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid categoryId)
+        public async Task<Product?> GetByIdAsync(Guid id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<List<Product>> GetAllAsync()
+        {
+            return await _context.Products.ToListAsync();
+        }
+
+        public async Task<List<Product>> GetByCategoryAsync(Guid categoryId)
         {
             return await _context.Products
                 .Where(p => p.CategoryId == categoryId)
-                .Include(p => p.Category)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Product>> GetAll()
+        public async Task<bool> ExistsByNameAsync(string name)
         {
             return await _context.Products
-                .ToListAsync();
+                .AnyAsync(p => p.Name.ToLower() == name.ToLower());
         }
-
-        public async Task AddAsync(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<bool> ExistsAsync(string name, Guid categoryId)
-        {
-            return await _context.Products
-                .AnyAsync(p => p.Name == name && p.CategoryId == categoryId);
-        }
-
 
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
-
         }
     }
 }
