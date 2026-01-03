@@ -9,7 +9,7 @@ namespace FurnitureShop.Application.DTOs.Category
     public class CategoryResponseDto
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public bool IsActive { get; set; }
     }
 }

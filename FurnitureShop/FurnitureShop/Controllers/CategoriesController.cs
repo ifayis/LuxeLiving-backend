@@ -11,90 +11,45 @@ namespace FurnitureShop.API.Controllers
     [Authorize]
     public class CategoriesController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly ICategoryService _service;
 
-        public CategoriesController(ICategoryService categoryService)
+        public CategoriesController(ICategoryService service)
         {
-            _categoryService = categoryService;
+            _service = service;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryRequestDto request)
         {
-            var category = await _categoryService.CreateAsync(request);
-
-            return Ok(
-                ApiResponse<CategoryResponseDto>.Success(
-                    category,
-                    ResponseMessages.CategoryCreated
-                )
-            );
+            var result = await _service.CreateAsync(request);
+            return Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync();
-
-            return Ok(
-                ApiResponse<List<CategoryResponseDto>>.Success(categories)
-            );
+            return Ok(await _service.GetAllAsync());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
-
-            if (category == null)
-            {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
-            }
-
-            return Ok(
-                ApiResponse<CategoryResponseDto>.Success(category)
-            );
+            var category = await _service.GetByIdAsync(id);
+            return category == null ? NotFound() : Ok(category);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteById(Guid id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _categoryService.DeleteByIdAsync(id);
-
-            if (!deleted)
-            {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
-            }
-
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.CategoryDeleted
-                )
-            );
+            await _service.DeleteByIdAsync(id);
+            return NoContent();
         }
 
         [HttpDelete("clear")]
-        public async Task<IActionResult> DeleteAll()
+        public async Task<IActionResult> Clear()
         {
-            await _categoryService.DeleteAllAsync();
-
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.CategoriesDeleted
-                )
-            );
+            await _service.DeleteAllAsync();
+            return NoContent();
         }
     }
 }

@@ -2,24 +2,23 @@
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly ICategoryRepository _repository;
 
-        public CategoryService(ICategoryRepository categoryRepository)
+        public CategoryService(ICategoryRepository repository)
         {
-            _categoryRepository = categoryRepository;
+            _repository = repository;
         }
 
         public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
         {
-            if (await _categoryRepository.ExistsByNameAsync(request.Name))
-            {
+            if (await _repository.ExistsByNameAsync(request.Name))
                 throw new InvalidOperationException("Category already exists");
-            }
 
             var category = new Category
             {
@@ -28,56 +27,46 @@ namespace FurnitureShop.Application.Services
                 IsActive = true
             };
 
-            await _categoryRepository.AddAsync(category);
-            await _categoryRepository.SaveChangesAsync();
+            await _repository.AddAsync(category);
+            await _repository.SaveChangesAsync();
 
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                IsActive = category.IsActive
-            };
+            return Map(category);
         }
 
         public async Task<List<CategoryResponseDto>> GetAllAsync()
         {
-            var categories = await _categoryRepository.GetAllAsync();
-
-            return categories.Select(c => new CategoryResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                IsActive = c.IsActive
-            }).ToList();
+            return (await _repository.GetAllAsync())
+                .Select(Map)
+                .ToList();
         }
 
         public async Task<CategoryResponseDto?> GetByIdAsync(Guid id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null) return null;
-
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                IsActive = category.IsActive
-            };
+            var category = await _repository.GetByIdAsync(id);
+            return category == null ? null : Map(category);
         }
 
-        public async Task<bool> DeleteByIdAsync(Guid id)
+        public async Task DeleteByIdAsync(Guid id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null) return false;
+            var category = await _repository.GetByIdAsync(id);
+            if (category == null)
+                throw new KeyNotFoundException("Category not found");
 
-            await _categoryRepository.DeleteAsync(category);
-            await _categoryRepository.SaveChangesAsync();
-            return true;
+            await _repository.DeleteAsync(category);
+            await _repository.SaveChangesAsync();
         }
 
         public async Task DeleteAllAsync()
         {
-            await _categoryRepository.DeleteAllAsync();
-            await _categoryRepository.SaveChangesAsync();
+            await _repository.DeleteAllAsync();
+            await _repository.SaveChangesAsync();
         }
+
+        private static CategoryResponseDto Map(Category c) => new()
+        {
+            Id = c.Id,
+            Name = c.Name,
+            IsActive = c.IsActive
+        };
     }
 }
