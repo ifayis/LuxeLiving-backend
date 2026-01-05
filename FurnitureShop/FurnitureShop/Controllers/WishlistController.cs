@@ -37,7 +37,7 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
-        [HttpGet("my Wishlist")]
+        [HttpGet("my-Wishlist")]
         public async Task<IActionResult> GetMy()
         {
             var wishlist = await _wishlistService.GetMyWishlistAsync(GetUserId());

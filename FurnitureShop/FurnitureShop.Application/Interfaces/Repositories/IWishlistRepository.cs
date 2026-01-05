@@ -7,6 +7,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task AddAsync(Wishlist wishlist);
         Task<Wishlist?> GetByUserIdAsync(Guid userId);
         Task<Wishlist?> GetByIdAsync(Guid id);
+        Task<bool> ProductExistsAsync(Guid productId);
         Task SaveChangesAsync();
         void RemoveItem(WishlistItem item);
         void RemoveAll(Wishlist wishlist);

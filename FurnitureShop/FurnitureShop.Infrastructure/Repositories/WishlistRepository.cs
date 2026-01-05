@@ -46,6 +46,12 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.WishlistItems.RemoveRange(wishlist.Items);
         }
 
+        public async Task<bool> ProductExistsAsync(Guid productId)
+        {
+            return await _context.Products.AnyAsync(p => p.Id == productId);
+        }
+
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
