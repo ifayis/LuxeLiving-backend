@@ -24,17 +24,38 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
 
-        [HttpPost("add")]
+    [HttpPost("add")]
         public async Task<IActionResult> Add(AddToWishlistRequestDto request)
         {
-            await _wishlistService.AddAsync(GetUserId(), request);
+            try
+            {
+              await _wishlistService.AddAsync(GetUserId(), request);
 
-            return Ok(
-                ApiResponse<object>.Success(
+                return Ok(
+                    ApiResponse<object>.Success(
                     null,
                     ResponseMessages.WishlistItemAdded
-                )
-            );
+                    )
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                    ex.Message,
+                    400
+                    )
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(
+                    ApiResponse<object>.Fail(
+                    ex.Message,
+                    409
+                    )
+                );
+            }
         }
 
         [HttpGet("my-Wishlist")]
@@ -74,27 +95,60 @@ namespace FurnitureShop.API.Controllers
         [HttpPatch("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
-            await _wishlistService.RemoveItemAsync(GetUserId(), itemId);
+            try
+            {
+                await _wishlistService.RemoveItemAsync(GetUserId(), itemId);
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.WishlistItemRemoved
-                )
-            );
+                return Ok(
+                    ApiResponse<object>.Success(
+                        null,
+                        ResponseMessages.WishlistItemRemoved
+                    )
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ex.Message,
+                        400
+                    )
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ex.Message,
+                        404
+                    )
+                );
+            }
         }
 
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
-            await _wishlistService.ClearAsync(GetUserId());
+            try
+            {
+                await _wishlistService.ClearAsync(GetUserId());
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.WishlistCleared
-                )
-            );
+                return Ok(
+                    ApiResponse<object>.Success(
+                        null,
+                        ResponseMessages.WishlistCleared
+                    )
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ex.Message,
+                        404
+                    )
+                );
+            }
         }
     }
 }
