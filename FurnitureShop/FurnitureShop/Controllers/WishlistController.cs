@@ -71,7 +71,6 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
-        // REMOVE ITEM
         [HttpPatch("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
@@ -85,7 +84,6 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
-        // CLEAR WISHLIST
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
