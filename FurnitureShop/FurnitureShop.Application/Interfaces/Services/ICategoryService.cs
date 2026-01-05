@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Category;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Category;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
@@ -7,7 +8,7 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request);
         Task<List<CategoryResponseDto>> GetAllAsync();
         Task<CategoryResponseDto?> GetByIdAsync(Guid id);
-        Task DeleteByIdAsync(Guid id);
-        Task DeleteAllAsync();
+        Task<ApiResponse<object>> DeleteByIdAsync(Guid id);
+        Task<ApiResponse<object>> DeleteAllAsync();
     }
 }

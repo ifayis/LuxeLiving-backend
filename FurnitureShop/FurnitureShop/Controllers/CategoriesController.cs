@@ -41,15 +41,15 @@ namespace FurnitureShop.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _service.DeleteByIdAsync(id);
-            return NoContent();
+            var response = await _service.DeleteByIdAsync(id);
+            return StatusCode(response.StatusCode, response);
         }
 
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
-            await _service.DeleteAllAsync();
-            return NoContent();
+            var response = await _service.DeleteAllAsync();
+            return StatusCode(response.StatusCode, response);
         }
     }
 }

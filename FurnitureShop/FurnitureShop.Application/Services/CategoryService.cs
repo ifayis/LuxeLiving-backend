@@ -1,7 +1,7 @@
-﻿using FurnitureShop.Application.DTOs.Category;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Category;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Services
@@ -46,22 +46,41 @@ namespace FurnitureShop.Application.Services
             return category == null ? null : Map(category);
         }
 
-        public async Task DeleteByIdAsync(Guid id)
+        public async Task<ApiResponse<object>> DeleteByIdAsync(Guid id)
         {
-            var category = await _repository.GetByIdAsync(id);
-            if (category == null)
-                throw new KeyNotFoundException("Category not found");
+            if (id == Guid.Empty)
+            {
+                return ApiResponse<object>.Fail(
+                    ErrorMessages.InvalidId,
+                    400
+                    );
+            }
 
-            await _repository.DeleteAsync(category);
-            await _repository.SaveChangesAsync();
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                return ApiResponse<object>.Fail(
+                    ErrorMessages.NotFound,
+                    400);
+            }
+
+            await _repository.DeleteAsync(entity);
+
+            return ApiResponse<object>.Success(
+                null,
+                ResponseMessages.CategoryDeleted,
+                200);
         }
 
-        public async Task DeleteAllAsync()
+        public async Task<ApiResponse<object>> DeleteAllAsync()
         {
             await _repository.DeleteAllAsync();
-            await _repository.SaveChangesAsync();
-        }
 
+            return ApiResponse<object>.Success(
+                null,
+                ResponseMessages.CategoriesDeleted,
+                200);
+        }
         private static CategoryResponseDto Map(Category c) => new()
         {
             Id = c.Id,

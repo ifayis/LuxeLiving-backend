@@ -11,6 +11,9 @@
         // Wishlist
         public const string WishlistItemRemoved = "Item removed from Wishlist";
 
+        // Category
+        public const string InvalidId = "Enter a valid Id";
+
         // Auth
         public const string InvalidCredentials = "Invalid credentials";
     }
