@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using FurnitureShop.Application.Common;
 
@@ -20,41 +19,34 @@ namespace FurnitureShop.API.Middlewares
             {
                 await _next(context);
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Conflict;
-                await WriteResponse(context, "Database constraint violation", ex.InnerException?.Message);
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                await WriteResponse(context, "Database constraint violation");
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentException ex)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await WriteResponse(context, "Invalid input", ex.Message);
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await WriteResponse(context, ex.Message);
             }
             catch (InvalidOperationException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    StatusCode = 409,
-                    Message = ex.Message
-                });
+                await WriteResponse(context, ex.Message);
             }
             catch (UnauthorizedAccessException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-                await context.Response.WriteAsJsonAsync(
-                    ApiResponse<object>.Fail(ex.Message, 401)
-                );
+                await WriteResponse(context, ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                await WriteResponse(context, "Something went wrong", ex.Message);
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await WriteResponse(context, "Something went wrong");
             }
         }
 
-        private static async Task WriteResponse(HttpContext context, string message, string? details = null)
+        private static async Task WriteResponse(HttpContext context, string message)
         {
             context.Response.ContentType = "application/json";
 
@@ -63,7 +55,9 @@ namespace FurnitureShop.API.Middlewares
                 context.Response.StatusCode
             );
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            await context.Response.WriteAsync(
+                JsonSerializer.Serialize(response)
+            );
         }
     }
 }
