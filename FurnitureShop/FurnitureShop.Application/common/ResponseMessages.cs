@@ -22,7 +22,7 @@
         public const string WishlistItemAdded = "Item adde to Wishlist";
         public const string WishlistFetched = "Wishlist items fetched Successfully";
         public const string WishlistCleared = "Wishlist successfully cleared";
-
+        public const string WishlistItemRemoved = "Item removed from Wishlist";
 
         // Auth
         public const string LoginSuccess = "Login successful";

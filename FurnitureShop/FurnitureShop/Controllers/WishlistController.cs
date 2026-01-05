@@ -37,7 +37,7 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
-        [HttpGet("my")]
+        [HttpGet("my Wishlist")]
         public async Task<IActionResult> GetMy()
         {
             var wishlist = await _wishlistService.GetMyWishlistAsync(GetUserId());
@@ -72,7 +72,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         // REMOVE ITEM
-        [HttpDelete("item/{itemId:guid}")]
+        [HttpPatch("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
             await _wishlistService.RemoveItemAsync(GetUserId(), itemId);
@@ -80,7 +80,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ErrorMessages.WishlistItemRemoved
+                    ResponseMessages.WishlistItemRemoved
                 )
             );
         }
