@@ -42,6 +42,19 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .AnyAsync(p => p.Name.ToLower() == name.ToLower());
         }
 
+        public async Task DeleteAsync(Product product)
+        {
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            var products = await _context.Products.ToListAsync();
+            _context.Products.RemoveRange(products);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

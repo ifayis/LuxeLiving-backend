@@ -17,5 +17,7 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<List<ProductResponseDto>> GetAllProducts();
         Task ActivateProductAsync(Guid productId);
         Task DeactivateProductAsync(Guid productId);
+        Task<ApiResponse<object>> DeleteByIdAsync(Guid id);
+        Task<ApiResponse<object>> DeleteAllAsync();
     }
 }

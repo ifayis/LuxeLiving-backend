@@ -83,5 +83,19 @@ namespace FurnitureShop.API.Controllers
                 )
             );
         }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var response = await _productService.DeleteByIdAsync(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> Clear()
+        {
+            var response = await _productService.DeleteAllAsync();
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

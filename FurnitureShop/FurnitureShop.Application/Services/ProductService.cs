@@ -71,6 +71,42 @@ namespace FurnitureShop.Application.Services
             await _productRepository.SaveChangesAsync();
         }
 
+        public async Task<ApiResponse<object>> DeleteByIdAsync(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return ApiResponse<object>.Fail(
+                    ErrorMessages.InvalidId,
+                    400);
+            }
+
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+            {
+                return ApiResponse<object>.Fail(
+                    ErrorMessages.NotFound,
+                    404);
+            }
+
+            await _productRepository.DeleteAsync(product);
+            await _productRepository.SaveChangesAsync();
+
+            return ApiResponse<object>.Success(
+                null,
+                ResponseMessages.ProductDeleted,
+                200);
+        }
+
+        public async Task<ApiResponse<object>> DeleteAllAsync()
+        {
+            await _productRepository.DeleteAllAsync();
+            await _productRepository.SaveChangesAsync();
+
+            return ApiResponse<object>.Success(
+                null,
+                ResponseMessages.ProductsDeleted,
+                200);
+        }
         private static ProductResponseDto MapToDto(Product product) =>
             new()
             {
