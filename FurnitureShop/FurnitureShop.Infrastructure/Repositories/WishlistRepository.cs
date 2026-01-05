@@ -22,18 +22,15 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .FirstOrDefaultAsync(w => w.UserId == userId);
         }
 
-        public async Task<Wishlist?> GetByIdAsync(Guid id)
-        {
-            return await _context.Wishlists
-                .Include(w => w.Items)
-                .ThenInclude(i => i.Product)
-                .FirstOrDefaultAsync(w => w.Id == id);
-        }
-
         public async Task AddAsync(Wishlist wishlist)
         {
             _context.Wishlists.Add(wishlist);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> ProductExistsAsync(Guid productId)
+        {
+            return await _context.Products.AnyAsync(p => p.Id == productId);
         }
 
         public void RemoveItem(WishlistItem item)
@@ -45,12 +42,6 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             _context.WishlistItems.RemoveRange(wishlist.Items);
         }
-
-        public async Task<bool> ProductExistsAsync(Guid productId)
-        {
-            return await _context.Products.AnyAsync(p => p.Id == productId);
-        }
-
 
         public async Task SaveChangesAsync()
         {

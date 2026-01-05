@@ -7,23 +7,22 @@ namespace FurnitureShop.Application.Services
 {
     public class WishlistService : IWishlistService
     {
-        private readonly IWishlistRepository _wishlistRepository;
+        private readonly IWishlistRepository _repository;
 
-        public WishlistService(IWishlistRepository wishlistRepository)
+        public WishlistService(IWishlistRepository repository)
         {
-            _wishlistRepository = wishlistRepository;
+            _repository = repository;
         }
 
         public async Task AddAsync(Guid userId, AddToWishlistRequestDto request)
         {
             if (request == null || request.ProductId == Guid.Empty)
-                throw new ArgumentException("Invalid input");
-
-            var productExists = await _wishlistRepository.ProductExistsAsync(request.ProductId);
-            if (!productExists)
                 throw new ArgumentException("Invalid product");
 
-            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
+            if (!await _repository.ProductExistsAsync(request.ProductId))
+                throw new ArgumentException("Product does not exist");
+
+            var wishlist = await _repository.GetByUserIdAsync(userId);
 
             if (wishlist == null)
             {
@@ -33,11 +32,11 @@ namespace FurnitureShop.Application.Services
                     UserId = userId
                 };
 
-                await _wishlistRepository.AddAsync(wishlist);
+                await _repository.AddAsync(wishlist);
             }
 
             if (wishlist.Items.Any(i => i.ProductId == request.ProductId))
-                throw new InvalidOperationException("Item already exists");
+                throw new InvalidOperationException("Product already in wishlist");
 
             wishlist.Items.Add(new WishlistItem
             {
@@ -45,20 +44,12 @@ namespace FurnitureShop.Application.Services
                 ProductId = request.ProductId
             });
 
-            await _wishlistRepository.SaveChangesAsync();
+            await _repository.SaveChangesAsync();
         }
 
-        public async Task<WishlistResponseDto?> GetMyWishlistAsync(Guid userId)
+        public async Task<WishlistResponseDto?> GetMyAsync(Guid userId)
         {
-            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
-            if (wishlist == null) return null;
-
-            return Map(wishlist);
-        }
-
-        public async Task<WishlistResponseDto?> GetByIdAsync(Guid id)
-        {
-            var wishlist = await _wishlistRepository.GetByIdAsync(id);
+            var wishlist = await _repository.GetByUserIdAsync(userId);
             return wishlist == null ? null : Map(wishlist);
         }
 
@@ -67,26 +58,23 @@ namespace FurnitureShop.Application.Services
             if (itemId == Guid.Empty)
                 throw new ArgumentException("Invalid item id");
 
-            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
-            if (wishlist == null)
-                throw new InvalidOperationException("Wishlist not found");
+            var wishlist = await _repository.GetByUserIdAsync(userId)
+                ?? throw new InvalidOperationException("Wishlist not found");
 
-            var item = wishlist.Items.FirstOrDefault(i => i.Id == itemId);
-            if (item == null)
-                throw new InvalidOperationException("Wishlist item not found");
+            var item = wishlist.Items.FirstOrDefault(i => i.Id == itemId)
+                ?? throw new InvalidOperationException("Wishlist item not found");
 
-            _wishlistRepository.RemoveItem(item);
-            await _wishlistRepository.SaveChangesAsync();
+            _repository.RemoveItem(item);
+            await _repository.SaveChangesAsync();
         }
 
         public async Task ClearAsync(Guid userId)
         {
-            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
-            if (wishlist == null)
-                throw new InvalidOperationException("Wishlist not found");
+            var wishlist = await _repository.GetByUserIdAsync(userId)
+                ?? throw new InvalidOperationException("Wishlist not found");
 
-            _wishlistRepository.RemoveAll(wishlist);
-            await _wishlistRepository.SaveChangesAsync();
+            _repository.RemoveAll(wishlist);
+            await _repository.SaveChangesAsync();
         }
 
         private static WishlistResponseDto Map(Wishlist wishlist)
