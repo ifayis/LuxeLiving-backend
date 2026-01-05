@@ -65,6 +65,7 @@ namespace FurnitureShop.Application.Services
             }
 
             await _repository.DeleteAsync(entity);
+            await _repository.SaveChangesAsync();
 
             return ApiResponse<object>.Success(
                 null,
@@ -75,6 +76,7 @@ namespace FurnitureShop.Application.Services
         public async Task<ApiResponse<object>> DeleteAllAsync()
         {
             await _repository.DeleteAllAsync();
+            await _repository.SaveChangesAsync();
 
             return ApiResponse<object>.Success(
                 null,

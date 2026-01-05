@@ -9,6 +9,7 @@ namespace FurnitureShop.Application.DTOs.Category
 {
     public class CreateCategoryRequestDto
     {
+        [Required]
         public string Name { get; set; } = string.Empty;
     }
 }
