@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,12 +24,7 @@ namespace FurnitureShop.API.Controllers
         {
             var product = await _productService.CreateAsync(request);
 
-            return Ok(
-                ApiResponse<ProductResponseDto>.Success(
-                    product,
-                    ResponseMessages.ProductCreated
-                )
-            );
+            return Ok(product);
         }
 
         [HttpGet("{id:guid}")]
@@ -38,17 +34,10 @@ namespace FurnitureShop.API.Controllers
 
             if (product == null)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<ProductResponseDto>.Success(product)
-            );
+            return Ok(product);
         }
 
         [HttpGet("category/{categoryId:guid}")]
@@ -56,9 +45,7 @@ namespace FurnitureShop.API.Controllers
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
 
-            return Ok(
-                ApiResponse<List<ProductResponseDto>>.Success(products)
-            );
+            return Ok(products);
         }
 
         [HttpGet]
@@ -66,9 +53,7 @@ namespace FurnitureShop.API.Controllers
         {
             var products = await _productService.GetAllProducts();
 
-            return Ok(
-                ApiResponse<List<ProductResponseDto>>.Success(products)
-            );
+            return Ok(products);
         }
 
         [HttpPut("activate/{id:guid}")]
