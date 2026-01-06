@@ -29,11 +29,11 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Add(AddToCartRequestDto request)
         {
-            await _cartService.AddToCartAsync(GetUserId(), request);
+            var result = await _cartService.AddToCartAsync(GetUserId(), request);
 
             return Ok(
-                ApiResponse<object>.Success(
-                    null,
+                ApiResponse<AddToCartResponseDto>.Success(
+                    result,
                     ResponseMessages.Success
                 )
             );
@@ -44,9 +44,7 @@ namespace FurnitureShop.API.Controllers
         {
             var cart = await _cartService.GetMyCartAsync(GetUserId());
 
-            return Ok(
-                ApiResponse<CartResponseDto>.Success(cart)
-            );
+            return Ok(cart);
         }
 
         [HttpGet("{cartId:guid}")]
@@ -56,17 +54,10 @@ namespace FurnitureShop.API.Controllers
 
             if (cart == null)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<CartResponseDto>.Success(cart)
-            );
+            return Ok(cart);
         }
 
         [HttpDelete("remove/{productId:guid}")]
@@ -74,12 +65,7 @@ namespace FurnitureShop.API.Controllers
         {
             await _cartService.RemoveItemAsync(GetUserId(), productId);
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok();
         }
 
         [HttpDelete("clear")]
@@ -87,12 +73,7 @@ namespace FurnitureShop.API.Controllers
         {
             await _cartService.ClearCartAsync(GetUserId());
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok();
         }
     }
 }

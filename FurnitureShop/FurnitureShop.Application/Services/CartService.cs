@@ -22,8 +22,14 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task AddToCartAsync(Guid userId, AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCartAsync(
+            Guid userId,
+            AddToCartRequestDto request)
         {
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
+            if (product == null || !product.IsActive)
+                throw new InvalidOperationException("Invalid product");
+
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
             if (cart == null)
@@ -34,13 +40,6 @@ namespace FurnitureShop.Application.Services
                     UserId = userId,
                     Items = new List<CartItem>()
                 };
-                cart.Items.Add(new CartItem
-                {
-                    Id = Guid.NewGuid(),
-                    CartId = cart.Id,
-                    ProductId = request.ProductId,
-                    Quantity = request.Quantity
-                });
 
                 await _cartRepository.AddAsync(cart);
             }
@@ -58,12 +57,24 @@ namespace FurnitureShop.Application.Services
                 {
                     Id = Guid.NewGuid(),
                     CartId = cart.Id,
-                    ProductId = request.ProductId,
+                    ProductId = product.Id,
                     Quantity = request.Quantity
                 });
             }
 
             await _cartRepository.SaveChangesAsync();
+
+            return new AddToCartResponseDto
+            {
+                CartId = cart.Id,
+                Product = new AddedCartProductDto
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Price = product.Price,
+                    Quantity = request.Quantity
+                }
+            };
         }
 
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)

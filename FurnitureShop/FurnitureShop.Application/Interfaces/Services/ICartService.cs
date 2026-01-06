@@ -6,7 +6,7 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface ICartService
     {
-        Task AddToCartAsync(Guid userId, AddToCartRequestDto request);
+        Task<AddToCartResponseDto> AddToCartAsync(Guid userId, AddToCartRequestDto request);
         Task<CartResponseDto?> GetMyCartAsync(Guid userId);
         Task<CartResponseDto?> GetCartByIdAsync(Guid cartId);
         Task RemoveItemAsync(Guid userId, Guid productId);
