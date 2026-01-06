@@ -28,9 +28,9 @@ namespace FurnitureShop.API.Services
 
             var claims = new List<Claim>
             {
-                new Claim("userid", user.Id.ToString()),
-                new Claim("e-mail", user.Email),
-                new Claim("role", user.Role)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(

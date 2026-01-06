@@ -12,14 +12,28 @@ namespace FurnitureShop.Application.Services
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CartService(ICartRepository cartRepository)
+        public CartService(
+            ICartRepository cartRepository,
+            IProductRepository productRepository)
         {
             _cartRepository = cartRepository;
+            _productRepository = productRepository;
         }
 
         public async Task AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
+            if (request.ProductId == Guid.Empty)
+                throw new ArgumentException("Invalid product id");
+
+            if (request.Quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero");
+
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
+            if (product == null || !product.IsActive)
+                throw new InvalidOperationException("Product not available");
+
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
             if (cart == null)
@@ -27,18 +41,11 @@ namespace FurnitureShop.Application.Services
                 cart = new Cart
                 {
                     Id = Guid.NewGuid(),
-                    UserId = userId
+                    UserId = userId,
+                    Items = new List<CartItem>()
                 };
 
-                cart.Items.Add(new CartItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductId = request.ProductId,
-                    Quantity = request.Quantity
-                });
-
                 await _cartRepository.AddAsync(cart);
-                return;
             }
 
             var existingItem = cart.Items
@@ -53,6 +60,7 @@ namespace FurnitureShop.Application.Services
                 cart.Items.Add(new CartItem
                 {
                     Id = Guid.NewGuid(),
+                    CartId = cart.Id,
                     ProductId = request.ProductId,
                     Quantity = request.Quantity
                 });
