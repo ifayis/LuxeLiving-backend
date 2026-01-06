@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -21,10 +22,13 @@ namespace FurnitureShop.API.Services
             var jwtSettings = _configuration.GetSection("JwtSettings");
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
+            );
 
             var credentials = new SigningCredentials(
-                key, SecurityAlgorithms.HmacSha256);
+                key,
+                SecurityAlgorithms.HmacSha256
+            );
 
             var claims = new List<Claim>
             {
@@ -38,7 +42,8 @@ namespace FurnitureShop.API.Services
                 audience: jwtSettings["Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(
-                    double.Parse(jwtSettings["ExpiresInMinutes"]!)),
+                    double.Parse(jwtSettings["ExpiresInMinutes"]!)
+                ),
                 signingCredentials: credentials
             );
 

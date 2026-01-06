@@ -24,16 +24,6 @@ namespace FurnitureShop.Application.Services
 
         public async Task AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
-            if (request.ProductId == Guid.Empty)
-                throw new ArgumentException("Invalid product id");
-
-            if (request.Quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero");
-
-            var product = await _productRepository.GetByIdAsync(request.ProductId);
-            if (product == null || !product.IsActive)
-                throw new InvalidOperationException("Product not available");
-
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
             if (cart == null)
