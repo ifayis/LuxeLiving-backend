@@ -97,5 +97,28 @@ namespace FurnitureShop.API.Controllers
             var response = await _productService.DeleteAllAsync();
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
+        {
+            var updated = await _productService.UpdateAsync(id, request);
+
+            if (!updated)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.Success
+                )
+            );
+        }
     }
 }

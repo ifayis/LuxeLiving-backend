@@ -107,6 +107,24 @@ namespace FurnitureShop.Application.Services
                 ResponseMessages.ProductsDeleted,
                 200);
         }
+
+        public async Task<bool> UpdateAsync(Guid productId, UpdateProductRequestDto request)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+
+            if (product == null)
+                return false;
+
+            product.Name = request.Name;
+            product.Description = request.Description;
+            product.Price = request.Price;
+            product.ImageUrl = request.ImageUrl;
+            product.CategoryId = request.CategoryId;
+            product.IsActive = request.IsActive;
+
+            await _productRepository.SaveChangesAsync();
+            return true;
+        }
         private static ProductResponseDto MapToDto(Product product) =>
             new()
             {
