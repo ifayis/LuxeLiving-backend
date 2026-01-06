@@ -34,6 +34,13 @@ namespace FurnitureShop.Application.Services
                     UserId = userId,
                     Items = new List<CartItem>()
                 };
+                cart.Items.Add(new CartItem
+                {
+                    Id = Guid.NewGuid(),
+                    CartId = cart.Id,
+                    ProductId = request.ProductId,
+                    Quantity = request.Quantity
+                });
 
                 await _cartRepository.AddAsync(cart);
             }
