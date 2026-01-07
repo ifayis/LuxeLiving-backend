@@ -24,6 +24,10 @@
         public const string WishlistCleared = "Wishlist successfully cleared";
         public const string WishlistItemRemoved = "Item removed from Wishlist";
 
+        // Orders
+        public const string empty = "No orders yet";
+
+
         // Auth
         public const string LoginSuccess = "Login successful";
         public const string UserRegistered = "User registered successfully";

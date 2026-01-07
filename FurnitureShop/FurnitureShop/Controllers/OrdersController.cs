@@ -37,10 +37,20 @@ namespace FurnitureShop.API.Controllers
         {
             var orders = await _orderService.GetMyOrdersAsync(GetUserId());
 
+            if (orders == null || !orders.Any())
+            {
+                return Ok(
+                           ApiResponse<object>.Success(
+                               Array.Empty<object>(),
+                               ResponseMessages.empty
+                           )
+                       );
+            }
+
             return Ok(orders);
         }
 
-        [HttpGet("my/{orderId:guid}")]
+        [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetMyOrder(Guid orderId)
         {
             var order = await _orderService.GetMyOrderByIdAsync(GetUserId(), orderId);

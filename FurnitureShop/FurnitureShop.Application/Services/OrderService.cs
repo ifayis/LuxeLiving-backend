@@ -98,7 +98,6 @@ namespace FurnitureShop.Application.Services
             if (order == null)
                 return null;
 
-            // Business rule
             if (order.Status == "Cancelled")
                 throw new Exception("Order already cancelled");
 
