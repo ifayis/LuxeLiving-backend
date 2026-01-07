@@ -29,12 +29,7 @@ namespace FurnitureShop.API.Controllers
         {
             await _orderService.CheckoutAsync(GetUserId(), request);
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok();
         }
 
         [HttpGet("my")]
@@ -42,9 +37,7 @@ namespace FurnitureShop.API.Controllers
         {
             var orders = await _orderService.GetMyOrdersAsync(GetUserId());
 
-            return Ok(
-                ApiResponse<List<OrderResponseDto>>.Success(orders)
-            );
+            return Ok(orders);
         }
 
         [HttpGet("my/{orderId:guid}")]
@@ -54,17 +47,10 @@ namespace FurnitureShop.API.Controllers
 
             if (order == null)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<OrderResponseDto>.Success(order)
-            );
+            return Ok(order);
         }
 
         [HttpPut("cancel/{orderId:guid}")]
@@ -74,17 +60,10 @@ namespace FurnitureShop.API.Controllers
 
             if (order == null)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<OrderResponseDto>.Success(order)
-            );
+            return Ok(order);
         }
     }
 }
