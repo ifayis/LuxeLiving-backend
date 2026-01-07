@@ -39,7 +39,6 @@ namespace FurnitureShop.API.Controllers
             return category == null ? NotFound() : Ok(category);
         }
         [HttpPut("{id:guid}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(Guid id, UpdateCategoryRequestDto request)
         {
             var updated = await _CategoryService.UpdateAsync(id, request);

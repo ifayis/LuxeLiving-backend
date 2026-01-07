@@ -22,13 +22,11 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<AddToCartResponseDto> AddToCartAsync(
-            Guid userId,
-            AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
             var product = await _productRepository.GetByIdAsync(request.ProductId);
-            if (product == null || !product.IsActive)
-                throw new InvalidOperationException("Invalid product");
+            if (product == null)
+                throw new InvalidOperationException("Product does not exist");
 
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
@@ -37,15 +35,16 @@ namespace FurnitureShop.Application.Services
                 cart = new Cart
                 {
                     Id = Guid.NewGuid(),
-                    UserId = userId,
-                    Items = new List<CartItem>()
+                    UserId = userId
                 };
 
-                await _cartRepository.AddAsync(cart);
+                _cartRepository.AddAsync(cart);
             }
 
             var existingItem = cart.Items
                 .FirstOrDefault(i => i.ProductId == request.ProductId);
+           
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
 
             if (existingItem != null)
             {
@@ -56,8 +55,7 @@ namespace FurnitureShop.Application.Services
                 cart.Items.Add(new CartItem
                 {
                     Id = Guid.NewGuid(),
-                    CartId = cart.Id,
-                    ProductId = product.Id,
+                    ProductId = request.ProductId,
                     Quantity = request.Quantity
                 });
             }
@@ -72,7 +70,7 @@ namespace FurnitureShop.Application.Services
                     Id = product.Id,
                     Name = product.Name,
                     Price = product.Price,
-                    Quantity = request.Quantity
+                    Quantity = item.Quantity
                 }
             };
         }
