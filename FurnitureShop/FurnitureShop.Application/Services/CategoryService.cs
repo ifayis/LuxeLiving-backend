@@ -8,16 +8,16 @@ namespace FurnitureShop.Application.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _repository;
+        private readonly ICategoryRepository _CategoryRepository;
 
-        public CategoryService(ICategoryRepository repository)
+        public CategoryService(ICategoryRepository CategoryRepository)
         {
-            _repository = repository;
+            _CategoryRepository = CategoryRepository;
         }
 
         public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
         {
-            if (await _repository.ExistsByNameAsync(request.Name))
+            if (await _CategoryRepository.ExistsByNameAsync(request.Name))
                 throw new InvalidOperationException("Category already exists");
 
             var category = new Category
@@ -27,24 +27,41 @@ namespace FurnitureShop.Application.Services
                 IsActive = true
             };
 
-            await _repository.AddAsync(category);
-            await _repository.SaveChangesAsync();
+            await _CategoryRepository.AddAsync(category);
+            await _CategoryRepository.SaveChangesAsync();
 
             return Map(category);
         }
 
         public async Task<List<CategoryResponseDto>> GetAllAsync()
         {
-            return (await _repository.GetAllAsync())
+            return (await _CategoryRepository.GetAllAsync())
                 .Select(Map)
                 .ToList();
         }
 
         public async Task<CategoryResponseDto?> GetByIdAsync(Guid id)
         {
-            var category = await _repository.GetByIdAsync(id);
+            var category = await _CategoryRepository.GetByIdAsync(id);
             return category == null ? null : Map(category);
         }
+
+        public async Task<bool> UpdateAsync(Guid categoryId, UpdateCategoryRequestDto request)
+        {
+            var category = await _CategoryRepository.GetByIdAsync(categoryId);
+            if (category == null)
+                return false;
+
+            if (await _CategoryRepository.ExistsByNameAsync(request.Name))
+                throw new InvalidOperationException("Category already exists");
+
+            category.Name = request.Name;
+            category.IsActive = request.IsActive;
+
+            await _CategoryRepository.SaveChangesAsync();
+            return true;
+        }
+
 
         public async Task<ApiResponse<object>> DeleteByIdAsync(Guid id)
         {
@@ -56,7 +73,7 @@ namespace FurnitureShop.Application.Services
                     );
             }
 
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _CategoryRepository.GetByIdAsync(id);
             if (entity == null)
             {
                 return ApiResponse<object>.Fail(
@@ -64,8 +81,8 @@ namespace FurnitureShop.Application.Services
                     400);
             }
 
-            await _repository.DeleteAsync(entity);
-            await _repository.SaveChangesAsync();
+            await _CategoryRepository.DeleteAsync(entity);
+            await _CategoryRepository.SaveChangesAsync();
 
             return ApiResponse<object>.Success(
                 null,
@@ -75,8 +92,8 @@ namespace FurnitureShop.Application.Services
 
         public async Task<ApiResponse<object>> DeleteAllAsync()
         {
-            await _repository.DeleteAllAsync();
-            await _repository.SaveChangesAsync();
+            await _CategoryRepository.DeleteAllAsync();
+            await _CategoryRepository.SaveChangesAsync();
 
             return ApiResponse<object>.Success(
                 null,
