@@ -123,8 +123,14 @@ namespace FurnitureShop.Application.Services
             if (item == null)
                 return false;
 
-            item.Quantity = request.Quantity;
-
+            if (request.Quantity == 0)
+            {
+                cart.Items.Remove(item);
+            }
+            else
+            {
+                item.Quantity = request.Quantity;
+            }
             await _cartRepository.SaveChangesAsync();
             return true;
         }
