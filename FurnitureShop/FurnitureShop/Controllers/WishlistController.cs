@@ -50,7 +50,7 @@ namespace FurnitureShop.API.Controllers
             ));
         }
 
-        [HttpPatch("item/{itemId:guid}")]
+        [HttpDelete("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
             await _WishlistService.RemoveItemAsync(GetUserId(), itemId);
