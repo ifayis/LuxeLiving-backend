@@ -11,6 +11,3 @@ namespace FurnitureShop.Application.DTOs.Order
         public bool SimulatePaymentSuccess { get; set; }
     }
 }
-
-//This flag simulates payment gateway response
-//(later replaced by Razorpay/Stripe webhook)

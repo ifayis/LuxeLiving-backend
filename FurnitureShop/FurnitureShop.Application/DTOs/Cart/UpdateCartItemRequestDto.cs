@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.DTOs.Cart
 {
-    public class UpdateCartItemDto
+    public class UpdateCartItemRequestDto
     {
-        public Guid CartItemId { get; set; }
+        public Guid ProductId { get; set; }
         public int Quantity { get; set; }
     }
 }

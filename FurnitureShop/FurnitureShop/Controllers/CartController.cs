@@ -68,6 +68,30 @@ namespace FurnitureShop.API.Controllers
             return Ok();
         }
 
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateItem(UpdateCartItemRequestDto request)
+        {
+            var updated = await _cartService.UpdateItemAsync(GetUserId(), request);
+
+            if (!updated)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.NotFound,
+                        404
+                    )
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.Success
+                )
+            );
+        }
+
+
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {

@@ -10,6 +10,7 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<CartResponseDto?> GetMyCartAsync(Guid userId);
         Task<CartResponseDto?> GetCartByIdAsync(Guid cartId);
         Task RemoveItemAsync(Guid userId, Guid productId);
+        Task<bool> UpdateItemAsync(Guid userId, UpdateCartItemRequestDto request);
         Task ClearCartAsync(Guid userId);
     }
 }

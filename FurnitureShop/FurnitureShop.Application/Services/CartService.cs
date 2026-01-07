@@ -110,6 +110,26 @@ namespace FurnitureShop.Application.Services
             await _cartRepository.SaveChangesAsync();
         }
 
+        public async Task<bool> UpdateItemAsync(Guid userId, UpdateCartItemRequestDto request)
+        {
+            if (request.Quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero");
+
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            if (cart == null)
+                return false;
+
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+            if (item == null)
+                return false;
+
+            item.Quantity = request.Quantity;
+
+            await _cartRepository.SaveChangesAsync();
+            return true;
+        }
+
+
         private static CartResponseDto? Map(Cart? cart)
         {
             if (cart == null) return null;
