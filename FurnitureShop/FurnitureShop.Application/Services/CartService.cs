@@ -22,12 +22,10 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<AddToCartResponseDto> AddToCartAsync(
-            Guid userId,
-            AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCartAsync(Guid userId, AddToCartRequestDto request)
         {
-            if (request.Quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero");
+            if (request == null || request.ProductId == Guid.Empty || request.Quantity <= 0)
+                throw new ArgumentException("Invalid cart request");
 
             var product = await _productRepository.GetByIdAsync(request.ProductId);
             if (product == null)
@@ -44,24 +42,26 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _cartRepository.AddAsync(cart);
+                await _cartRepository.SaveChangesAsync();
             }
 
-            var cartItem = cart.Items
-                .FirstOrDefault(i => i.ProductId == request.ProductId);
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
 
-            if (cartItem != null)
+            if (item != null)
             {
-                cartItem.Quantity += request.Quantity;
+                item.Quantity += request.Quantity;
             }
             else
             {
-                cart.Items.Add(new CartItem
+                item = new CartItem
                 {
                     Id = Guid.NewGuid(),
                     CartId = cart.Id,
                     ProductId = request.ProductId,
                     Quantity = request.Quantity
-                });
+                };
+
+                cart.Items.Add(item);
             }
 
             await _cartRepository.SaveChangesAsync();
@@ -74,7 +74,7 @@ namespace FurnitureShop.Application.Services
                     Id = product.Id,
                     Name = product.Name,
                     Price = product.Price,
-                    Quantity = cartItem?.Quantity ?? request.Quantity
+                    Quantity = item.Quantity
                 }
             };
         }
