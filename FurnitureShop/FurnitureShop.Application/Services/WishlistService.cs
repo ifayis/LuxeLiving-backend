@@ -19,17 +19,14 @@ namespace FurnitureShop.Application.Services
 
         public async Task AddAsync(Guid userId, AddToWishlistRequestDto request)
         {
-            if (request.ProductId == Guid.Empty)
-                throw new ArgumentException("Invalid product id");
+            if (request == null || request.ProductId == Guid.Empty)
+                throw new ArgumentException("Invalid wishlist request");
 
-            var product =
-                await _productRepository.GetByIdAsync(request.ProductId);
-
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
             if (product == null)
                 throw new ArgumentException("Product does not exist");
 
-            var wishlist =
-                await _WishlistRepository.GetByUserIdAsync(userId);
+            var wishlist = await _WishlistRepository.GetByUserIdAsync(userId);
 
             if (wishlist == null)
             {
@@ -40,6 +37,7 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _WishlistRepository.AddAsync(wishlist);
+                await _WishlistRepository.SaveChangesAsync();
             }
 
             if (wishlist.Items.Any(i => i.ProductId == request.ProductId))

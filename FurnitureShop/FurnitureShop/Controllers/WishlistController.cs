@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Wishlist;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Application.Services;
 using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,14 +31,11 @@ namespace FurnitureShop.API.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] AddToWishlistRequestDto request)
+        public async Task<IActionResult> Add(AddToWishlistRequestDto request)
         {
             await _WishlistService.AddAsync(GetUserId(), request);
 
-            return Ok(ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistItemAdded
-            ));
+            return Ok();
         }
 
         [HttpGet("my")]
@@ -45,10 +43,7 @@ namespace FurnitureShop.API.Controllers
         {
             var wishlist = await _WishlistService.GetMyAsync(GetUserId());
 
-            return Ok(ApiResponse<object>.Success(
-                wishlist,
-                ResponseMessages.WishlistFetched
-            ));
+            return Ok(wishlist);
         }
 
         [HttpDelete("item/{itemId:guid}")]
@@ -56,10 +51,7 @@ namespace FurnitureShop.API.Controllers
         {
             await _WishlistService.RemoveItemAsync(GetUserId(), itemId);
 
-            return Ok(ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistItemRemoved
-            ));
+            return Ok();
         }
 
         [HttpDelete("clear")]
@@ -67,10 +59,7 @@ namespace FurnitureShop.API.Controllers
         {
             await _WishlistService.ClearAsync(GetUserId());
 
-            return Ok(ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistCleared
-            ));
+            return Ok();
         }
     }
 }
