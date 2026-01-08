@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.DTOs.Wishlist;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Services
@@ -9,11 +10,15 @@ namespace FurnitureShop.Application.Services
     {
         private readonly IWishlistRepository _WishlistRepository;
         private readonly IProductRepository _productRepository;
+        private readonly ICartRepository _cartRepository;
 
-        public WishlistService(IWishlistRepository WishlistRepository, IProductRepository productRepository)
+
+        public WishlistService(IWishlistRepository WishlistRepository, IProductRepository productRepository, ICartRepository cartRepository)
         {
             _WishlistRepository = WishlistRepository;
             _productRepository = productRepository;
+            _cartRepository = cartRepository;
+
 
         }
 
@@ -82,6 +87,61 @@ namespace FurnitureShop.Application.Services
             _WishlistRepository.RemoveAll(wishlist);
             await _WishlistRepository.SaveChangesAsync();
         }
+
+        public async Task MoveToCartAsync(Guid userId, Guid wishlistItemId)
+        {
+            var wishlist = await _WishlistRepository.GetByUserIdAsync(userId);
+            if (wishlist == null)
+                throw new InvalidOperationException("Wishlist not found");
+
+            var wishlistItem = wishlist.Items
+                .FirstOrDefault(i => i.Id == wishlistItemId);
+
+            if (wishlistItem == null)
+                throw new InvalidOperationException("Wishlist item not found");
+
+            var product = await _productRepository.GetByIdAsync(wishlistItem.ProductId);
+            if (product == null)
+                throw new InvalidOperationException("Product does not exist");
+
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+
+            if (cart == null)
+            {
+                cart = new Cart
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId
+                };
+
+                await _cartRepository.AddAsync(cart);
+                await _cartRepository.SaveChangesAsync();
+            }
+
+            var cartItem = cart.Items
+                .FirstOrDefault(i => i.ProductId == product.Id);
+
+            if (cartItem != null)
+            {
+                cartItem.Quantity += 1;
+            }
+            else
+            {
+                cart.Items.Add(new CartItem
+                {
+                    Id = Guid.NewGuid(),
+                    CartId = cart.Id,
+                    ProductId = product.Id,
+                    Quantity = 1
+                });
+            }
+
+            wishlist.Items.Remove(wishlistItem);
+
+            await _WishlistRepository.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
+        }
+
 
         private static WishlistResponseDto Map(Wishlist wishlist)
         {

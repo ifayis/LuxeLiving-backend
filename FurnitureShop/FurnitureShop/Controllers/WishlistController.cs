@@ -54,6 +54,15 @@ namespace FurnitureShop.API.Controllers
             return Ok();
         }
 
+        [HttpPost("move-to-cart/{ItemId:guid}")]
+        public async Task<IActionResult> MoveToCart(Guid ItemId)
+        {
+            await _WishlistService.MoveToCartAsync(GetUserId(), ItemId);
+
+            return Ok();
+        }
+
+
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
