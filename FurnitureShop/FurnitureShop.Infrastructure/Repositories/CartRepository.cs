@@ -19,10 +19,11 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<Cart?> GetByUserIdAsync(Guid userId)
         {
             return await _context.Carts
+                .AsTracking()
                 .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
-
         public async Task<Cart?> GetByIdAsync(Guid cartId)
         {
             return await _context.Carts
@@ -32,7 +33,7 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task AddAsync(Cart cart)
         {
-            _context.Carts.Add(cart);
+           _context.Carts.Add(cart);
         }
 
         public async Task SaveChangesAsync()

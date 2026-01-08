@@ -19,10 +19,17 @@ namespace FurnitureShop.API.Middlewares
             {
                 await _next(context);
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status409Conflict;
-                await WriteResponse(context, "Database constraint violation");
+                if (ex.InnerException?.Message.Contains("FOREIGN KEY") == true ||
+                    ex.InnerException?.Message.Contains("UNIQUE") == true)
+                {
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    await WriteResponse(context, "Resource conflict");
+                    return;
+                }
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await WriteResponse(context, "Database error");
             }
             catch (ArgumentException ex)
             {
@@ -31,7 +38,7 @@ namespace FurnitureShop.API.Middlewares
             }
             catch (InvalidOperationException ex)
             {
-                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await WriteResponse(context, ex.Message);
             }
             catch (UnauthorizedAccessException ex)

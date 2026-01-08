@@ -22,7 +22,9 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<AddToCartResponseDto> AddToCartAsync(Guid userId, AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCartAsync(
+            Guid userId,
+            AddToCartRequestDto request)
         {
             var product = await _productRepository.GetByIdAsync(request.ProductId);
             if (product == null)
@@ -38,26 +40,27 @@ namespace FurnitureShop.Application.Services
                     UserId = userId
                 };
 
-                _cartRepository.AddAsync(cart);
+                await _cartRepository.AddAsync(cart);
+                await _cartRepository.SaveChangesAsync();
             }
 
-            var existingItem = cart.Items
-                .FirstOrDefault(i => i.ProductId == request.ProductId);
-           
             var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
 
-            if (existingItem != null)
+            if (item == null)
             {
-                existingItem.Quantity += request.Quantity;
+                item = new CartItem
+                {
+                    Id = Guid.NewGuid(),
+                    CartId = cart.Id,
+                    ProductId = product.Id,
+                    Quantity = request.Quantity
+                };
+
+                cart.Items.Add(item);
             }
             else
             {
-                cart.Items.Add(new CartItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductId = request.ProductId,
-                    Quantity = request.Quantity
-                });
+                item.Quantity += request.Quantity;
             }
 
             await _cartRepository.SaveChangesAsync();
@@ -74,7 +77,7 @@ namespace FurnitureShop.Application.Services
                 }
             };
         }
-
+        
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
