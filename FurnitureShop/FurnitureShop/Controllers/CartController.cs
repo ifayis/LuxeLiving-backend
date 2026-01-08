@@ -31,12 +31,7 @@ namespace FurnitureShop.API.Controllers
         {
             var result = await _cartService.AddToCartAsync(GetUserId(), request);
 
-            return Ok(
-                ApiResponse<AddToCartResponseDto>.Success(
-                    result,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok(result);
         }
 
         [HttpGet("my")]
@@ -75,20 +70,10 @@ namespace FurnitureShop.API.Controllers
 
             if (!updated)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok(updated);
         }
 
 

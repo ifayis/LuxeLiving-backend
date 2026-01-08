@@ -26,9 +26,12 @@ namespace FurnitureShop.Application.Services
             Guid userId,
             AddToCartRequestDto request)
         {
+            if (request.Quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero");
+
             var product = await _productRepository.GetByIdAsync(request.ProductId);
             if (product == null)
-                throw new InvalidOperationException("Product does not exist");
+                throw new ArgumentException("Product does not exist");
 
             var cart = await _cartRepository.GetByUserIdAsync(userId);
 
@@ -41,26 +44,24 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _cartRepository.AddAsync(cart);
-                await _cartRepository.SaveChangesAsync();
             }
 
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+            var cartItem = cart.Items
+                .FirstOrDefault(i => i.ProductId == request.ProductId);
 
-            if (item == null)
+            if (cartItem != null)
             {
-                item = new CartItem
-                {
-                    Id = Guid.NewGuid(),
-                    CartId = cart.Id,
-                    ProductId = product.Id,
-                    Quantity = request.Quantity
-                };
-
-                cart.Items.Add(item);
+                cartItem.Quantity += request.Quantity;
             }
             else
             {
-                item.Quantity += request.Quantity;
+                cart.Items.Add(new CartItem
+                {
+                    Id = Guid.NewGuid(),
+                    CartId = cart.Id,
+                    ProductId = request.ProductId,
+                    Quantity = request.Quantity
+                });
             }
 
             await _cartRepository.SaveChangesAsync();
@@ -73,11 +74,11 @@ namespace FurnitureShop.Application.Services
                     Id = product.Id,
                     Name = product.Name,
                     Price = product.Price,
-                    Quantity = item.Quantity
+                    Quantity = cartItem?.Quantity ?? request.Quantity
                 }
             };
         }
-        
+
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);

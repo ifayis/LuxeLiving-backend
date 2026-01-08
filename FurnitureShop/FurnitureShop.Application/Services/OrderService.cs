@@ -15,9 +15,7 @@ namespace FurnitureShop.Application.Services
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
 
-        public OrderService(
-            ICartRepository cartRepository,
-            IOrderRepository orderRepository)
+        public OrderService(ICartRepository cartRepository, IOrderRepository orderRepository)
         {
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;

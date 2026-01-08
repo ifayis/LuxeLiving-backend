@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Wishlist;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -21,7 +22,7 @@ namespace FurnitureShop.API.Controllers
 
         private Guid GetUserId()
         {
-            var userId = User.FindFirstValue("userid");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))
                 throw new UnauthorizedAccessException("User id not found in token");
 
