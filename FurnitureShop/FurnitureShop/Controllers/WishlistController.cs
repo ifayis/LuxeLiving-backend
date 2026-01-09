@@ -9,6 +9,7 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/wishlist")]
+    [Authorize(Roles = Roles.User)]
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _WishlistService;

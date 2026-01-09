@@ -8,6 +8,9 @@ namespace FurnitureShop.Application.DTOs.Order
 {
     public class OrderResponseDto
     {
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+
         public Guid OrderId { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;

@@ -89,6 +89,14 @@ namespace FurnitureShop.Application.Services
             };
         }
 
+        public async Task<List<OrderResponseDto>> GetOrdersByUserAsync(Guid userId)
+        {
+            var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);
+
+            return orders.Select(o => Map(o)).ToList();
+        }
+
+
         public async Task<OrderResponseDto?> CancelOrderAsync(Guid userId, Guid orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
@@ -121,7 +129,23 @@ namespace FurnitureShop.Application.Services
             };
         }
 
-
+        private static OrderResponseDto Map(Order order)
+        {
+            return new OrderResponseDto
+            {
+                Id = order.Id,
+                UserId = order.UserId,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status,
+                CreatedAt = order.CreatedAt,
+                Items = order.Items.Select(i => new OrderItemResponseDto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+        }
 
     }
 }

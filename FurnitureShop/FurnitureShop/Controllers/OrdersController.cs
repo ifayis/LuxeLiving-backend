@@ -29,6 +29,7 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
+
         [Authorize(Roles = Roles.User)]
         [HttpPost("add")]
         public async Task<IActionResult> Checkout(CheckoutRequestDto request)
@@ -38,6 +39,8 @@ namespace FurnitureShop.API.Controllers
             return Ok();
         }
 
+
+        [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> GetMyOrders()
         {
@@ -50,25 +53,25 @@ namespace FurnitureShop.API.Controllers
                                Array.Empty<object>(),
                                ResponseMessages.empty
                            )
-                       );
+                );
             }
 
             return Ok(orders);
         }
 
-        [HttpGet("{orderId:guid}")]
-        public async Task<IActionResult> GetMyOrder(Guid orderId)
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetOrdersByUser(Guid userId)
         {
-            var order = await _orderService.GetMyOrderByIdAsync(GetUserId(), orderId);
+            var orders = await _orderService.GetOrdersByUserAsync(userId);
 
-            if (order == null)
-            {
+            if (orders == null || !orders.Any())
                 return NotFound();
-            }
 
-            return Ok(order);
+            return Ok(orders);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpPut("cancel/{orderId:guid}")]
         public async Task<IActionResult> CancelOrder(Guid orderId)
         {
