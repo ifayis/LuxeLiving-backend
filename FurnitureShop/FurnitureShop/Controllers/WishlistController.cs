@@ -1,8 +1,6 @@
-﻿using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.DTOs.Wishlist;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Application.Services;
-using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,7 +9,6 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/wishlist")]
-    [Authorize]
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _WishlistService;
@@ -24,12 +21,14 @@ namespace FurnitureShop.API.Controllers
         private Guid GetUserId()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (string.IsNullOrWhiteSpace(userId))
                 throw new UnauthorizedAccessException("User id not found in token");
 
             return Guid.Parse(userId);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpPost("add")]
         public async Task<IActionResult> Add(AddToWishlistRequestDto request)
         {

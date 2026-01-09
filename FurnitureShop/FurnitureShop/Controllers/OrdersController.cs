@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Order;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,6 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/orders")]
-    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -21,9 +21,15 @@ namespace FurnitureShop.API.Controllers
 
         private Guid GetUserId()
         {
-            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new UnauthorizedAccessException("User id not found in token");
+
+            return Guid.Parse(userId);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpPost("add")]
         public async Task<IActionResult> Checkout(CheckoutRequestDto request)
         {

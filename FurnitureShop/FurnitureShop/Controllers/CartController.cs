@@ -1,17 +1,15 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Security.Claims;
 
 namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/cart")]
-    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -23,9 +21,15 @@ namespace FurnitureShop.API.Controllers
 
         private Guid GetUserId()
         {
-            return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new UnauthorizedAccessException("User id not found in token");
+
+            return Guid.Parse(userId);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpPost("add")]
         public async Task<IActionResult> Add(AddToCartRequestDto request)
         {
@@ -34,6 +38,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpGet("my")]
         public async Task<IActionResult> GetMyCart()
         {
@@ -42,6 +47,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(cart);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpGet("{cartId:guid}")]
         public async Task<IActionResult> GetById(Guid cartId)
         {
@@ -55,6 +61,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(cart);
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("remove/{productId:guid}")]
         public async Task<IActionResult> Remove(Guid productId)
         {
@@ -63,6 +70,8 @@ namespace FurnitureShop.API.Controllers
             return Ok();
         }
 
+
+        [Authorize(Roles = Roles.User)]
         [HttpPut("update")]
         public async Task<IActionResult> UpdateItem(UpdateCartItemRequestDto request)
         {
@@ -76,7 +85,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(updated);
         }
 
-
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {

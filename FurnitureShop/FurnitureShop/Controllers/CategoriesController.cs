@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Category;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Application.Services;
@@ -9,7 +10,6 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/categories")]
-    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _CategoryService;
@@ -19,6 +19,7 @@ namespace FurnitureShop.API.Controllers
             _CategoryService = CategoryService;
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryRequestDto request)
         {
@@ -38,6 +39,8 @@ namespace FurnitureShop.API.Controllers
             var category = await _CategoryService.GetByIdAsync(id);
             return category == null ? NotFound() : Ok(category);
         }
+
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateCategoryRequestDto request)
         {
@@ -45,23 +48,13 @@ namespace FurnitureShop.API.Controllers
 
             if (!updated)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok(updated);
         }
 
-
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -69,6 +62,7 @@ namespace FurnitureShop.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {

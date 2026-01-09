@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Common;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
@@ -18,8 +19,8 @@ namespace FurnitureShop.API.Controllers
             _productService = productService;
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Create(CreateProductRequestDto request)
         {
             var product = await _productService.CreateAsync(request);
@@ -56,8 +57,8 @@ namespace FurnitureShop.API.Controllers
             return Ok(products);
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("activate/{id:guid}")]
-        [Authorize]
         public async Task<IActionResult> Activate(Guid id)
         {
             await _productService.ActivateProductAsync(id);
@@ -70,8 +71,8 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("deactivate/{id:guid}")]
-        [Authorize]
         public async Task<IActionResult> Deactivate(Guid id)
         {
             await _productService.DeactivateProductAsync(id);
@@ -84,6 +85,7 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -91,6 +93,7 @@ namespace FurnitureShop.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
@@ -98,6 +101,7 @@ namespace FurnitureShop.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
         {
@@ -105,20 +109,10 @@ namespace FurnitureShop.API.Controllers
 
             if (!updated)
             {
-                return NotFound(
-                    ApiResponse<object>.Fail(
-                        ErrorMessages.NotFound,
-                        404
-                    )
-                );
+                return NotFound();
             }
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.Success
-                )
-            );
+            return Ok(updated );
         }
     }
 }
