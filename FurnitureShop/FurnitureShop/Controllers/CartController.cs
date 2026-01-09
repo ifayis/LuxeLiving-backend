@@ -47,19 +47,18 @@ namespace FurnitureShop.API.Controllers
             return Ok(cart);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpGet("{cartId:guid}")]
-        public async Task<IActionResult> GetById(Guid cartId)
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetUserCart(Guid userId)
         {
-            var cart = await _cartService.GetCartByIdAsync(cartId);
+            var cart = await _cartService.GetMyCartAsync(userId);
 
             if (cart == null)
-            {
                 return NotFound();
-            }
 
             return Ok(cart);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpDelete("remove/{productId:guid}")]

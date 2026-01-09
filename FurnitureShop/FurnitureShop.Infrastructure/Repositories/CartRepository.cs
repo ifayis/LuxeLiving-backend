@@ -36,11 +36,6 @@ namespace FurnitureShop.Infrastructure.Repositories
            _context.Carts.Add(cart);
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public async Task ClearCartAsync(Guid userId)
         {
             var cart = await _context.Carts
@@ -52,6 +47,12 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.CartItems.RemoveRange(cart.Items);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
 
     }
 }
