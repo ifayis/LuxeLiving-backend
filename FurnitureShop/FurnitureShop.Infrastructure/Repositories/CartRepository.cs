@@ -1,9 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using FurnitureShop.Application.Interfaces.Repositories;
+﻿using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -19,11 +20,10 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<Cart?> GetByUserIdAsync(Guid userId)
         {
             return await _context.Carts
-                .AsTracking()
                 .Include(c => c.Items)
-                    .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
+
         public async Task<Cart?> GetByIdAsync(Guid cartId)
         {
             return await _context.Carts
@@ -33,7 +33,18 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task AddAsync(Cart cart)
         {
-           _context.Carts.Add(cart);
+            _context.Carts.Add(cart);
+        }
+
+        public async Task<CartItem?> GetCartItemAsync(Guid cartId, Guid productId)
+        {
+            return await _context.CartItems
+                .FirstOrDefaultAsync(i => i.CartId == cartId && i.ProductId == productId);
+        }
+
+        public async Task AddCartItemAsync(CartItem item)
+        {
+            _context.CartItems.Add(item);
         }
 
         public async Task ClearCartAsync(Guid userId)

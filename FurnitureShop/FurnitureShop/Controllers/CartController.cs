@@ -1,4 +1,5 @@
 ﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -66,7 +67,11 @@ namespace FurnitureShop.API.Controllers
         {
             await _cartService.RemoveItemAsync(GetUserId(), productId);
 
-            return Ok();
+            return Ok(
+                 ApiResponse<object>.Success(
+                 null,
+                 ResponseMessages.CartRemoved
+                 ));
         }
 
 
@@ -78,7 +83,9 @@ namespace FurnitureShop.API.Controllers
 
             if (!updated)
             {
-                return NotFound();
+                return NotFound(ApiResponse<object>.Fail(
+                    null
+                    ));
             }
 
             return Ok(updated);
@@ -90,7 +97,12 @@ namespace FurnitureShop.API.Controllers
         {
             await _cartService.ClearCartAsync(GetUserId());
 
-            return Ok();
+            return Ok(
+                 ApiResponse<object>.Success(
+                 null,
+                 ResponseMessages.cartCleared
+                 )
+            );
         }
     }
 }

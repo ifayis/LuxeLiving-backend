@@ -5,6 +5,10 @@
         // Common
         public const string Success = "Success";
 
+        // Cart
+        public const string CartRemoved = "Item removed from the cart successful";
+        public const string cartCleared = "Cart cleared";
+
         // Category
         public const string CategoryCreated = "Category created successfully";
         public const string CategoryDeleted = "Category deleted successfully";

@@ -45,13 +45,10 @@ namespace FurnitureShop.Application.Services
                 await _cartRepository.SaveChangesAsync();
             }
 
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+            var item = await _cartRepository
+                .GetCartItemAsync(cart.Id, request.ProductId);
 
-            if (item != null)
-            {
-                item.Quantity += request.Quantity;
-            }
-            else
+            if (item == null)
             {
                 item = new CartItem
                 {
@@ -61,7 +58,11 @@ namespace FurnitureShop.Application.Services
                     Quantity = request.Quantity
                 };
 
-                cart.Items.Add(item);
+                await _cartRepository.AddCartItemAsync(item);
+            }
+            else
+            {
+                item.Quantity += request.Quantity;
             }
 
             await _cartRepository.SaveChangesAsync();
@@ -78,7 +79,6 @@ namespace FurnitureShop.Application.Services
                 }
             };
         }
-
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);

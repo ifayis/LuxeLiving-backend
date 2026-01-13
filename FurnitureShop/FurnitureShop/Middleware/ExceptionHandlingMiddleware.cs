@@ -21,15 +21,14 @@ namespace FurnitureShop.API.Middlewares
             }
             catch (DbUpdateException ex)
             {
-                if (ex.InnerException?.Message.Contains("FOREIGN KEY") == true ||
-                    ex.InnerException?.Message.Contains("UNIQUE") == true)
-                {
-                    context.Response.StatusCode = StatusCodes.Status409Conflict;
-                    await WriteResponse(context, "Resource conflict");
-                    return;
-                }
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await WriteResponse(context, "Database error");
+
+                var realMessage =
+                    ex.InnerException?.Message ??
+                    ex.Message ??
+                    "Unknown database error";
+
+                await WriteResponse(context, realMessage);
             }
             catch (ArgumentException ex)
             {
