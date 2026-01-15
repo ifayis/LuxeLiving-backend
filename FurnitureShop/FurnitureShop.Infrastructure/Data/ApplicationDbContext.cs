@@ -38,8 +38,19 @@ namespace FurnitureShop.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(i => i.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Wishlist>()
+                .HasMany(w => w.Items)
+                .WithOne(i => i.Wishlist)
+                .HasForeignKey(i => i.WishlistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WishlistItem>()
+                .HasOne(i => i.Product)
+                .WithMany()
+                .HasForeignKey(i => i.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
-
-
     }
 }

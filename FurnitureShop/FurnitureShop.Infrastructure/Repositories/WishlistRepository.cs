@@ -25,7 +25,11 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task AddAsync(Wishlist wishlist)
         {
             _context.Wishlists.Add(wishlist);
-            await _context.SaveChangesAsync();
+        }
+
+        public void AddItem(WishlistItem item)
+        {
+            _context.WishlistItems.Add(item);
         }
 
         public async Task<bool> ProductExistsAsync(Guid productId)

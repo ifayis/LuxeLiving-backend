@@ -18,8 +18,6 @@ namespace FurnitureShop.Application.Services
             _WishlistRepository = WishlistRepository;
             _productRepository = productRepository;
             _cartRepository = cartRepository;
-
-
         }
 
         public async Task AddAsync(Guid userId, AddToWishlistRequestDto request)
@@ -42,18 +40,19 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _WishlistRepository.AddAsync(wishlist);
-                await _WishlistRepository.SaveChangesAsync();
             }
 
             if (wishlist.Items.Any(i => i.ProductId == request.ProductId))
                 throw new InvalidOperationException("Product already in wishlist");
 
-            wishlist.Items.Add(new WishlistItem
+            var wishlistItem = new WishlistItem
             {
                 Id = Guid.NewGuid(),
                 WishlistId = wishlist.Id,
                 ProductId = request.ProductId
-            });
+            };
+
+            _WishlistRepository.AddItem(wishlistItem);
 
             await _WishlistRepository.SaveChangesAsync();
         }
