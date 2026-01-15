@@ -24,7 +24,7 @@ namespace FurnitureShop.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrWhiteSpace(userId))
-                throw new UnauthorizedAccessException("User id not found in token");
+                throw new UnauthorizedAccessException();
 
             return Guid.Parse(userId);
         }
@@ -49,10 +49,10 @@ namespace FurnitureShop.API.Controllers
             if (orders == null || !orders.Any())
             {
                 return Ok(
-                           ApiResponse<object>.Success(
-                               Array.Empty<object>(),
-                               ResponseMessages.empty
-                           )
+                        ApiResponse<object>.Success(
+                        Array.Empty<object>(),
+                        ResponseMessages.empty
+                        )
                 );
             }
 

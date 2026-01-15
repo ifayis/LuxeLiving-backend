@@ -12,6 +12,8 @@ namespace FurnitureShop.Domain.Enitities
         public Guid UserId { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending";
+        public string PaymentMethod { get; set; } = string.Empty;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();

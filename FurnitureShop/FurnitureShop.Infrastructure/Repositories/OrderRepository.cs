@@ -29,6 +29,7 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             return await _context.Orders
                 .Include(o => o.Items)
+                   .ThenInclude(i => i.Product)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
@@ -38,6 +39,7 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             return await _context.Orders
                 .Include(o => o.Items)
+                   .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
         }
 
@@ -46,7 +48,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
-
 
         public async Task SaveChangesAsync()
         {
