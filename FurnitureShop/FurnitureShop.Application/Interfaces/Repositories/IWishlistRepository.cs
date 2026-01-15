@@ -9,7 +9,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         void AddItem(WishlistItem item);
         Task<bool> ProductExistsAsync(Guid productId);
         void RemoveItem(WishlistItem item);
-        void RemoveAll(Wishlist wishlist);
+        Task RemoveAll(Wishlist wishlist);
         Task SaveChangesAsync();
     }
 }

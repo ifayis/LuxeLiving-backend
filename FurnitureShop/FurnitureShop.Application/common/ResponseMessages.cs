@@ -23,6 +23,7 @@
         public const string ProductsDeleted = "All products deleted successfully";
 
         // Wishlist
+        public const string WishlistAdded = "Item Added to Wishlist";
         public const string WishlistItemsMoved = "Items moved to cart";
         public const string WishlistCleared = "Wishlist successfully cleared";
         public const string WishlistItemRemoved = "Item removed from Wishlist";

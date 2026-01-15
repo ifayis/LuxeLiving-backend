@@ -34,9 +34,14 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Add(AddToWishlistRequestDto request)
         {
-           var result =await _WishlistService.AddAsync(GetUserId(), request);
+           await _WishlistService.AddAsync(GetUserId(), request);
 
-            return Ok(result);
+            return Ok(
+                ApiResponse<object>.Success(
+                null,
+                ResponseMessages.WishlistAdded
+                )
+            );
         }
 
         [HttpGet("my")]
@@ -59,17 +64,17 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
-        [HttpPost("move-to-cart/{ItemId:guid}")]
-        public async Task<IActionResult> MoveToCart(Guid ItemId)
+        [HttpPost("move-to-cart")]
+        public async Task<IActionResult> MoveAllToCart()
         {
-            await _WishlistService.MoveToCartAsync(GetUserId(), ItemId);
+            await _WishlistService.MoveToCartAsync(GetUserId());
 
             return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.WishlistItemsMoved
-                 )
-             );
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.WishlistItemsMoved
+                )
+            );
         }
 
 
