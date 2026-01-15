@@ -36,7 +36,12 @@ namespace FurnitureShop.API.Controllers
         {
             await _orderService.CheckoutAsync(GetUserId(), request);
 
-            return Ok();
+            return Ok(
+                ApiResponse<object>.Success(
+                null,
+                ResponseMessages.CheckoutPayment
+                )
+            );
         }
 
 

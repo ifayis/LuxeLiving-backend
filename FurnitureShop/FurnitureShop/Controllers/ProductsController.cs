@@ -112,7 +112,7 @@ namespace FurnitureShop.API.Controllers
                 return NotFound();
             }
 
-            return Ok(updated );
+            return Ok(updated);
         }
     }
 }

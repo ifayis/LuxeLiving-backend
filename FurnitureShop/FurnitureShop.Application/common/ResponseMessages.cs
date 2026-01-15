@@ -23,13 +23,15 @@
         public const string ProductsDeleted = "All products deleted successfully";
 
         // Wishlist
-        public const string WishlistItemAdded = "Item adde to Wishlist";
-        public const string WishlistFetched = "Wishlist items fetched Successfully";
+        public const string WishlistItemsMoved = "Items moved to cart";
         public const string WishlistCleared = "Wishlist successfully cleared";
         public const string WishlistItemRemoved = "Item removed from Wishlist";
 
         // Orders
         public const string empty = "No orders yet";
+
+        // Checkout
+        public const string CheckoutPayment = "Payment under process";
 
 
         // Auth

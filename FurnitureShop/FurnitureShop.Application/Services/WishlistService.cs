@@ -20,7 +20,7 @@ namespace FurnitureShop.Application.Services
             _cartRepository = cartRepository;
         }
 
-        public async Task AddAsync(Guid userId, AddToWishlistRequestDto request)
+        public async Task<WishlistResponseDto> AddAsync(Guid userId, AddToWishlistRequestDto request)
         {
             if (request == null || request.ProductId == Guid.Empty)
                 throw new ArgumentException("Invalid wishlist request");
@@ -53,8 +53,10 @@ namespace FurnitureShop.Application.Services
             };
 
             _WishlistRepository.AddItem(wishlistItem);
-
             await _WishlistRepository.SaveChangesAsync();
+
+            var updatedWishlist = await _WishlistRepository.GetByUserIdAsync(userId);
+            return Map(updatedWishlist!);
         }
 
         public async Task<WishlistResponseDto?> GetMyAsync(Guid userId)

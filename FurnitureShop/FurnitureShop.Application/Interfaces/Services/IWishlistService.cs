@@ -4,7 +4,7 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IWishlistService
     {
-        Task AddAsync(Guid userId, AddToWishlistRequestDto request);
+        Task<WishlistResponseDto> AddAsync(Guid userId, AddToWishlistRequestDto request);
         Task<WishlistResponseDto?> GetMyAsync(Guid userId);
         Task MoveToCartAsync(Guid userId, Guid wishlistItemId);
 
