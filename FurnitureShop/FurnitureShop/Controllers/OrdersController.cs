@@ -29,22 +29,6 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
-
-        [Authorize(Roles = Roles.User)]
-        [HttpPost("add")]
-        public async Task<IActionResult> Checkout(CheckoutRequestDto request)
-        {
-            await _orderService.CheckoutAsync(GetUserId(), request);
-
-            return Ok(
-                ApiResponse<object>.Success(
-                null,
-                ResponseMessages.CheckoutPayment
-                )
-            );
-        }
-
-
         [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> GetMyOrders()

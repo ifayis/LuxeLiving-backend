@@ -10,7 +10,6 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IOrderService
     {
-        Task CheckoutAsync(Guid userId, CheckoutRequestDto request);
         Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId);
         Task<OrderResponseDto?> GetMyOrderByIdAsync(Guid userId, Guid orderId);
         Task<List<OrderResponseDto>> GetOrdersByUserAsync(Guid userId);

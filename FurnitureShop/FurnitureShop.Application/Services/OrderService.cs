@@ -22,42 +22,6 @@ namespace FurnitureShop.Application.Services
             _orderRepository = orderRepository;
         }
 
-        public async Task CheckoutAsync(Guid userId, CheckoutRequestDto request)
-        {
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
-
-            if (cart == null || !cart.Items.Any())
-                throw new Exception("Cart is empty");
-
-            var total = cart.Items.Sum(i => i.Quantity * i.Product.Price);
-
-            var status = request.SimulatePaymentSuccess ? "Paid" : "Pending";
-            var paymentMethod = request.SimulatePaymentSuccess
-                ? "Online Pay"
-                : "Cash On Delivery";
-
-            var order = new Order
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                TotalAmount = total,
-                Status = status,
-                PaymentMethod = paymentMethod,
-                Items = cart.Items.Select(i => new OrderItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Product.Price
-                }).ToList()
-            };
-
-            await _orderRepository.AddAsync(order);
-
-            if (status == "Paid")
-                await _cartRepository.ClearCartAsync(userId);
-        }
-
         public async Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId)
         {
             var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);
