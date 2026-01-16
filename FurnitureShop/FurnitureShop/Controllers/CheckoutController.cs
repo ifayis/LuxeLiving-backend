@@ -43,7 +43,7 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(ApiResponse<object>.Success(
                 null,
-                "Payment successful. Order created."
+                ResponseMessages.ExecutePayment
             ));
         }
     }

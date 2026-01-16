@@ -33,6 +33,7 @@
 
         // Checkout
         public const string CheckoutPayment = "Payment under process";
+        public const string ExecutePayment = "Order created";
 
 
         // Auth
