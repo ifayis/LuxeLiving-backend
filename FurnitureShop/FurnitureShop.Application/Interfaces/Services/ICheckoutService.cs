@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
-    public class ICheckoutService
+    public interface ICheckoutService
     {
         Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId);
-        Task ExecutePaymentAsync(Guid userId, PaymentRequestDto request)
+        Task ExecutePaymentAsync(Guid userId, PaymentRequestDto request);
     }
 }

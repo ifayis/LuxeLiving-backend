@@ -13,6 +13,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<Cart?> GetByIdAsync(Guid cartId);
         Task AddAsync(Cart cart);
         Task SaveChangesAsync();
+        void Clear(Cart cart);
         Task ClearCartAsync(Guid userId);
     }
 }

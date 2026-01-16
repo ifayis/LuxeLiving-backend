@@ -25,7 +25,7 @@ namespace FurnitureShop.Application.Services
             if (cart == null || !cart.Items.Any())
                 return new CheckoutResponseDto();
 
-            var items = cart.Items.Select(i => new CheckoutItemDto
+            var items = cart.Items.Select(i => new CheckOutItemDto
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product.Name,

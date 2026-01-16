@@ -13,6 +13,6 @@ namespace FurnitureShop.Application.DTOs.Checkout
         public string ImageUrl { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-        public decimal total => Price * Quantity;
+        public decimal Total => Price * Quantity;
     }
 }

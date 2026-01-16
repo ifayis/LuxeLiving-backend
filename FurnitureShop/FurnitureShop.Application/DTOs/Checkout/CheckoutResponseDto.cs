@@ -9,6 +9,6 @@ namespace FurnitureShop.Application.DTOs.Checkout
     public class CheckoutResponseDto
     {
         public List<CheckOutItemDto> Items { get; set; }
-        public decimal grossTotal { get; set; }
+        public decimal GrossTotal { get; set; }
     }
 }
