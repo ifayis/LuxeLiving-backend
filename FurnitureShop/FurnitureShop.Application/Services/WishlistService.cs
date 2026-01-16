@@ -91,8 +91,10 @@ namespace FurnitureShop.Application.Services
 
         public async Task MoveToCartAsync(Guid userId)
         {
-            var wishlist = await _WishlistRepository.GetByUserIdAsync(userId);
-            if (wishlist == null || !wishlist.Items.Any())
+            var wishlist = await _WishlistRepository.GetByUserIdAsync(userId)
+                ?? throw new InvalidOperationException("Wishlist not found");
+
+            if (!wishlist.Items.Any())
                 throw new InvalidOperationException("Wishlist is empty");
 
             var cart = await _cartRepository.GetByUserIdAsync(userId);
@@ -106,17 +108,17 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _cartRepository.AddAsync(cart);
-                await _cartRepository.SaveChangesAsync();
             }
 
-            foreach (var item in wishlist.Items.ToList())
-            {
-                var cartItem = cart.Items
-                    .FirstOrDefault(c => c.ProductId == item.ProductId);
+            var wishlistItems = wishlist.Items.ToList();
 
-                if (cartItem != null)
+            foreach (var item in wishlistItems)
+            {
+                var existing = cart.Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+
+                if (existing != null)
                 {
-                    cartItem.Quantity += 1;
+                    existing.Quantity += 1;
                 }
                 else
                 {

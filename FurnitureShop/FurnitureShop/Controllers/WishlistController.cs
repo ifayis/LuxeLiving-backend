@@ -69,12 +69,10 @@ namespace FurnitureShop.API.Controllers
         {
             await _WishlistService.MoveToCartAsync(GetUserId());
 
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.WishlistItemsMoved
-                )
-            );
+            return Ok(ApiResponse<object>.Success(
+                null,
+                ResponseMessages.WishlistItemsMoved
+            ));
         }
 
 
