@@ -59,16 +59,9 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public void Clear(Cart cart)
-        {
-            _context.CartItems.RemoveRange(cart.Items);
-        }
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
-
-
     }
 }

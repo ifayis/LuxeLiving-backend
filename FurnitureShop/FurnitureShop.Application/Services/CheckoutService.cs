@@ -70,8 +70,7 @@ namespace FurnitureShop.Application.Services
 
             await _orderRepository.AddAsync(order);
 
-            _cartRepository.Clear(cart);
-            await _cartRepository.SaveChangesAsync();
+            _cartRepository.ClearCartAsync(userId);
         }
     }
 }
