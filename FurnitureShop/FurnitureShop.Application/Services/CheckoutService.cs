@@ -69,8 +69,7 @@ namespace FurnitureShop.Application.Services
             };
 
             await _orderRepository.AddAsync(order);
-
-            _cartRepository.ClearCartAsync(userId);
+            await _cartRepository.ClearCartAsync(userId);
         }
     }
 }
