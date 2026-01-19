@@ -42,7 +42,7 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.WishlistItems.Remove(item);
         }
 
-        public async Task RemoveAll(Wishlist wishlist)
+        public void RemoveAll(Wishlist wishlist)
         {
             _context.WishlistItems.RemoveRange(wishlist.Items);
         }

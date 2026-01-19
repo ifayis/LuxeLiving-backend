@@ -85,7 +85,7 @@ namespace FurnitureShop.Application.Services
             var wishlist = await _WishlistRepository.GetByUserIdAsync(userId)
                 ?? throw new InvalidOperationException("Wishlist not found");
 
-            await _WishlistRepository.RemoveAll(wishlist);
+            _WishlistRepository.RemoveAll(wishlist);
             await _WishlistRepository.SaveChangesAsync();
         }
 
@@ -133,6 +133,7 @@ namespace FurnitureShop.Application.Services
             _WishlistRepository.RemoveAll(wishlist);
 
             await _WishlistRepository.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
         }
 
 
