@@ -14,14 +14,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Wishlist?> GetByUserIdAsync(Guid userId)
-        {
-            return await _context.Wishlists
-                .Include(w => w.Items)
-                .ThenInclude(i => i.Product)
-                .FirstOrDefaultAsync(w => w.UserId == userId);
-        }
-
         public async Task AddAsync(Wishlist wishlist)
         {
             _context.Wishlists.Add(wishlist);
@@ -35,6 +27,13 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<bool> ProductExistsAsync(Guid productId)
         {
             return await _context.Products.AnyAsync(p => p.Id == productId);
+        }
+        public async Task<Wishlist?> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Wishlists
+                .Include(w => w.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(w => w.UserId == userId);
         }
 
         public void RemoveItem(WishlistItem item)

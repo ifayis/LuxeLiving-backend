@@ -54,6 +54,7 @@ namespace FurnitureShop.Application.Services
 
             _WishlistRepository.AddItem(wishlistItem);
             await _WishlistRepository.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
 
             var updatedWishlist = await _WishlistRepository.GetByUserIdAsync(userId);
             return Map(updatedWishlist!);
