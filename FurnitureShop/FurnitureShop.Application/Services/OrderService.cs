@@ -89,7 +89,7 @@ namespace FurnitureShop.Application.Services
             else if (order.Status == "Pending")
             {
                 order.Status = "Cancelled";
-                order.PaymentMethod = "Cancelled";
+                order.PaymentMethod = "COD - Cancelled";
             }
 
             await _orderRepository.UpdateAsync(order);
