@@ -25,42 +25,13 @@ namespace FurnitureShop.Application.Services
         public async Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId)
         {
             var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);
-
-            return orders.Select(o => new OrderResponseDto
-            {
-                OrderId = o.Id,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                PaymentMethod = o.PaymentMethod,
-                CreatedAt = o.CreatedAt,
-                Items = o.Items.Select(i => new OrderItemResponseDto
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Price
-                }).ToList()
-            }).ToList();
+            return orders.Select(Map).ToList();
         }
 
         public async Task<OrderResponseDto?> GetMyOrderByIdAsync(Guid userId, Guid orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
-            if (order == null) return null;
-
-            return new OrderResponseDto
-            {
-                OrderId = order.Id,
-                TotalAmount = order.TotalAmount,
-                Status = order.Status,
-                PaymentMethod = order.PaymentMethod,
-                CreatedAt = order.CreatedAt,
-                Items = order.Items.Select(i => new OrderItemResponseDto
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Product.Price
-                }).ToList()
-            };
+            return order == null ? null : Map(order);
         }
 
         public async Task<List<OrderResponseDto>> GetOrdersByUserAsync(Guid userId)
@@ -70,13 +41,10 @@ namespace FurnitureShop.Application.Services
             return orders.Select(o => Map(o)).ToList();
         }
 
-
         public async Task<OrderResponseDto?> CancelOrderAsync(Guid userId, Guid orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
-
-            if (order == null)
-                return null;
+            if (order == null) return null;
 
             if (order.Status == "Cancelled")
                 throw new Exception("Order already cancelled");
@@ -94,20 +62,7 @@ namespace FurnitureShop.Application.Services
 
             await _orderRepository.UpdateAsync(order);
 
-            return new OrderResponseDto
-            {
-                OrderId = order.Id,
-                TotalAmount = order.TotalAmount,
-                Status = order.Status,
-                PaymentMethod = order.PaymentMethod,
-                CreatedAt = order.CreatedAt,
-                Items = order.Items.Select(i => new OrderItemResponseDto
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Price
-                }).ToList()
-            };
+            return Map(order);
         }
 
         private static OrderResponseDto Map(Order order)
