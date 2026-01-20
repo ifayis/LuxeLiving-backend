@@ -6,6 +6,7 @@ namespace FurnitureShop.Application.Interfaces.Services
     {
         Task<WishlistResponseDto> AddAsync(Guid userId, AddToWishlistRequestDto request);
         Task<WishlistResponseDto?> GetMyAsync(Guid userId);
+        Task<WishlistResponseDto?> GetByUserIdAsync(Guid userId);
         Task MoveToCartAsync(Guid userId);
         Task RemoveItemAsync(Guid userId, Guid itemId);
         Task ClearAsync(Guid userId);

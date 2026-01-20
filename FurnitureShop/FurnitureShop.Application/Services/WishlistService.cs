@@ -65,6 +65,12 @@ namespace FurnitureShop.Application.Services
             return wishlist == null ? null : Map(wishlist);
         }
 
+        public async Task<WishlistResponseDto?> GetByUserIdAsync(Guid userId)
+        {
+            var wishlist = await _WishlistRepository.GetByUserIdAsync(userId);
+            return wishlist == null ? null : Map(wishlist);
+        }
+
         public async Task RemoveItemAsync(Guid userId, Guid itemId)
         {
             if (itemId == Guid.Empty)

@@ -10,7 +10,6 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/wishlist")]
-    [Authorize(Roles = Roles.User)]
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _WishlistService;
@@ -44,6 +43,7 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpGet("my")]
         public async Task<IActionResult> GetMy()
         {
@@ -52,6 +52,20 @@ namespace FurnitureShop.API.Controllers
             return Ok(wishlist);
         }
 
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("user/{userId:guid}")]
+        public async Task<IActionResult> GetUserWishlist(Guid userId)
+        {
+            var wishlist = await _WishlistService.GetByUserIdAsync(userId);
+
+            if (wishlist == null)
+                return NotFound();
+
+            return Ok(wishlist);
+        }
+
+
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
@@ -64,6 +78,7 @@ namespace FurnitureShop.API.Controllers
             );
         }
 
+        [Authorize(Roles = Roles.User)]
         [HttpPost("move-to-cart")]
         public async Task<IActionResult> MoveAllToCart()
         {
@@ -75,7 +90,7 @@ namespace FurnitureShop.API.Controllers
             ));
         }
 
-
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()
         {
