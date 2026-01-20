@@ -11,5 +11,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
     {
         Task<User?> GetByEmailAsync(string email);
         Task AddAsync(User user);
+        Task<List<User>> GetAllAsyn();
+        Task<User?> GetById(Guid Id);
     }
 }
