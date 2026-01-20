@@ -31,12 +31,12 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<User>> GetAllAsyn()
+        public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User?> GetById(Guid Id)
+        public async Task<User?> GetByIdAsync(Guid Id)
         {
             return await _context.Users.FirstOrDefault(u => u.Id == id);
         }
