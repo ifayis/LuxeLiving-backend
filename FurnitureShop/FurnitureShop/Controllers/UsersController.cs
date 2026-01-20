@@ -1,4 +1,5 @@
 ﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,5 +35,24 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(user);
         }
+
+        [HttpPut("block/{id:guid}")]
+        public async Task<IActionResult> BlockUser(Guid id)
+        {
+            var success = await _userService.BlockUserAsync(id);
+            if (!success) return NotFound();
+
+            return Ok(ApiResponse<object>.Success(null, "User blocked"));
+        }
+
+        [HttpPut("unblock/{id:guid}")]
+        public async Task<IActionResult> UnblockUser(Guid id)
+        {
+            var success = await _userService.UnblockUserAsync(id);
+            if (!success) return NotFound();
+
+            return Ok(ApiResponse<object>.Success(null, "User unblocked"));
+        }
+
     }
 }

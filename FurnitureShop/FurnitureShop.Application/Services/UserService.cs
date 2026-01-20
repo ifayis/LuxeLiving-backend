@@ -54,8 +54,30 @@ namespace FurnitureShop.Application.Services
                 Email = user.Email,
                 Role = user.Role,
                 CartId = cart?.Id,
-                WishlistId = wishlist?.Id
+                WishlistId = wishlist?.Id,
+                IsBlocked = user.IsBlocked
             };
         }
+
+        public async Task<bool> BlockUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsBlocked = true;
+            await _userRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UnblockUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsBlocked = false;
+            await _userRepository.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

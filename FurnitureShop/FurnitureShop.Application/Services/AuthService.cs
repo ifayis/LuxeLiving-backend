@@ -53,6 +53,9 @@ namespace FurnitureShop.Application.Services
             if (user == null)
                 return null;
 
+            if (user.IsBlocked)
+                throw new UnauthorizedAccessException("Your account is blocked by admin");
+
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
             if (!isPasswordValid)

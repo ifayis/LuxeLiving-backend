@@ -36,9 +36,14 @@ namespace FurnitureShop.Infrastructure.Repositories
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User?> GetByIdAsync(Guid Id)
+        public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users.FirstOrDefault(u => u.Id == id);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

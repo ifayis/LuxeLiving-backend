@@ -14,7 +14,7 @@ namespace FurnitureShop.Application.DTOs.User
         public string Role { get; set; } = string.Empty;
         public Guid? CartId { get; set; }
         public Guid? WishlistId { get; set; }
-
+        public bool IsBlocked { get; set; }
 
     }
 }
