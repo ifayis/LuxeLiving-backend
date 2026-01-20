@@ -54,7 +54,6 @@ namespace FurnitureShop.Application.Services
 
             _WishlistRepository.AddItem(wishlistItem);
             await _WishlistRepository.SaveChangesAsync();
-            await _cartRepository.SaveChangesAsync();
 
             var updatedWishlist = await _WishlistRepository.GetByUserIdAsync(userId);
             return Map(updatedWishlist!);
@@ -121,7 +120,7 @@ namespace FurnitureShop.Application.Services
                 }
                 else
                 {
-                    cart.Items.Add(new CartItem
+                    await _cartRepository.AddCartItemAsync(new CartItem
                     {
                         Id = Guid.NewGuid(),
                         CartId = cart.Id,

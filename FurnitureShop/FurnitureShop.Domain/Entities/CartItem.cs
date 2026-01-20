@@ -18,4 +18,4 @@ namespace FurnitureShop.Domain.Enitities
 
         public int Quantity { get; set; }
     }
-}
+} 

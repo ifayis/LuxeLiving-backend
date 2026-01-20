@@ -35,6 +35,7 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task AddAsync(Cart cart)
         {
             _context.Carts.Add(cart);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<CartItem?> GetCartItemAsync(Guid cartId, Guid productId)
