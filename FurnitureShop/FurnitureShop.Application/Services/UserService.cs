@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Domain.Enitities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,17 @@ namespace FurnitureShop.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICartRepository _cartRepository;
+        private readonly IWishlistRepository _wishlistRepository;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(
+            IUserRepository userRepository,
+            ICartRepository cartRepository,
+            IWishlistRepository wishlistRepository)
         {
             _userRepository = userRepository;
+            _cartRepository = cartRepository;
+            _wishlistRepository = wishlistRepository;
         }
 
         public async Task<List<UserResponseDto>> GetAllUsersAsync()
@@ -36,12 +44,17 @@ namespace FurnitureShop.Application.Services
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return null;
 
+            var cart = await _cartRepository.GetByUserIdAsync(user.Id);
+            var wishlist = await _wishlistRepository.GetByUserIdAsync(user.Id);
+
             return new UserResponseDto
             {
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role,
+                CartId = cart?.Id,
+                WishlistId = wishlist?.Id
             };
         }
     }

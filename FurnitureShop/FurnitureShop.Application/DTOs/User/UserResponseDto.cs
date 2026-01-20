@@ -12,5 +12,9 @@ namespace FurnitureShop.Application.DTOs.User
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+        public Guid? CartId { get; set; }
+        public Guid? WishlistId { get; set; }
+
+
     }
 }
