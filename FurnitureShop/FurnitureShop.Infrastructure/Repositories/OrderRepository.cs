@@ -49,6 +49,26 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> GetTotalProductsPurchasedAsync()
+        {
+            return await _context.OrderItems.SumAsync(i => i.Quantity);
+        }
+
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _context.Orders
+                .Where(o => o.Status == "Paid")
+                .SumAsync(o => o.TotalAmount);
+        }
+
+        public async Task<Order?> GetOrderDetailsAsync(Guid orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
