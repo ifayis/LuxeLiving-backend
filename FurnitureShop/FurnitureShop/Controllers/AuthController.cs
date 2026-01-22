@@ -32,7 +32,6 @@ namespace FurnitureShop.API.Controllers
             }
 
             await _authService.RegisterAsync(request);
-
             return Ok(ResponseMessages.UserRegistered);
         }
 

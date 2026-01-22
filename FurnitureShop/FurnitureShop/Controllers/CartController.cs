@@ -31,7 +31,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpPost("add")]
+        [HttpPost("user/add")]
         public async Task<IActionResult> Add(AddToCartRequestDto request)
         {
             var result = await _cartService.AddToCartAsync(GetUserId(), request);
@@ -40,7 +40,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpGet("my")]
+        [HttpGet("user/my")]
         public async Task<IActionResult> GetMyCart()
         {
             var cart = await _cartService.GetMyCartAsync(GetUserId());
@@ -76,7 +76,7 @@ namespace FurnitureShop.API.Controllers
 
 
         [Authorize(Roles = Roles.User)]
-        [HttpPut("update")]
+        [HttpPut("update-cart")]
         public async Task<IActionResult> UpdateItem(UpdateCartItemRequestDto request)
         {
             var updated = await _cartService.UpdateItemAsync(GetUserId(), request);
@@ -92,7 +92,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpDelete("clear")]
+        [HttpDelete("clear-cart")]
         public async Task<IActionResult> Clear()
         {
             await _cartService.ClearCartAsync(GetUserId());
