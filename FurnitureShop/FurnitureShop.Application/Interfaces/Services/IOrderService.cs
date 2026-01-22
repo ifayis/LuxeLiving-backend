@@ -13,7 +13,9 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId);
         Task<OrderResponseDto?> GetMyOrderByIdAsync(Guid userId, Guid orderId);
         Task<List<OrderResponseDto>> GetOrdersByUserAsync(Guid userId);
-
+        Task<int> GetTotalProductsPurchasedAsync();
+        Task<decimal> GetTotalRevenueAsync();
+        Task<OrderResponseDto?> GetOrderDetailsAsync(Guid orderId);
         Task<OrderResponseDto?> CancelOrderAsync(Guid userId, Guid orderId);
 
     }
