@@ -53,7 +53,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("user/{userId:guid}")]
+        [HttpGet("User/{userId:guid}")]
         public async Task<IActionResult> GetUserWishlist(Guid userId)
         {
             var wishlist = await _WishlistService.GetByUserIdAsync(userId);

@@ -20,7 +20,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> Create(CreateCategoryRequestDto request)
         {
             var result = await _CategoryService.CreateAsync(request);
@@ -41,7 +41,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("{id:guid}")]
+        [HttpPut("Update{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateCategoryRequestDto request)
         {
             var updated = await _CategoryService.UpdateAsync(id, request);
@@ -55,7 +55,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("Delete:{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _CategoryService.DeleteByIdAsync(id);

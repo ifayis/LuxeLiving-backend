@@ -20,7 +20,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> Create(CreateProductRequestDto request)
         {
             var product = await _productService.CreateAsync(request);
@@ -49,7 +49,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(products);
         }
 
-        [HttpGet]
+        [HttpGet("All")]
         public async Task<IActionResult> GetAll()
         {
             var products = await _productService.GetAllProducts();
@@ -58,7 +58,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("activate/{id:guid}")]
+        [HttpPut("Activate/{id:guid}")]
         public async Task<IActionResult> Activate(Guid id)
         {
             await _productService.ActivateProductAsync(id);
@@ -72,7 +72,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("deactivate/{id:guid}")]
+        [HttpPut("Deactivate/{id:guid}")]
         public async Task<IActionResult> Deactivate(Guid id)
         {
             await _productService.DeactivateProductAsync(id);
@@ -86,7 +86,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("{id:guid}")]
+        [HttpDelete("Delete/{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _productService.DeleteByIdAsync(id);
@@ -94,7 +94,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("clear")]
+        [HttpDelete("Clear")]
         public async Task<IActionResult> Clear()
         {
             var response = await _productService.DeleteAllAsync();
@@ -102,7 +102,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("{id:guid}")]
+        [HttpPut("Update/{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
         {
             var updated = await _productService.UpdateAsync(id, request);

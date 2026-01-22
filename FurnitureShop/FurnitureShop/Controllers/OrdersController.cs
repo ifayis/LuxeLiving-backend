@@ -29,7 +29,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpGet("user/my")]
+        [HttpGet("my")]
         public async Task<IActionResult> GetMyOrders()
         {
             var orders = await _orderService.GetMyOrdersAsync(GetUserId());
@@ -48,7 +48,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("user/{userId:guid}")]
+        [HttpGet("User/{userId:guid}")]
         public async Task<IActionResult> GetOrdersByUser(Guid userId)
         {
             var orders = await _orderService.GetOrdersByUserAsync(userId);
@@ -74,7 +74,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("admin/total-products")]
+        [HttpGet("Total-Products")]
         public async Task<IActionResult> TotalProductsPurchased()
         {
             var total = await _orderService.GetTotalProductsPurchasedAsync();
@@ -82,7 +82,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("admin/total-revenue")]
+        [HttpGet("Total-Revenue")]
         public async Task<IActionResult> TotalRevenue()
         {
             var revenue = await _orderService.GetTotalRevenueAsync();
@@ -90,7 +90,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("admin/order-details/{orderId}")]
+        [HttpGet("Order-Details/{orderId}")]
         public async Task<IActionResult> OrderDetails(Guid orderId)
         {
             var order = await _orderService.GetOrderDetailsAsync(orderId);
