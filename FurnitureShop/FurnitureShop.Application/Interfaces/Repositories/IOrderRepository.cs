@@ -13,6 +13,9 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<List<Order>> GetOrdersByUserIdAsync(Guid userId);
         Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId);
         Task UpdateAsync(Order order);
+        Task<int> GetTotalProductsPurchasedAsync();
+        Task<decimal> GetTotalRevenueAsync();
+        Task<Order?> GetOrderDetailsAsync(Guid orderId);
         Task SaveChangesAsync();
 
     }
