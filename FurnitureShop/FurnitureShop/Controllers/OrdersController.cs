@@ -1,6 +1,5 @@
 ﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
-using FurnitureShop.Application.DTOs.Order;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,8 +28,8 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
-        [Authorize]
-        [HttpGet("my")]
+        [Authorize(Roles = Roles.User)]
+        [HttpGet("user/my")]
         public async Task<IActionResult> GetMyOrders()
         {
             var orders = await _orderService.GetMyOrdersAsync(GetUserId());
@@ -73,5 +72,32 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(order);
         }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("admin/total-products")]
+        public async Task<IActionResult> TotalProductsPurchased()
+        {
+            var total = await _orderService.GetTotalProductsPurchasedAsync();
+            return Ok(total);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("admin/total-revenue")]
+        public async Task<IActionResult> TotalRevenue()
+        {
+            var revenue = await _orderService.GetTotalRevenueAsync();
+            return Ok(revenue);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("admin/order-details/{orderId}")]
+        public async Task<IActionResult> OrderDetails(Guid orderId)
+        {
+            var order = await _orderService.GetOrderDetailsAsync(orderId);
+            if (order == null) return NotFound("Order not found");
+
+            return Ok(order);
+        }
+
     }
 }
