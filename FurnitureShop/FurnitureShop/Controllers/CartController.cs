@@ -60,21 +60,6 @@ namespace FurnitureShop.API.Controllers
             return Ok(cart);
         }
 
-
-        [Authorize(Roles = Roles.User)]
-        [HttpDelete("remove/{productId:guid}")]
-        public async Task<IActionResult> Remove(Guid productId)
-        {
-            await _cartService.RemoveItemAsync(GetUserId(), productId);
-
-            return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.CartRemoved
-                 ));
-        }
-
-
         [Authorize(Roles = Roles.User)]
         [HttpPut("update")]
         public async Task<IActionResult> UpdateItem(UpdateCartItemRequestDto request)
@@ -89,6 +74,19 @@ namespace FurnitureShop.API.Controllers
             }
 
             return Ok(updated);
+        }
+
+        [Authorize(Roles = Roles.User)]
+        [HttpDelete("remove/{productId:guid}")]
+        public async Task<IActionResult> Remove(Guid productId)
+        {
+            await _cartService.RemoveItemAsync(GetUserId(), productId);
+
+            return Ok(
+                 ApiResponse<object>.Success(
+                 null,
+                 ResponseMessages.CartRemoved
+                 ));
         }
 
         [Authorize(Roles = Roles.User)]

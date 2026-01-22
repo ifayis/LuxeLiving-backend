@@ -59,20 +59,6 @@ namespace FurnitureShop.API.Controllers
             return Ok(orders);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpPut("cancel/{orderId:guid}")]
-        public async Task<IActionResult> CancelOrder(Guid orderId)
-        {
-            var order = await _orderService.CancelOrderAsync(GetUserId(), orderId);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(order);
-        }
-
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("Total-Products")]
         public async Task<IActionResult> TotalProductsPurchased()
@@ -99,5 +85,18 @@ namespace FurnitureShop.API.Controllers
             return Ok(order);
         }
 
+        [Authorize(Roles = Roles.User)]
+        [HttpPut("cancel/{orderId:guid}")]
+        public async Task<IActionResult> CancelOrder(Guid orderId)
+        {
+            var order = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
     }
 }

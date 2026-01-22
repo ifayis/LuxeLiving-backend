@@ -58,6 +58,20 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
+        [HttpPut("Update/{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
+        {
+            var updated = await _productService.UpdateAsync(id, request);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            return Ok(updated);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("Activate/{id:guid}")]
         public async Task<IActionResult> Activate(Guid id)
         {
@@ -99,20 +113,6 @@ namespace FurnitureShop.API.Controllers
         {
             var response = await _productService.DeleteAllAsync();
             return StatusCode(response.StatusCode, response);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Update/{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
-        {
-            var updated = await _productService.UpdateAsync(id, request);
-
-            if (!updated)
-            {
-                return NotFound();
-            }
-
-            return Ok(updated);
         }
     }
 }
