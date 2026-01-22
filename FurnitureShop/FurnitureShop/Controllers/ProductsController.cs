@@ -41,7 +41,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(product);
         }
 
-        [HttpGet("category/{categoryId:guid}")]
+        [HttpGet("{categoryId:guid}")]
         public async Task<IActionResult> GetByCategory(Guid categoryId)
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
@@ -58,7 +58,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Update/{id:guid}")]
+        [HttpPut("Update:{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
         {
             var updated = await _productService.UpdateAsync(id, request);
@@ -71,8 +71,9 @@ namespace FurnitureShop.API.Controllers
             return Ok(updated);
         }
 
+
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Activate/{id:guid}")]
+        [HttpPut("Activate:{id:guid}")]
         public async Task<IActionResult> Activate(Guid id)
         {
             await _productService.ActivateProductAsync(id);
@@ -86,7 +87,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Deactivate/{id:guid}")]
+        [HttpPut("Deactivate:{id:guid}")]
         public async Task<IActionResult> Deactivate(Guid id)
         {
             await _productService.DeactivateProductAsync(id);
@@ -100,7 +101,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("Delete/{id:guid}")]
+        [HttpDelete("Delete:{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var response = await _productService.DeleteByIdAsync(id);

@@ -25,7 +25,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(users);
         }
 
-        [HttpGet("User/{id:guid}")]
+        [HttpGet("Individual:{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -36,7 +36,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(user);
         }
 
-        [HttpPut("Block/{id:guid}")]
+        [HttpPut("Block:{id:guid}")]
         public async Task<IActionResult> BlockUser(Guid id)
         {
             var success = await _userService.BlockUserAsync(id);
@@ -45,7 +45,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ApiResponse<object>.Success(null, "User blocked"));
         }
 
-        [HttpPut("Unblock/{id:guid}")]
+        [HttpPut("Unblock:{id:guid}")]
         public async Task<IActionResult> UnblockUser(Guid id)
         {
             var success = await _userService.UnblockUserAsync(id);

@@ -29,7 +29,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpGet("my")]
+        [HttpGet("my-orders")]
         public async Task<IActionResult> GetMyOrders()
         {
             var orders = await _orderService.GetMyOrdersAsync(GetUserId());
@@ -48,7 +48,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("User/{userId:guid}")]
+        [HttpGet("Individual:    {userId:guid}")]
         public async Task<IActionResult> GetOrdersByUser(Guid userId)
         {
             var orders = await _orderService.GetOrdersByUserAsync(userId);
@@ -76,7 +76,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Order-Details/{orderId}")]
+        [HttpGet("Order-Details:{orderId}")]
         public async Task<IActionResult> OrderDetails(Guid orderId)
         {
             var order = await _orderService.GetOrderDetailsAsync(orderId);
@@ -86,7 +86,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpPut("cancel/{orderId:guid}")]
+        [HttpPut("cancel:{orderId:guid}")]
         public async Task<IActionResult> CancelOrder(Guid orderId)
         {
             var order = await _orderService.CancelOrderAsync(GetUserId(), orderId);

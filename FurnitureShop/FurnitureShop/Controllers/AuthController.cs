@@ -17,7 +17,7 @@ namespace FurnitureShop.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
+        [HttpPost("SignUp")]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -35,7 +35,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ResponseMessages.UserRegistered);
         }
 
-        [HttpPost("login")]
+        [HttpPost("SignIn")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
             var token = await _authService.LoginAsync(request);

@@ -27,7 +27,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _CategoryService.GetAllAsync());
@@ -41,7 +41,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Update{id:guid}")]
+        [HttpPut("Update:{id:guid}")]
         public async Task<IActionResult> Update(Guid id, UpdateCategoryRequestDto request)
         {
             var updated = await _CategoryService.UpdateAsync(id, request);
