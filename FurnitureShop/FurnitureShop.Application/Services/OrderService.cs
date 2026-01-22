@@ -65,6 +65,24 @@ namespace FurnitureShop.Application.Services
             return Map(order);
         }
 
+        public async Task<int> GetTotalProductsPurchasedAsync()
+        {
+            return await _orderRepository.GetTotalProductsPurchasedAsync();
+        }
+
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _orderRepository.GetTotalRevenueAsync();
+        }
+
+        public async Task<OrderResponseDto?> GetOrderDetailsAsync(Guid orderId)
+        {
+            var order = await _orderRepository.GetOrderDetailsAsync(orderId);
+            if (order == null) return null;
+
+            return Map(order);
+        }
+
         private static OrderResponseDto Map(Order order)
         {
             return new OrderResponseDto
