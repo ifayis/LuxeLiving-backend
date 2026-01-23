@@ -11,5 +11,6 @@ namespace FurnitureShop.Application.Interfaces.Services
     {
         string GenerateToken(User user);
         string GenerateRefreshToken();
+        string GenerateAccessToken(User user);
     }
 }

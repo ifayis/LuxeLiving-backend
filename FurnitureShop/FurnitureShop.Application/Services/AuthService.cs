@@ -46,7 +46,7 @@ namespace FurnitureShop.Application.Services
             await _userRepository.AddAsync(user);
         }
 
-        public async Task<string?> LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
 

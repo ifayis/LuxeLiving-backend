@@ -49,10 +49,7 @@ namespace FurnitureShop.API.Controllers
                 );
             }
 
-            return Ok(new LoginResponseDto
-            {
-                AccessToken = token
-            });
+            return Ok(token);
         }
 
         [HttpPost("refresh-token")]

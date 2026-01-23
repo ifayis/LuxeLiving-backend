@@ -58,5 +58,9 @@ namespace FurnitureShop.API.Services
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
+        public string GenerateAccessToken(User user)
+        {
+            return GenerateToken(user);
+        }
     }
 }
