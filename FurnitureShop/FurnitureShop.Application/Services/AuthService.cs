@@ -104,5 +104,16 @@ namespace FurnitureShop.Application.Services
                 RefreshToken = newRefreshToken
             };
         }
+
+        public async Task LogoutAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return;
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }

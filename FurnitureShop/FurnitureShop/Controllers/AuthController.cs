@@ -2,7 +2,9 @@
 using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Auth;
 using FurnitureShop.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FurnitureShop.API.Controllers
 {
@@ -60,5 +62,18 @@ namespace FurnitureShop.API.Controllers
             return Ok(response);
         }
 
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _authService.LogoutAsync(userId);
+
+            return Ok(new
+            {
+                message = "Logged out successfully"
+            });
+        }
     }
 }
