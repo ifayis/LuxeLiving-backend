@@ -28,7 +28,16 @@ namespace FurnitureShop.API.Controllers
             return Ok(product);
         }
 
-        [HttpGet("{id:guid}")]
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await _productService.GetAllProducts();
+
+            return Ok(products);
+        }
+
+        [HttpGet("single{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetProductByIdAsync(id);
@@ -45,14 +54,6 @@ namespace FurnitureShop.API.Controllers
         public async Task<IActionResult> GetByCategory(Guid categoryId)
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
-
-            return Ok(products);
-        }
-
-        [HttpGet("All")]
-        public async Task<IActionResult> GetAll()
-        {
-            var products = await _productService.GetAllProducts();
 
             return Ok(products);
         }

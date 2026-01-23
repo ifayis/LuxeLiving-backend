@@ -48,7 +48,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Individual:    {userId:guid}")]
+        [HttpGet("Individual:{userId:guid}")]
         public async Task<IActionResult> GetOrdersByUser(Guid userId)
         {
             var orders = await _orderService.GetOrdersByUserAsync(userId);
