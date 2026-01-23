@@ -17,8 +17,8 @@ namespace FurnitureShop.Application.Services
         private readonly ITokenService _tokenService;
 
         public AuthService(
-     IUserRepository userRepository,
-     ITokenService tokenService)
+            IUserRepository userRepository,
+            ITokenService tokenService)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
@@ -62,9 +62,47 @@ namespace FurnitureShop.Application.Services
                 return null;
 
             var token = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
 
-            return token;
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            await _userRepository.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken
+            };
         }
 
+        public async Task<LoginResponseDto> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+
+            if (user == null)
+                throw new UnauthorizedAccessException("Invalid refresh token");
+
+            if (user.RefreshTokenExpiryTime < DateTime.UtcNow)
+                throw new UnauthorizedAccessException("Refresh token expired");
+
+            if (user.IsBlocked)
+                throw new UnauthorizedAccessException("User is blocked");
+
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            var newAccessToken = _tokenService.GenerateAccessToken(user);
+
+            await _userRepository.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
     }
 }

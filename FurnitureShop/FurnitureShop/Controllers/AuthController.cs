@@ -49,8 +49,16 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(new LoginResponseDto
             {
-                Token = token
+                AccessToken = token
             });
         }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto request)
+        {
+            var response = await _authService.RefreshTokenAsync(request.RefreshToken);
+            return Ok(response);
+        }
+
     }
 }

@@ -11,5 +11,6 @@ namespace FurnitureShop.Application.Interfaces.Services
     {
         Task RegisterAsync(RegisterRequestDto request);
         Task<string?> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> RefreshTokenAsync(string refreshToken);
     }
 }
