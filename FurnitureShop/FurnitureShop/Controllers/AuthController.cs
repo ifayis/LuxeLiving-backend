@@ -63,7 +63,7 @@ namespace FurnitureShop.API.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = Guid.Parse(User.FindFirstValue("UID")!);
 
             await _authService.LogoutAsync(userId);
 

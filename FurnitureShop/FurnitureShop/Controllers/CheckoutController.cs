@@ -22,7 +22,7 @@ namespace FurnitureShop.API.Controllers
 
         private Guid GetUserId()
         {
-            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var id = User.FindFirstValue("UID");
             if (string.IsNullOrWhiteSpace(id))
                 throw new UnauthorizedAccessException("User not found");
 
