@@ -35,7 +35,8 @@ namespace FurnitureShop.Application.Services
                 Id = u.Id,
                 FullName = u.FullName,
                 Email = u.Email,
-                Role = u.Role
+                Role = u.Role,
+                IsBlocked = u.IsBlocked
             }).ToList();
         }
 
