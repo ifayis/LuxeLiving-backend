@@ -40,7 +40,7 @@ namespace FurnitureShop.Application.Services
             }).ToList();
         }
 
-        public async Task<UserResponseDto?> GetUserByIdAsync(Guid id)
+        public async Task<SingleUserResponseDto?> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return null;
@@ -48,7 +48,7 @@ namespace FurnitureShop.Application.Services
             var cart = await _cartRepository.GetByUserIdAsync(user.Id);
             var wishlist = await _wishlistRepository.GetByUserIdAsync(user.Id);
 
-            return new UserResponseDto
+            return new SingleUserResponseDto
             {
                 Id = user.Id,
                 FullName = user.FullName,

@@ -10,7 +10,7 @@ namespace FurnitureShop.Application.Interfaces.Services
     public interface IUserService
     {
         Task<List<UserResponseDto>> GetAllUsersAsync();
-        Task<UserResponseDto> GetUserByIdAsync(Guid id);
+        Task<SingleUserResponseDto> GetUserByIdAsync(Guid id);
         Task<bool> BlockUserAsync(Guid id);
         Task<bool> UnblockUserAsync(Guid id);
     }
