@@ -72,6 +72,19 @@ namespace FurnitureShop.API.Controllers
             return Ok(updated);
         }
 
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("Deactivate:{id:guid}")]
+        public async Task<IActionResult> Deactivate(Guid id)
+        {
+            await _productService.DeactivateProductAsync(id);
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.ProductDeactivated
+                )
+            );
+        }
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPut("Activate:{id:guid}")]
@@ -83,20 +96,6 @@ namespace FurnitureShop.API.Controllers
                 ApiResponse<object>.Success(
                     null,
                     ResponseMessages.ProductActivated
-                )
-            );
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Deactivate:{id:guid}")]
-        public async Task<IActionResult> Deactivate(Guid id)
-        {
-            await _productService.DeactivateProductAsync(id);
-
-            return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.ProductDeactivated
                 )
             );
         }
