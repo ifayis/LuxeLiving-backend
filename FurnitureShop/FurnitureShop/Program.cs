@@ -20,7 +20,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .WithExposedHeaders("refreshtoken");
     });
 });
 
@@ -58,7 +59,9 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key),
 
         NameClaimType = "UID",
-        RoleClaimType = "Role"
+        RoleClaimType = "Role",
+
+        ClockSkew = TimeSpan.Zero
     };
 });
 builder.Services.AddAuthorization();

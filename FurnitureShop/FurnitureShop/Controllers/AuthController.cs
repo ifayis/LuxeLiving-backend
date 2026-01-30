@@ -52,6 +52,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(token);
         }
 
+        [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto request)
         {

@@ -83,7 +83,9 @@ namespace FurnitureShop.Application.Services
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid refresh token");
 
-            if (user.RefreshTokenExpiryTime < DateTime.UtcNow)
+            if (user.RefreshToken == null ||
+                user.RefreshToken != dto.RefreshToken ||
+                user.RefreshTokenExpiryTime < DateTime.UtcNow)
                 throw new UnauthorizedAccessException("Refresh token expired");
 
             if (user.IsBlocked)
