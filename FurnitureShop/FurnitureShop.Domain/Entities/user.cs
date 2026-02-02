@@ -19,8 +19,6 @@ namespace FurnitureShop.Domain.Enitities
         public bool IsBlocked { get; set; } = false;
 
         public Guid? ShippingAddressId { get; set; }
-        public ShippingAddress? ShippingAddress { get; set; }
-
-
+        public ICollection<ShippingAddress> ShippingAddresses { get; set; } = new List<ShippingAddress>();
     }
 }

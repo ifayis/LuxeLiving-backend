@@ -23,7 +23,6 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(User.FindFirst("UID")!.Value);
         }
 
-
         [HttpGet("All")]
         public async Task<IActionResult> GetAll()
         {
