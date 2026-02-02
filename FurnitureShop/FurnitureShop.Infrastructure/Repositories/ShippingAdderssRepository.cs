@@ -19,19 +19,27 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<ShippingAddress?> GetByUserIdAsync(Guid userId)
-        {
-            return await _context.ShippingAddresses
-                .FirstOrDefaultAsync(x => x.UserId == userId);
-        }
-
         public async Task AddAsync(ShippingAddress address)
         {
             _context.ShippingAddresses.Add(address);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task SaveChangesAsync()
+        public async Task<List<ShippingAddress>> GetByUserIdAsync(Guid userId)
         {
+            return await _context.ShippingAddresses
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<ShippingAddress?> GetByIdAsync(Guid id)
+        {
+            return await _context.ShippingAddresses.FindAsync(id);
+        }
+
+        public async Task RemoveAsync(ShippingAddress address)
+        {
+            _context.ShippingAddresses.Remove(address);
             await _context.SaveChangesAsync();
         }
     }
