@@ -65,7 +65,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("User:{userId:guid}")]
+        [HttpGet("User/{userId:guid}")]
         public async Task<IActionResult> GetUserWishlist(Guid userId)
         {
             var wishlist = await _WishlistService.GetByUserIdAsync(userId);
@@ -77,7 +77,7 @@ namespace FurnitureShop.API.Controllers
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpDelete("item:{itemId:guid}")]
+        [HttpDelete("item/{itemId:guid}")]
         public async Task<IActionResult> RemoveItem(Guid itemId)
         {
             await _WishlistService.RemoveItemAsync(GetUserId(), itemId);

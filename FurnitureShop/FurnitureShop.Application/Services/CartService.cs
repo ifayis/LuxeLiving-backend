@@ -42,7 +42,6 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _cartRepository.AddAsync(cart);
-                await _cartRepository.SaveChangesAsync();
             }
 
             var item = await _cartRepository
@@ -82,8 +81,6 @@ namespace FurnitureShop.Application.Services
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
-            if (cart == null || !cart.Items.Any())
-                return null;
             return Map(cart);
         }
 
