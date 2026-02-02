@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FurnitureShop.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,10 @@ namespace FurnitureShop.Domain.Enitities
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
         public bool IsBlocked { get; set; } = false;
+
+        public Guid? ShippingAddressId { get; set; }
+        public ShippingAddress? ShippingAddress { get; set; }
+
 
     }
 }
