@@ -82,6 +82,8 @@ namespace FurnitureShop.Application.Services
         public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
+            if (cart == null || !cart.Items.Any())
+                return null;
             return Map(cart);
         }
 
@@ -148,6 +150,9 @@ namespace FurnitureShop.Application.Services
                 Items = cart.Items.Select(i => new CartItemResponseDto
                 {
                     ProductId = i.ProductId,
+                    Name = i.Product.Name,
+                    Price = i.Product.Price,
+                    Imageurl = i.Product.ImageUrl,
                     Quantity = i.Quantity
                 }).ToList()
             };
