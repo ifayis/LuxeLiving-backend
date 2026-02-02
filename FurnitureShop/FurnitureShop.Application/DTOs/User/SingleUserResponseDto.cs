@@ -16,5 +16,6 @@ namespace FurnitureShop.Application.DTOs.User
         public Guid? WishlistId { get; set; }
         public bool IsBlocked { get; set; }
 
+        public ShippingAddressResponseDto? ShippingAddress { get; set; }
     }
 }

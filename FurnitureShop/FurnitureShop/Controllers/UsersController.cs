@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,11 @@ namespace FurnitureShop.API.Controllers
         {
             _userService = userService;
         }
+        private Guid GetUserId()
+        {
+            return Guid.Parse(User.FindFirst("UID")!.Value);
+        }
+
 
         [HttpGet("All")]
         public async Task<IActionResult> GetAll()
@@ -53,6 +59,15 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(ApiResponse<object>.Success(null, "User unblocked"));
         }
+
+        [Authorize]
+        [HttpPost("shipping-address")]
+        public async Task<IActionResult> AddShippingAddress(AddShippingAddressRequestDto dto)
+        {
+            await _userService.AddOrUpdateShippingAddressAsync(GetUserId(), dto);
+            return Ok();
+        }
+
 
     }
 }

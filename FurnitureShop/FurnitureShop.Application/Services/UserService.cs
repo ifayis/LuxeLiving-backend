@@ -1,7 +1,6 @@
 ﻿using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -16,15 +15,19 @@ namespace FurnitureShop.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IWishlistRepository _wishlistRepository;
+        private readonly IShippingAddressRepository _shippingAddressRepository;
+
 
         public UserService(
             IUserRepository userRepository,
             ICartRepository cartRepository,
-            IWishlistRepository wishlistRepository)
+            IWishlistRepository wishlistRepository,
+            IShippingAddressRepository shippingAddressRepository)
         {
             _userRepository = userRepository;
             _cartRepository = cartRepository;
             _wishlistRepository = wishlistRepository;
+            _shippingAddressRepository = shippingAddressRepository;
         }
 
         public async Task<List<UserResponseDto>> GetAllUsersAsync()
@@ -57,7 +60,20 @@ namespace FurnitureShop.Application.Services
                 Role = user.Role,
                 CartId = cart?.Id,
                 WishlistId = wishlist?.Id,
-                IsBlocked = user.IsBlocked
+                IsBlocked = user.IsBlocked,
+
+                ShippingAddress = user.ShippingAddress == null
+            ? null
+            : new ShippingAddressResponseDto
+            {
+                Id = user.ShippingAddress.Id,
+                FullName = user.ShippingAddress.FullName,
+                PhoneNumber = user.ShippingAddress.PhoneNumber,
+                AddressLine1 = user.ShippingAddress.AddressLine1,
+                AddressLine2 = user.ShippingAddress.AddressLine2,
+                City = user.ShippingAddress.City,
+                PinCode = user.ShippingAddress.PinCode
+            }
             };
         }
 
@@ -81,9 +97,7 @@ namespace FurnitureShop.Application.Services
             return true;
         }
 
-        public async Task AddOrUpdateShippingAddressAsync(
-    Guid userId,
-    AddShippingAddressRequestDto dto)
+        public async Task AddOrUpdateShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto)
         {
             var user = await _userRepository.GetByIdAsync(userId)
                 ?? throw new Exception("User not found");

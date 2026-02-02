@@ -38,7 +38,9 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
-            return _context.Users.FirstOrDefault(u => u.Id == id);
+            return await _context.Users
+                .Include(u => u.ShippingAddress)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
