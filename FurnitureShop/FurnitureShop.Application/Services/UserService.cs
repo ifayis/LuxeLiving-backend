@@ -2,6 +2,7 @@
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,6 +80,39 @@ namespace FurnitureShop.Application.Services
             await _userRepository.SaveChangesAsync();
             return true;
         }
+
+        public async Task AddOrUpdateShippingAddressAsync(
+    Guid userId,
+    AddShippingAddressRequestDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new Exception("User not found");
+
+            var address = await _shippingAddressRepository.GetByUserIdAsync(userId);
+
+            if (address == null)
+            {
+                address = new ShippingAddress
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _shippingAddressRepository.AddAsync(address);
+                user.ShippingAddressId = address.Id;
+            }
+
+            address.FullName = dto.FullName;
+            address.PhoneNumber = dto.PhoneNumber;
+            address.AddressLine1 = dto.AddressLine1;
+            address.AddressLine2 = dto.AddressLine2;
+            address.City = dto.City;
+            address.PinCode = dto.PinCode;
+
+            await _userRepository.SaveChangesAsync();
+        }
+
 
     }
 }
