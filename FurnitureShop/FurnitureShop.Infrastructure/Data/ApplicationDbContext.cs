@@ -24,6 +24,7 @@ namespace FurnitureShop.Infrastructure.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<ShippingAddress> ShippingAddresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +52,13 @@ namespace FurnitureShop.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(i => i.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ShippingAddress)
+                .WithOne(a => a.User)
+                .HasForeignKey<ShippingAddress>(a => a.UserId);
+
+                 base.OnModelCreating(modelBuilder);
         }
     }
 }
