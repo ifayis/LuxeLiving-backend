@@ -1,0 +1,61 @@
+﻿using FurnitureShop.Application.DTOs.ShippingAddress;
+using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace FurnitureShop.API.Controllers
+{
+    [ApiController]
+    [Route("api/shipping-addresses")]
+    public class ShippingAddressesController : ControllerBase
+    {
+        private readonly IShippingAddressService _shippingaddressService;
+
+        public ShippingAddressesController(IShippingAddressService service)
+        {
+            _shippingaddressService = service;
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Add(ShippingAddressRequestDto dto)
+        {
+            await _shippingaddressService.AddAsync(GetUserId(), dto);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMy()
+        {
+            return Ok(await _shippingaddressService.GetMyAsync(GetUserId()));
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUser(Guid userId)
+        {
+            return Ok(await _shippingaddressService.GetMyAsync(userId));
+        }
+
+        [Authorize]
+        [HttpPut("{addressId}")]
+        public async Task<IActionResult> Update(Guid addressId, ShippingAddressRequestDto dto)
+        {
+            await _shippingaddressService.UpdateAsync(GetUserId(), addressId, dto);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete("{addressId}")]
+        public async Task<IActionResult> Delete(Guid addressId)
+        {
+            await _shippingaddressService.DeleteAsync(GetUserId(), addressId);
+            return Ok();
+        }
+
+        private Guid GetUserId()
+            => Guid.Parse(User.FindFirst("Name")!.Value);
+    }
+}

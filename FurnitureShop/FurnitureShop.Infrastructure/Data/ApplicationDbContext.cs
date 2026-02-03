@@ -24,6 +24,8 @@ namespace FurnitureShop.Infrastructure.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<ShippingAddress> ShippingAddresses { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
