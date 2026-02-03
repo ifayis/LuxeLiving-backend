@@ -13,7 +13,6 @@ namespace FurnitureShop.Domain.Entities
         public string? AddressLine2 { get; set; }
         public string City { get; set; }
         public string PinCode { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public User User { get; set; }

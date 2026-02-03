@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Interfaces.Services;
+﻿using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Entities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -43,5 +44,4 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
     }
-
 }

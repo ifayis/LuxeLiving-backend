@@ -62,18 +62,18 @@ namespace FurnitureShop.Application.Services
                 WishlistId = wishlist?.Id,
                 IsBlocked = user.IsBlocked,
 
-                ShippingAddress = user.ShippingAddress == null
-            ? null
-            : new ShippingAddressResponseDto
-            {
-                Id = user.ShippingAddress.Id,
-                FullName = user.ShippingAddress.FullName,
-                PhoneNumber = user.ShippingAddress.PhoneNumber,
-                AddressLine1 = user.ShippingAddress.AddressLine1,
-                AddressLine2 = user.ShippingAddress.AddressLine2,
-                City = user.ShippingAddress.City,
-                PinCode = user.ShippingAddress.PinCode
-            }
+            //    ShippingAddress = user.ShippingAddress == null
+            //? null
+            //: new ShippingAddressResponseDto
+            //{
+            //    Id = user.ShippingAddress.Id,
+            //    FullName = user.ShippingAddress.FullName,
+            //    PhoneNumber = user.ShippingAddress.PhoneNumber,
+            //    AddressLine1 = user.ShippingAddress.AddressLine1,
+            //    AddressLine2 = user.ShippingAddress.AddressLine2,
+            //    City = user.ShippingAddress.City,
+            //    PinCode = user.ShippingAddress.PinCode
+            //}
             };
         }
 
@@ -96,6 +96,43 @@ namespace FurnitureShop.Application.Services
             await _userRepository.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task AddShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto)
+        {
+            var address = new ShippingAddress
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                FullName = dto.FullName,
+                PhoneNumber = dto.PhoneNumber,
+                AddressLine1 = dto.AddressLine1,
+                AddressLine2 = dto.AddressLine2,
+                City = dto.City,
+                PinCode = dto.PinCode,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _shippingAddressRepository.AddAsync(address);
+        }
+
+        public async Task<List<ShippingAddressResponseDto>> GetMyAddressesAsync(Guid userId)
+        {
+            var addresses = await _shippingAddressRepository.GetByUserIdAsync(userId);
+
+            return addresses.Select(a => new ShippingAddressResponseDto
+            {
+                Id = a.Id,
+                FullName = a.FullName,
+                PhoneNumber = a.PhoneNumber,
+                AddressLine1 = a.AddressLine1,
+                AddressLine2 = a.AddressLine2,
+                City = a.City,
+                PinCode = a.PinCode
+            }).ToList();
+        }
+
+
 
         public async Task AddOrUpdateShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto)
         {
@@ -126,7 +163,5 @@ namespace FurnitureShop.Application.Services
 
             await _userRepository.SaveChangesAsync();
         }
-
-
     }
 }

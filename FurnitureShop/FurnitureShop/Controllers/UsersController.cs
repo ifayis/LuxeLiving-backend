@@ -61,12 +61,27 @@ namespace FurnitureShop.API.Controllers
 
         [Authorize]
         [HttpPost("shipping-address")]
-        public async Task<IActionResult> AddShippingAddress(AddShippingAddressRequestDto dto)
+        public async Task<IActionResult> AddShippingAddress(
+            AddShippingAddressRequestDto dto)
         {
-            await _userService.AddOrUpdateShippingAddressAsync(GetUserId(), dto);
+            await _userService.AddShippingAddressAsync(GetUserId(), dto);
             return Ok();
         }
 
+        [Authorize]
+        [HttpGet("shipping-addresses")]
+        public async Task<IActionResult> GetMyShippingAddresses()
+        {
+            var result = await _userService.GetMyAddressesAsync(GetUserId());
+            return Ok(result);
+        }
 
+        [Authorize(Roles = "admin")]
+        [HttpGet("{userId}/shipping-addresses")]
+        public async Task<IActionResult> GetUserShippingAddresses(Guid userId)
+        {
+            var result = await _userService.GetMyAddressesAsync(userId);
+            return Ok(result);
+        }
     }
 }
