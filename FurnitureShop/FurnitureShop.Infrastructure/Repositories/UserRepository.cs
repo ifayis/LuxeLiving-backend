@@ -39,7 +39,6 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users
-                .Include(u => u.ShippingAddress)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 

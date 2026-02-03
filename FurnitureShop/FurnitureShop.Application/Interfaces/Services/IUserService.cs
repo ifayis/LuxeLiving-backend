@@ -13,9 +13,5 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<SingleUserResponseDto> GetUserByIdAsync(Guid id);
         Task<bool> BlockUserAsync(Guid id);
         Task<bool> UnblockUserAsync(Guid id);
-        Task<List<ShippingAddressResponseDto>> GetMyAddressesAsync(Guid userId);
-        Task AddShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto);
-        Task AddOrUpdateShippingAddressAsync(Guid userId,AddShippingAddressRequestDto dto
-   );
     }
 }

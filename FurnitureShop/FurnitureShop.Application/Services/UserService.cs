@@ -15,19 +15,16 @@ namespace FurnitureShop.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IWishlistRepository _wishlistRepository;
-        private readonly IShippingAddressRepository _shippingAddressRepository;
 
 
         public UserService(
             IUserRepository userRepository,
             ICartRepository cartRepository,
-            IWishlistRepository wishlistRepository,
-            IShippingAddressRepository shippingAddressRepository)
+            IWishlistRepository wishlistRepository)
         {
             _userRepository = userRepository;
             _cartRepository = cartRepository;
             _wishlistRepository = wishlistRepository;
-            _shippingAddressRepository = shippingAddressRepository;
         }
 
         public async Task<List<UserResponseDto>> GetAllUsersAsync()
@@ -61,19 +58,6 @@ namespace FurnitureShop.Application.Services
                 CartId = cart?.Id,
                 WishlistId = wishlist?.Id,
                 IsBlocked = user.IsBlocked,
-
-            //    ShippingAddress = user.ShippingAddress == null
-            //? null
-            //: new ShippingAddressResponseDto
-            //{
-            //    Id = user.ShippingAddress.Id,
-            //    FullName = user.ShippingAddress.FullName,
-            //    PhoneNumber = user.ShippingAddress.PhoneNumber,
-            //    AddressLine1 = user.ShippingAddress.AddressLine1,
-            //    AddressLine2 = user.ShippingAddress.AddressLine2,
-            //    City = user.ShippingAddress.City,
-            //    PinCode = user.ShippingAddress.PinCode
-            //}
             };
         }
 
@@ -95,73 +79,6 @@ namespace FurnitureShop.Application.Services
             user.IsBlocked = false;
             await _userRepository.SaveChangesAsync();
             return true;
-        }
-
-
-        public async Task AddShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto)
-        {
-            var address = new ShippingAddress
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                FullName = dto.FullName,
-                PhoneNumber = dto.PhoneNumber,
-                AddressLine1 = dto.AddressLine1,
-                AddressLine2 = dto.AddressLine2,
-                City = dto.City,
-                PinCode = dto.PinCode,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _shippingAddressRepository.AddAsync(address);
-        }
-
-        public async Task<List<ShippingAddressResponseDto>> GetMyAddressesAsync(Guid userId)
-        {
-            var addresses = await _shippingAddressRepository.GetByUserIdAsync(userId);
-
-            return addresses.Select(a => new ShippingAddressResponseDto
-            {
-                Id = a.Id,
-                FullName = a.FullName,
-                PhoneNumber = a.PhoneNumber,
-                AddressLine1 = a.AddressLine1,
-                AddressLine2 = a.AddressLine2,
-                City = a.City,
-                PinCode = a.PinCode
-            }).ToList();
-        }
-
-
-
-        public async Task AddOrUpdateShippingAddressAsync(Guid userId, AddShippingAddressRequestDto dto)
-        {
-            var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new Exception("User not found");
-
-            var address = await _shippingAddressRepository.GetByUserIdAsync(userId);
-
-            if (address == null)
-            {
-                address = new ShippingAddress
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = userId,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _shippingAddressRepository.AddAsync(address);
-                user.ShippingAddressId = address.Id;
-            }
-
-            address.FullName = dto.FullName;
-            address.PhoneNumber = dto.PhoneNumber;
-            address.AddressLine1 = dto.AddressLine1;
-            address.AddressLine2 = dto.AddressLine2;
-            address.City = dto.City;
-            address.PinCode = dto.PinCode;
-
-            await _userRepository.SaveChangesAsync();
         }
     }
 }

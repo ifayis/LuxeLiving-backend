@@ -17,8 +17,5 @@ namespace FurnitureShop.Domain.Enitities
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
         public bool IsBlocked { get; set; } = false;
-
-        public Guid? ShippingAddressId { get; set; }
-        public ICollection<ShippingAddress> ShippingAddresses { get; set; } = new List<ShippingAddress>();
     }
 }
