@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.ShippingAddress;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.DTOs.ShippingAddress;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -32,8 +33,8 @@ namespace FurnitureShop.API.Controllers
             return Ok(await _shippingaddressService.GetMyAsync(GetUserId()));
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpGet("user/{userId}")]
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("User/{userId}")]
         public async Task<IActionResult> GetByUser(Guid userId)
         {
             return Ok(await _shippingaddressService.GetMyAsync(userId));
@@ -56,6 +57,6 @@ namespace FurnitureShop.API.Controllers
         }
 
         private Guid GetUserId()
-            => Guid.Parse(User.FindFirst("Name")!.Value);
+            => Guid.Parse(User.FindFirst("UID")!.Value);
     }
 }
