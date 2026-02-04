@@ -35,6 +35,10 @@
         public const string CheckoutPayment = "Payment under process";
         public const string ExecutePayment = "Order created";
 
+        // Shipping Address
+        public const string AddressAdded = "Address saved";
+        public const string AddressUpdated = "Address Updated";
+        public const string AddressDeleted = "Address Deleted";
 
         // Auth
         public const string LoginSuccess = "Login successful";

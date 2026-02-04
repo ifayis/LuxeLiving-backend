@@ -1,4 +1,5 @@
 ﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.ShippingAddress;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Application.Services;
@@ -23,7 +24,11 @@ namespace FurnitureShop.API.Controllers
         public async Task<IActionResult> Add(ShippingAddressRequestDto dto)
         {
             await _shippingaddressService.AddAsync(GetUserId(), dto);
-            return Ok();
+            return Ok(
+                ApiResponse<object>.Success(
+                null,
+                ResponseMessages.AddressAdded
+                ));
         }
 
         [Authorize]
@@ -45,7 +50,11 @@ namespace FurnitureShop.API.Controllers
         public async Task<IActionResult> Update(Guid addressId, ShippingAddressRequestDto dto)
         {
             await _shippingaddressService.UpdateAsync(GetUserId(), addressId, dto);
-            return Ok();
+            return Ok(
+                 ApiResponse<object>.Success(
+                 null,
+                 ResponseMessages.AddressUpdated
+                 ));
         }
 
         [Authorize]
@@ -53,7 +62,11 @@ namespace FurnitureShop.API.Controllers
         public async Task<IActionResult> Delete(Guid addressId)
         {
             await _shippingaddressService.DeleteAsync(GetUserId(), addressId);
-            return Ok();
+            return Ok(
+                 ApiResponse<object>.Success(
+                 null,
+                 ResponseMessages.AddressDeleted
+                 ));
         }
 
         private Guid GetUserId()
