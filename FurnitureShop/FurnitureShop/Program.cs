@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontendPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173","https://furniture-shop-theta-one.vercel.app")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithExposedHeaders("refreshtoken");
