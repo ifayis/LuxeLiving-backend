@@ -109,11 +109,14 @@ namespace FurnitureShop.Application.Services
                 Status = order.Status,
                 PaymentMethod = order.PaymentMethod,
                 CreatedAt = order.CreatedAt,
+
                 Items = order.Items.Select(i => new OrderItemResponseDto
                 {
                     ProductId = i.ProductId,
+                    ProductName = i.Product.Name,
+                    ImageUrl = i.Product.ImageUrl,
                     Quantity = i.Quantity,
-                    Price = i.Price,
+                    Price = i.Price
                 }).ToList()
             };
         }
