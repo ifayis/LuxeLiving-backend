@@ -33,12 +33,17 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task<List<Category>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories
+                .Where(c => c.IsActive)
+                .ToListAsync();
         }
-
-        public async Task DeleteAsync(Category category)
+        public async Task<bool> ExistsByNameExceptIdAsync(
+            string name,
+            Guid categoryId)
         {
-            _context.Categories.Remove(category);
+            return await _context.Categories.AnyAsync(c =>
+                c.Id != categoryId &&
+                c.Name.ToLower() == name.ToLower());
         }
 
         public async Task DeleteAllAsync()
@@ -49,6 +54,11 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public Task<bool> ExistsByNameExceptIdAsync(string v, object categoryId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

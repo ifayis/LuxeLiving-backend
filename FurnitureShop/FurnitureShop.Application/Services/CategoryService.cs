@@ -15,15 +15,20 @@ namespace FurnitureShop.Application.Services
             _CategoryRepository = CategoryRepository;
         }
 
-        public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
+        public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request, Guid categoryId)
         {
-            if (await _CategoryRepository.ExistsByNameAsync(request.Name))
-                throw new InvalidOperationException("Category already exists");
-
+            if (await _CategoryRepository
+                .ExistsByNameExceptIdAsync(
+                    request.Name.Trim(),
+                    categoryId))
+            {
+                throw new InvalidOperationException(
+                    "Category already exists");
+            }
             var category = new Category
             {
                 Id = Guid.NewGuid(),
-                Name = request.Name,
+                Name = request.Name.Trim(),
                 IsActive = true
             };
 
@@ -55,7 +60,7 @@ namespace FurnitureShop.Application.Services
             if (await _CategoryRepository.ExistsByNameAsync(request.Name))
                 throw new InvalidOperationException("Category already exists");
 
-            category.Name = request.Name;
+            category.Name = request.Name.Trim();
             category.IsActive = request.IsActive;
 
             await _CategoryRepository.SaveChangesAsync();
@@ -81,9 +86,10 @@ namespace FurnitureShop.Application.Services
                     400);
             }
 
-            await _CategoryRepository.DeleteAsync(entity);
-            await _CategoryRepository.SaveChangesAsync();
+            entity.IsActive = false;
 
+            await _CategoryRepository.SaveChangesAsync();
+            
             return ApiResponse<object>.Success(
                 null,
                 ResponseMessages.CategoryDeleted,
@@ -106,5 +112,10 @@ namespace FurnitureShop.Application.Services
             Name = c.Name,
             IsActive = c.IsActive
         };
+
+        public Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

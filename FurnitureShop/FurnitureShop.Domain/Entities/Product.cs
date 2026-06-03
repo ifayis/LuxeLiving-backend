@@ -21,6 +21,8 @@ namespace FurnitureShop.Domain.Enitities
 
         public Guid CategoryId { get; set; }
 
+        public Category? Category { get; set; }
+
         public int StockQuantity { get; set; }
 
         public bool IsActive { get; set; } = true;
