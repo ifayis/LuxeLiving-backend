@@ -24,9 +24,12 @@ namespace FurnitureShop.Application.Services
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
+                Description = request.Description ?? string.Empty,
                 Price = request.Price,
+                ImageUrl = request.ImageUrl,
                 CategoryId = request.CategoryId,
-                IsActive = true
+                IsActive = true,
+                StockQuantity = request.StockQuantity
             };
 
             await _productRepository.AddAsync(product);
@@ -121,6 +124,8 @@ namespace FurnitureShop.Application.Services
             product.ImageUrl = request.ImageUrl;
             product.CategoryId = request.CategoryId;
             product.IsActive = request.IsActive;
+            product.StockQuantity = request.StockQuantity;
+
 
             await _productRepository.SaveChangesAsync();
             return true;
@@ -130,7 +135,9 @@ namespace FurnitureShop.Application.Services
             {
                 Id = product.Id,
                 Name = product.Name,
+                Description = product.Description,
                 Price = product.Price,
+                ImageUrl = product.ImageUrl,
                 CategoryId = product.CategoryId,
                 IsActive = product.IsActive
             };

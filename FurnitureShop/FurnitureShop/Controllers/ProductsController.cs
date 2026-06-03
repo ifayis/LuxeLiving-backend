@@ -5,6 +5,8 @@ using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace FurnitureShop.API.Controllers
 {
@@ -114,6 +116,58 @@ namespace FurnitureShop.API.Controllers
         {
             var response = await _productService.DeleteAllAsync();
             return StatusCode(response.StatusCode, response);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("No image uploaded.");
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Only jpg, jpeg, png and webp files are allowed.");
+            }
+
+            const long maxFileSize = 5 * 1024 * 1024;
+
+            if (image.Length > maxFileSize)
+            {
+                return BadRequest("Maximum file size is 5 MB.");
+            }
+
+            var uploadsFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "uploads",
+                "products");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var fileName = $"{Guid.NewGuid()}{extension}";
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+
+            await image.CopyToAsync(stream);
+
+            var imageUrl = $"/uploads/products/{fileName}";
+
+            return Ok(new UploadProductImageResponseDto
+            {
+                ImageUrl = imageUrl
+            });
         }
     }
 }

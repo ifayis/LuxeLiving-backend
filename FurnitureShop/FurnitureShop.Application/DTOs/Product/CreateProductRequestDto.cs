@@ -16,6 +16,8 @@ namespace FurnitureShop.Application.DTOs.Product
         public decimal Price { get; set; }
         public string? ImageUrl { get; set; }
         [Required]
+        public int StockQuantity { get; set; }
+        [Required]
         public Guid CategoryId { get; set; }
     }
 }
