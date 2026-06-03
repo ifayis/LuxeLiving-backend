@@ -29,7 +29,7 @@ namespace FurnitureShop.Application.Services
             var existingUser = await _userRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                throw new Exception("User already exists");
+                throw new InvalidOperationException("User already exists");
             }
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -48,7 +48,9 @@ namespace FurnitureShop.Application.Services
 
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var email = request.Email.Trim().ToLower();
+
+            var user = await _userRepository.GetByEmailAsync(email);
 
             if (user == null)
                 return null;
