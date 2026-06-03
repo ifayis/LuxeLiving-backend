@@ -9,15 +9,17 @@ namespace FurnitureShop.Application.Services
     {
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
 
         public CheckoutService(
             ICartRepository cartRepository,
-            IOrderRepository orderRepository)
+            IOrderRepository orderRepository,
+            IProductRepository productRepository)
         {
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
+            _productRepository = productRepository;
         }
-
         public async Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
@@ -52,11 +54,27 @@ namespace FurnitureShop.Application.Services
             if (cart == null || !cart.Items.Any())
                 throw new InvalidOperationException("Cart is empty");
 
+            foreach (var cartItem in cart.Items)
+            {
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+
+                if (product == null)
+                    throw new InvalidOperationException("Product not found.");
+
+                if (!product.IsActive)
+                    throw new InvalidOperationException(
+                        $"{product.Name} is unavailable.");
+
+                if (product.StockQuantity < cartItem.Quantity)
+                    throw new InvalidOperationException(
+                        $"{product.Name} has only {product.StockQuantity} item(s) remaining.");
+            }
+
             var order = new Order
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                Status = request.PaymentMethod == "Online Pay" ? "Paid" : "Pending",
+                Status = "Pending",
                 PaymentMethod = request.PaymentMethod,
                 TotalAmount = cart.Items.Sum(i => i.Product.Price * i.Quantity),
                 Items = cart.Items.Select(i => new OrderItem
@@ -69,6 +87,19 @@ namespace FurnitureShop.Application.Services
             };
 
             await _orderRepository.AddAsync(order);
+
+            foreach (var cartItem in cart.Items)
+            {
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+
+                if (product == null)
+                    continue;
+
+                product.StockQuantity -= cartItem.Quantity;
+            }
+
+            await _productRepository.SaveChangesAsync();
+
             await _cartRepository.ClearCartAsync(userId);
         }
     }

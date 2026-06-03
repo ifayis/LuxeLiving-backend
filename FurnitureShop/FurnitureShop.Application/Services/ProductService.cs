@@ -139,7 +139,8 @@ namespace FurnitureShop.Application.Services
                 Price = product.Price,
                 ImageUrl = product.ImageUrl,
                 CategoryId = product.CategoryId,
-                IsActive = product.IsActive
+                IsActive = product.IsActive,
+                StockQuantity = product.StockQuantity
             };
     }
 }

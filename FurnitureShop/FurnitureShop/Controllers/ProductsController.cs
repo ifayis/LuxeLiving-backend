@@ -39,7 +39,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(products);
         }
 
-        [HttpGet("single{id:guid}")]
+        [HttpGet("single/{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetProductByIdAsync(id);

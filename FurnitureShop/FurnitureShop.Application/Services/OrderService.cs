@@ -15,11 +15,16 @@ namespace FurnitureShop.Application.Services
     {
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
 
-        public OrderService(ICartRepository cartRepository, IOrderRepository orderRepository)
+        public OrderService(
+            ICartRepository cartRepository,
+            IOrderRepository orderRepository,
+            IProductRepository productRepository)
         {
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<List<OrderResponseDto>> GetMyOrdersAsync(Guid userId)
@@ -59,6 +64,18 @@ namespace FurnitureShop.Application.Services
                 order.Status = "Cancelled";
                 order.PaymentMethod = "COD - Cancelled";
             }
+
+            foreach (var item in order.Items)
+            {
+                var product = await _productRepository.GetByIdAsync(item.ProductId);
+
+                if (product == null)
+                    continue;
+
+                product.StockQuantity += item.Quantity;
+            }
+
+            await _productRepository.SaveChangesAsync();
 
             await _orderRepository.UpdateAsync(order);
 
