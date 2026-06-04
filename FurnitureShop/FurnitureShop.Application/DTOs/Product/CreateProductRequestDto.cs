@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FurnitureShop.Application.DTOs.Product
 {
     public class CreateProductRequestDto
     {
         [Required]
-        public string Name { get; set; } = null!;
+        [StringLength(100, MinimumLength = 2)]
+        public string Name { get; set; } = string.Empty;
+
+        [StringLength(1000)]
         public string? Description { get; set; }
+
         [Required]
+        [Range(0.01, 9999999)]
         public decimal Price { get; set; }
+
         public string? ImageUrl { get; set; }
+
         [Required]
+        [Range(0, int.MaxValue)]
         public int StockQuantity { get; set; }
+
         [Required]
         public Guid CategoryId { get; set; }
     }

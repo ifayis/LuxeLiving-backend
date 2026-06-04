@@ -42,6 +42,15 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .AnyAsync(p => p.Name.ToLower() == name.ToLower());
         }
 
+        public async Task<bool> ExistsByNameExceptIdAsync(
+            string name,
+            Guid productId)
+        {
+            return await _context.Products.AnyAsync(p =>
+                p.Id != productId &&
+                p.Name.ToLower() == name.ToLower());
+        }
+
         public async Task DeleteAsync(Product product)
         {
             _context.Products.Remove(product);

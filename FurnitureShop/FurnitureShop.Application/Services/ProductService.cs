@@ -9,21 +9,47 @@ namespace FurnitureShop.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(
+            IProductRepository productRepository,
+            ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request)
         {
-            if (await _productRepository.ExistsByNameAsync(request.Name))
-                throw new InvalidOperationException(ErrorMessages.AlreadyExists);
+
+            var category = await _categoryRepository
+            .GetByIdAsync(request.CategoryId);
+
+            if (category == null)
+            {
+                throw new InvalidOperationException(
+                    "Category not found");
+            }
+
+            if (!category.IsActive)
+            {
+                throw new InvalidOperationException(
+                    "Category is inactive");
+            }
+
+            var productName = request.Name.Trim();
+
+            if (await _productRepository.ExistsByNameAsync(productName))
+            {
+                throw new InvalidOperationException(
+                    ErrorMessages.AlreadyExists);
+            }
+
 
             var product = new Product
             {
                 Id = Guid.NewGuid(),
-                Name = request.Name,
+                Name = productName,
                 Description = request.Description ?? string.Empty,
                 Price = request.Price,
                 ImageUrl = request.ImageUrl,
@@ -118,9 +144,21 @@ namespace FurnitureShop.Application.Services
             if (product == null)
                 return false;
 
-            product.Name = request.Name;
-            product.Description = request.Description;
-            product.Price = request.Price;
+            var productName = request.Name.Trim();
+
+            if (await _productRepository
+                .ExistsByNameExceptIdAsync(
+                    productName,
+                    productId))
+            {
+                throw new InvalidOperationException(
+                    ErrorMessages.AlreadyExists);
+            }
+
+            product.Name = productName;
+            product.Description =
+                request.Description?.Trim()
+                ?? string.Empty; product.Price = request.Price;
             product.ImageUrl = request.ImageUrl;
             product.CategoryId = request.CategoryId;
             product.IsActive = request.IsActive;
