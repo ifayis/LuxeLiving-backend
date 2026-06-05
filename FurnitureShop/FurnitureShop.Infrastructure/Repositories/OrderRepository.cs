@@ -57,7 +57,7 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<decimal> GetTotalRevenueAsync()
         {
             return await _context.Orders
-                .Where(o => o.Status != "Cancelled")
+                .Where(o => o.Status == "Delivered")
                 .SumAsync(o => o.TotalAmount);
         }
 

@@ -51,9 +51,6 @@ namespace FurnitureShop.Application.Services
             var order = await _orderRepository.GetOrderByIdAsync(orderId, userId);
             if (order == null) return null;
 
-            if (order.Status == "Cancelled")
-                throw new Exception("Order already cancelled");
-
             if (order.Status == "Paid")
             {
                 order.Status = "Cancelled";
@@ -63,6 +60,18 @@ namespace FurnitureShop.Application.Services
             {
                 order.Status = "Cancelled";
                 order.PaymentMethod = "COD - Cancelled";
+            }
+
+            if (order.Status == "Delivered")
+            {
+                throw new InvalidOperationException(
+                    "Delivered orders cannot be cancelled");
+            }
+
+            if (order.Status == "Cancelled")
+            {
+                throw new InvalidOperationException(
+                    "Order already cancelled");
             }
 
             foreach (var item in order.Items)
@@ -113,8 +122,8 @@ namespace FurnitureShop.Application.Services
                 Items = order.Items.Select(i => new OrderItemResponseDto
                 {
                     ProductId = i.ProductId,
-                    ProductName = i.Product.Name,
-                    ImageUrl = i.Product.ImageUrl,
+                    ProductName = i.Product.Name ?? string.Empty,
+                    ImageUrl = i.Product?.ImageUrl,
                     Quantity = i.Quantity,
                     Price = i.Price
                 }).ToList()
