@@ -2,6 +2,7 @@
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Application.common;
 
 namespace FurnitureShop.Application.Services
 {
@@ -19,12 +20,6 @@ namespace FurnitureShop.Application.Services
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
-        }
-
-        public static class PaymentMethods
-        {
-            public const string OnlinePay = "Online Pay";
-            public const string CashOnDelivery = "Cash On Delivery";
         }
 
         public async Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId)
@@ -84,7 +79,7 @@ namespace FurnitureShop.Application.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                Status = "Pending",
+                Status = OrderStatuses.Pending,
                 PaymentMethod = request.PaymentMethod,
                 TotalAmount = cart.Items.Sum(i => i.Product.Price * i.Quantity),
                 Items = cart.Items.Select(i => new OrderItem

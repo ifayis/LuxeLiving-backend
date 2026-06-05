@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.Interfaces.Repositories;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,7 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<decimal> GetTotalRevenueAsync()
         {
             return await _context.Orders
-                .Where(o => o.Status == "Delivered")
+                .Where(o => o.Status == OrderStatuses.Delivered)
                 .SumAsync(o => o.TotalAmount);
         }
 

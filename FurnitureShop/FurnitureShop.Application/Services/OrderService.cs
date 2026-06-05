@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.Order;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.DTOs.Order;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
@@ -53,22 +54,22 @@ namespace FurnitureShop.Application.Services
 
             if (order.Status == "Paid")
             {
-                order.Status = "Cancelled";
-                order.PaymentMethod = "Will be Refunded";
+                order.Status = OrderStatuses.Cancelled;
+                order.PaymentMethod = PaymentMethods.Refunded;
             }
-            else if (order.Status == "Pending")
+            else if (order.Status == OrderStatuses.Pending)
             {
-                order.Status = "Cancelled";
-                order.PaymentMethod = "COD - Cancelled";
+                order.Status = OrderStatuses.Cancelled;
+                order.PaymentMethod = PaymentMethods.CodCancelled;
             }
 
-            if (order.Status == "Delivered")
+            if (order.Status == OrderStatuses.Delivered)
             {
                 throw new InvalidOperationException(
                     "Delivered orders cannot be cancelled");
             }
 
-            if (order.Status == "Cancelled")
+            if (order.Status == OrderStatuses.Cancelled)
             {
                 throw new InvalidOperationException(
                     "Order already cancelled");
