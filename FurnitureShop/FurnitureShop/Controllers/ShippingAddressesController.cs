@@ -19,7 +19,7 @@ namespace FurnitureShop.API.Controllers
             _shippingaddressService = service;
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.User)]
         [HttpPost]
         public async Task<IActionResult> Add(ShippingAddressRequestDto dto)
         {
@@ -31,7 +31,7 @@ namespace FurnitureShop.API.Controllers
                 ));
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.User)]
         [HttpGet("my")]
         public async Task<IActionResult> GetMy()
         {
@@ -45,7 +45,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(await _shippingaddressService.GetMyAsync(userId));
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.User)]
         [HttpPut("{addressId}")]
         public async Task<IActionResult> Update(Guid addressId, ShippingAddressRequestDto dto)
         {
@@ -57,7 +57,7 @@ namespace FurnitureShop.API.Controllers
                  ));
         }
 
-        [Authorize]
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("{addressId}")]
         public async Task<IActionResult> Delete(Guid addressId)
         {
@@ -67,6 +67,22 @@ namespace FurnitureShop.API.Controllers
                  null,
                  ResponseMessages.AddressDeleted
                  ));
+        }
+
+        [Authorize(Roles = Roles.User)]
+        [HttpPut("{addressId}/set-default")]
+        public async Task<IActionResult> SetDefault(
+            Guid addressId)
+        {
+            await _shippingaddressService
+                .SetDefaultAsync(
+                    GetUserId(),
+                    addressId);
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    "Default address updated"));
         }
 
         private Guid GetUserId()

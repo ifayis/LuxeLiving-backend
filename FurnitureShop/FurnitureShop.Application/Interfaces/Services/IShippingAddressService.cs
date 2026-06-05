@@ -13,5 +13,6 @@ namespace FurnitureShop.Application.Interfaces.Services
         Task<List<ShippingAddressResponseDto>> GetMyAsync(Guid userId);
         Task UpdateAsync(Guid userId, Guid addressId, ShippingAddressRequestDto dto);
         Task DeleteAsync(Guid userId, Guid addressId);
+        Task SetDefaultAsync(Guid userId, Guid addressId);
     }
 }

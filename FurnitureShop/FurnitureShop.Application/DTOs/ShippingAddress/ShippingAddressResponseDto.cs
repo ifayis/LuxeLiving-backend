@@ -15,5 +15,6 @@ namespace FurnitureShop.Application.DTOs.ShippingAddress
         public string? AddressLine2 { get; set; }
         public string City { get; set; } = null!;
         public string PinCode { get; set; } = null!;
+        public bool IsDefault { get; set; }
     }
 }
