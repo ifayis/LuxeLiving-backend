@@ -4,5 +4,6 @@
     {
         public Guid Id { get; set; }
         public List<WishlistItemResponseDto> Items { get; set; }
+        public int ItemCount { get; set; }
     }
 }

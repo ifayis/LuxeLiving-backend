@@ -24,10 +24,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.WishlistItems.Add(item);
         }
 
-        public async Task<bool> ProductExistsAsync(Guid productId)
-        {
-            return await _context.Products.AnyAsync(p => p.Id == productId);
-        }
         public async Task<Wishlist?> GetByUserIdAsync(Guid userId)
         {
             return await _context.Wishlists
