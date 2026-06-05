@@ -3,9 +3,6 @@ using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Services
 {
@@ -22,16 +19,35 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task<AddToCartResponseDto> AddToCartAsync(Guid userId, AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCartAsync(
+            Guid userId,
+            AddToCartRequestDto request)
         {
-            if (request == null || request.ProductId == Guid.Empty || request.Quantity <= 0)
-                throw new ArgumentException("Invalid cart request");
+            if (request == null ||
+                request.ProductId == Guid.Empty ||
+                request.Quantity <= 0)
+            {
+                throw new ArgumentException(
+                    "Invalid cart request");
+            }
 
-            var product = await _productRepository.GetByIdAsync(request.ProductId);
+            var product = await _productRepository
+                .GetByIdAsync(request.ProductId);
+
             if (product == null)
-                throw new ArgumentException("Product does not exist");
+            {
+                throw new InvalidOperationException(
+                    "Product does not exist");
+            }
 
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            if (!product.IsActive)
+            {
+                throw new InvalidOperationException(
+                    "Product is unavailable");
+            }
+
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
 
             if (cart == null)
             {
@@ -45,7 +61,20 @@ namespace FurnitureShop.Application.Services
             }
 
             var item = await _cartRepository
-                .GetCartItemAsync(cart.Id, request.ProductId);
+                .GetCartItemAsync(
+                    cart.Id,
+                    request.ProductId);
+
+            var requestedQuantity =
+                item == null
+                    ? request.Quantity
+                    : item.Quantity + request.Quantity;
+
+            if (requestedQuantity > product.StockQuantity)
+            {
+                throw new InvalidOperationException(
+                    $"Only {product.StockQuantity} item(s) available.");
+            }
 
             if (item == null)
             {
@@ -78,80 +107,139 @@ namespace FurnitureShop.Application.Services
                 }
             };
         }
-        public async Task<CartResponseDto?> GetMyCartAsync(Guid userId)
+
+        public async Task<CartResponseDto?> GetMyCartAsync(
+            Guid userId)
         {
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
+
             return Map(cart);
         }
 
-        public async Task<CartResponseDto?> GetCartByIdAsync(Guid cartId)
+        public async Task<CartResponseDto?> GetCartByIdAsync(
+            Guid cartId)
         {
-            var cart = await _cartRepository.GetByIdAsync(cartId);
+            var cart = await _cartRepository
+                .GetByIdAsync(cartId);
+
             return Map(cart);
         }
 
-        public async Task RemoveItemAsync(Guid userId, Guid productId)
+        public async Task RemoveItemAsync(
+            Guid userId,
+            Guid productId)
         {
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
-            if (cart == null) return;
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
 
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
-            if (item == null) return;
+            if (cart == null)
+                return;
+
+            var item = cart.Items
+                .FirstOrDefault(i => i.ProductId == productId);
+
+            if (item == null)
+                return;
 
             cart.Items.Remove(item);
+
             await _cartRepository.SaveChangesAsync();
         }
 
         public async Task ClearCartAsync(Guid userId)
         {
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
-            if (cart == null) return;
-
-            cart.Items.Clear();
-            await _cartRepository.SaveChangesAsync();
+            await _cartRepository.ClearCartAsync(userId);
         }
 
-        public async Task<bool> UpdateItemAsync(Guid userId, UpdateCartItemRequestDto request)
+        public async Task<bool> UpdateItemAsync(
+            Guid userId,
+            UpdateCartItemRequestDto request)
         {
-            if (request.Quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero");
+            if (request.Quantity < 0)
+            {
+                throw new ArgumentException(
+                    "Quantity cannot be negative");
+            }
 
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
+
             if (cart == null)
                 return false;
 
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+            var item = cart.Items
+                .FirstOrDefault(i =>
+                    i.ProductId == request.ProductId);
+
             if (item == null)
                 return false;
 
             if (request.Quantity == 0)
             {
                 cart.Items.Remove(item);
+
+                await _cartRepository.SaveChangesAsync();
+
+                return true;
             }
-            else
+
+            var product = await _productRepository
+                .GetByIdAsync(request.ProductId);
+
+            if (product == null)
             {
-                item.Quantity = request.Quantity;
+                throw new InvalidOperationException(
+                    "Product not found");
             }
+
+            if (!product.IsActive)
+            {
+                throw new InvalidOperationException(
+                    "Product is unavailable");
+            }
+
+            if (request.Quantity > product.StockQuantity)
+            {
+                throw new InvalidOperationException(
+                    $"Only {product.StockQuantity} item(s) available.");
+            }
+
+            item.Quantity = request.Quantity;
+
             await _cartRepository.SaveChangesAsync();
+
             return true;
         }
 
-
         private static CartResponseDto? Map(Cart? cart)
         {
-            if (cart == null) return null;
+            if (cart == null)
+                return null;
+
+            var activeItems = cart.Items
+                .Where(i =>
+                    i.Product != null &&
+                    i.Product.IsActive)
+                .ToList();
 
             return new CartResponseDto
             {
                 CartId = cart.Id,
-                Items = cart.Items.Select(i => new CartItemResponseDto
-                {
-                    ProductId = i.ProductId,
-                    Name = i.Product.Name,
-                    Price = i.Product.Price,
-                    Imageurl = i.Product.ImageUrl,
-                    Quantity = i.Quantity
-                }).ToList()
+
+                Items = activeItems
+                    .Select(i => new CartItemResponseDto
+                    {
+                        ProductId = i.ProductId,
+                        Name = i.Product.Name,
+                        Price = i.Product.Price,
+                        Imageurl = i.Product.ImageUrl,
+                        Quantity = i.Quantity
+                    })
+                    .ToList(),
+
+                TotalAmount = activeItems.Sum(i =>
+                    i.Product.Price * i.Quantity)
             };
         }
     }

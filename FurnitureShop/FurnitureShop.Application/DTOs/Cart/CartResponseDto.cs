@@ -7,5 +7,6 @@ namespace FurnitureShop.Application.DTOs.Cart
     {
         public Guid CartId { get; set; }
         public List<CartItemResponseDto> Items { get; set; } = new();
+        public decimal TotalAmount { get; set; }
     }
 }
