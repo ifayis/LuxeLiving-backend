@@ -33,7 +33,14 @@ namespace FurnitureShop.Infrastructure.Repositories
 
         public async Task<List<User>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Users.CountAsync();
         }
 
         public async Task<User?> GetByIdAsync(Guid id)

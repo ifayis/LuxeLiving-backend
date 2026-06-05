@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.User;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Entities;
@@ -61,13 +62,32 @@ namespace FurnitureShop.Application.Services
             };
         }
 
-        public async Task<bool> BlockUserAsync(Guid userId)
+        public async Task<bool> BlockUserAsync(
+            Guid userId,
+            Guid currentAdminId)
         {
+
+            if (userId == currentAdminId)
+            {
+                throw new InvalidOperationException(
+                    "You cannot block your own account.");
+            }
+
             var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null) return false;
+
+            if (user == null)
+                return false;
+
+            if (user.Role == Roles.Admin)
+            {
+                throw new InvalidOperationException(
+                    "Admin accounts cannot be blocked.");
+            }
 
             user.IsBlocked = true;
+
             await _userRepository.SaveChangesAsync();
+
             return true;
         }
 

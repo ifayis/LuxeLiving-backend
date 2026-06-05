@@ -20,7 +20,12 @@ namespace FurnitureShop.API.Controllers
         }
         private Guid GetUserId()
         {
-            return Guid.Parse(User.FindFirst("UID")!.Value);
+            var userId = User.FindFirst("UID")?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new UnauthorizedAccessException();
+
+            return Guid.Parse(userId);
         }
 
         [HttpGet("All")]
@@ -44,7 +49,7 @@ namespace FurnitureShop.API.Controllers
         [HttpPut("Block/{id:guid}")]
         public async Task<IActionResult> BlockUser(Guid id)
         {
-            var success = await _userService.BlockUserAsync(id);
+            var success = await _userService.BlockUserAsync(id,GetUserId());
             if (!success) return NotFound();
 
             return Ok(ApiResponse<object>.Success(null, "User blocked"));

@@ -11,7 +11,9 @@ namespace FurnitureShop.Application.Interfaces.Services
     {
         Task<List<UserResponseDto>> GetAllUsersAsync();
         Task<SingleUserResponseDto> GetUserByIdAsync(Guid id);
-        Task<bool> BlockUserAsync(Guid id);
+        Task<bool> BlockUserAsync(
+            Guid userId,
+            Guid currentAdminId);
         Task<bool> UnblockUserAsync(Guid id);
     }
 }

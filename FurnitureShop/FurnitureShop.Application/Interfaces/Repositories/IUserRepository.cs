@@ -14,6 +14,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<List<User>> GetAllAsync();
         Task<User?> GetByIdAsync(Guid id);
         Task<User?> GetByRefreshTokenAsync(string refreshToken);
+        Task<int> CountAsync();
         Task SaveChangesAsync();
     }
 }
