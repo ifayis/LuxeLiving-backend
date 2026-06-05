@@ -20,6 +20,13 @@ namespace FurnitureShop.Application.Services
             _orderRepository = orderRepository;
             _productRepository = productRepository;
         }
+
+        public static class PaymentMethods
+        {
+            public const string OnlinePay = "Online Pay";
+            public const string CashOnDelivery = "Cash On Delivery";
+        }
+
         public async Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
@@ -27,16 +34,19 @@ namespace FurnitureShop.Application.Services
             if (cart == null || !cart.Items.Any())
                 return new CheckoutResponseDto();
 
-            var items = cart.Items.Select(i => new CheckOutItemDto
-            {
-                ProductId = i.ProductId,
-                ProductName = i.Product.Name,
-                ImageUrl = i.Product.ImageUrl,
-                Price = i.Product.Price,
-                Quantity = i.Quantity
-            }).ToList();
-
-            return new CheckoutResponseDto
+            var items = cart.Items
+                .Where(i =>
+                    i.Product != null &&
+                    i.Product.IsActive)
+                .Select(i => new CheckOutItemDto
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product.Name,
+                    ImageUrl = i.Product.ImageUrl,
+                    Price = i.Product.Price,
+                    Quantity = i.Quantity
+                })
+                .ToList(); return new CheckoutResponseDto
             {
                 Items = items,
                 GrossTotal = items.Sum(i => i.Total)
@@ -45,8 +55,8 @@ namespace FurnitureShop.Application.Services
 
         public async Task ExecutePaymentAsync(Guid userId, PaymentRequestDto request)
         {
-            if (request.PaymentMethod != "Online Pay" &&
-                request.PaymentMethod != "Cash On Delivery")
+            if (request.PaymentMethod != PaymentMethods.OnlinePay &&
+                request.PaymentMethod != PaymentMethods.CashOnDelivery)
                 throw new ArgumentException("Invalid payment method");
 
             var cart = await _cartRepository.GetByUserIdAsync(userId);
