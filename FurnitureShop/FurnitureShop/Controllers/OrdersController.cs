@@ -39,7 +39,7 @@ namespace FurnitureShop.API.Controllers
                 return Ok(
                         ApiResponse<object>.Success(
                         Array.Empty<object>(),
-                        ResponseMessages.empty
+                        ResponseMessages.NoOrders
                         )
                 );
             }

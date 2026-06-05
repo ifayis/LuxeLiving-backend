@@ -98,7 +98,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                  ApiResponse<object>.Success(
                  null,
-                 ResponseMessages.cartCleared
+                 ResponseMessages.CartCleared
                  )
             );
         }

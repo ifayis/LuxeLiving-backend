@@ -23,12 +23,7 @@ namespace FurnitureShop.API.Middlewares
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                var realMessage =
-                    ex.InnerException?.Message ??
-                    ex.Message ??
-                    "Unknown database error";
-
-                await WriteResponse(context, realMessage);
+                await WriteResponse(context, "Database operation failed.");
             }
             catch (ArgumentException ex)
             {
@@ -43,6 +38,11 @@ namespace FurnitureShop.API.Middlewares
             catch (UnauthorizedAccessException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await WriteResponse(context, ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
                 await WriteResponse(context, ex.Message);
             }
             catch (Exception)

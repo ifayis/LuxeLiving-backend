@@ -7,7 +7,7 @@
 
         // Cart
         public const string CartRemoved = "Item removed from the cart successful";
-        public const string cartCleared = "Cart cleared";
+        public const string CartCleared = "Cart cleared";
 
         // Category
         public const string CategoryCreated = "Category created successfully";
@@ -29,8 +29,7 @@
         public const string WishlistItemRemoved = "Item removed from Wishlist";
 
         // Orders
-        public const string empty = "No orders yet";
-
+        public const string NoOrders = "No orders yet";
         // Checkout
         public const string CheckoutPayment = "Payment under process";
         public const string ExecutePayment = "Order created";

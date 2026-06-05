@@ -10,20 +10,23 @@ namespace FurnitureShop.API.Filters
             ResultExecutingContext context,
             ResultExecutionDelegate next)
         {
-            if (context.Result is ObjectResult { Value: ApiResponse<object> })
+            if (context.Result is ObjectResult objectResult1 &&
+                objectResult1.Value != null &&
+                objectResult1.Value.GetType().IsGenericType &&
+                objectResult1.Value.GetType().GetGenericTypeDefinition() == typeof(ApiResponse<>))
             {
                 await next();
                 return;
             }
 
-            if (context.Result is ObjectResult objectResult &&
-                objectResult.StatusCode is >= 200 and < 300)
+            if (context.Result is ObjectResult objectResult2 &&
+                objectResult2.StatusCode is >= 200 and < 300)
             {
                 context.Result = new ObjectResult(
-                    ApiResponse<object>.Success(objectResult.Value)
+                    ApiResponse<object>.Success(objectResult2.Value)
                 )
                 {
-                    StatusCode = objectResult.StatusCode
+                    StatusCode = objectResult2.StatusCode
                 };
             }
             else if (context.Result is EmptyResult)
