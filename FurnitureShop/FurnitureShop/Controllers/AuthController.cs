@@ -33,6 +33,7 @@ namespace FurnitureShop.API.Controllers
                 );
             }
 
+            await _authService.RegisterAsync(request);
             return Created("", ResponseMessages.UserRegistered);
         }
 

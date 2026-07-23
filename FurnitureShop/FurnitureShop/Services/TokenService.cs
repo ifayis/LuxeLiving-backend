@@ -43,7 +43,7 @@ namespace FurnitureShop.API.Services
                 audience: jwtSettings["Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(
-                    double.Parse(jwtSettings["ExpiresInMinutes"]!)
+                    double.Parse(jwtSettings["AccessTokenMinutes"]!)
                 ),
                 signingCredentials: credentials
             );

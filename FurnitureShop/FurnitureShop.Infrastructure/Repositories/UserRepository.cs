@@ -22,7 +22,8 @@ namespace FurnitureShop.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task AddAsync(User user)

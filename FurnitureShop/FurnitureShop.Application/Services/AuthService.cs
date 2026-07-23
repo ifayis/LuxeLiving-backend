@@ -38,7 +38,7 @@ namespace FurnitureShop.Application.Services
             {
                 Id = Guid.NewGuid(),
                 FullName = request.FullName.Trim(),
-                Email = request.Email.ToLower().Trim(),
+                Email = request.Email.Trim().ToUpperInvariant(),
                 PasswordHash = passwordHash,
                 Role = Roles.User
             };
@@ -106,8 +106,10 @@ namespace FurnitureShop.Application.Services
             var newRefreshToken = _tokenService.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            var refreshDays = _configuration.GetValue<int>("JwtSettings:RefreshTokenDays");
 
+            user.RefreshTokenExpiryTime =
+                DateTime.UtcNow.AddDays(refreshDays);
             var newAccessToken = _tokenService.GenerateAccessToken(user);
 
             await _userRepository.SaveChangesAsync();

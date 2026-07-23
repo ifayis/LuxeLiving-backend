@@ -33,6 +33,9 @@ namespace FurnitureShop.Infrastructure.Data
                 .HasIndex(x => x.Email)
                 .IsUnique();
 
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.RefreshToken);
+
             modelBuilder.Entity<Cart>()
                 .HasMany(c => c.Items)
                 .WithOne(i => i.Cart)
