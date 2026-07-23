@@ -52,7 +52,7 @@ namespace FurnitureShop.API.Controllers
         [HttpGet("Individual/{userId:guid}")]
         public async Task<IActionResult> GetUserCart(Guid userId)
         {
-            var cart = await _cartService.GetMyCartAsync(userId);
+            var cart = await _cartService.GetCartByIdAsync(userId);
 
             if (cart == null)
                 return NotFound();

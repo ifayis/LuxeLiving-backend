@@ -8,7 +8,7 @@ namespace FurnitureShop.Application.DTOs.Cart
         [Required]
         public Guid ProductId { get; set; }
 
-        [Range(1, 100)]
+        [Range(0, 100)]
         public int Quantity { get; set; }
     }
 }
