@@ -19,7 +19,7 @@ namespace FurnitureShop.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("SignUp")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -33,21 +33,13 @@ namespace FurnitureShop.API.Controllers
                 );
             }
 
-            await _authService.RegisterAsync(request);
-            return Ok(ResponseMessages.UserRegistered);
+            return Created("", ResponseMessages.UserRegistered);
         }
 
-        [HttpPost("SignIn")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
             var token = await _authService.LoginAsync(request);
-
-            if (token == null)
-            {
-                throw new UnauthorizedAccessException(
-                    ErrorMessages.InvalidCredentials
-                );
-            }
 
             return Ok(token);
         }

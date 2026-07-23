@@ -1,13 +1,10 @@
-﻿using FurnitureShop.Application.DTOs.Auth;
-using FurnitureShop.Domain.Enitities;
-using BCrypt.Net;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Auth;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
+using FurnitureShop.Domain.Enitities;
+using Microsoft.Extensions.Configuration;
 
 namespace FurnitureShop.Application.Services
 {
@@ -15,13 +12,16 @@ namespace FurnitureShop.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IConfiguration _configuration;
 
         public AuthService(
             IUserRepository userRepository,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            IConfiguration configuration)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _configuration = configuration;
         }
 
         public async Task RegisterAsync(RegisterRequestDto request)
@@ -40,20 +40,20 @@ namespace FurnitureShop.Application.Services
                 FullName = request.FullName.Trim(),
                 Email = request.Email.ToLower().Trim(),
                 PasswordHash = passwordHash,
-                Role = "User"
+                Role = Roles.User
             };
 
             await _userRepository.AddAsync(user);
         }
 
-        public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
         {
-            var email = request.Email.Trim().ToLower();
+            var email = request.Email.Trim().ToUpperInvariant();
 
             var user = await _userRepository.GetByEmailAsync(email);
 
             if (user == null)
-                return null;
+                throw new UnauthorizedAccessException(ErrorMessages.InvalidCredentials);
 
             if (user.IsBlocked)
                 throw new UnauthorizedAccessException("Your account is blocked by admin");
@@ -61,20 +61,32 @@ namespace FurnitureShop.Application.Services
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
             if (!isPasswordValid)
-                return null;
+                throw new UnauthorizedAccessException(ErrorMessages.InvalidCredentials);
 
             var token = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
+            if (token == null)
+            {
+                throw new UnauthorizedAccessException(
+                    ErrorMessages.InvalidCredentials
+                );
+            }
+
+
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            var refreshDays = _configuration.GetValue<int>("JwtSettings:RefreshTokenDays");
+
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshDays);
 
             await _userRepository.SaveChangesAsync();
 
             return new LoginResponseDto
             {
                 AccessToken = token,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(
+                    _configuration.GetValue<int>("JwtSettings:AccessTokenMinutes"))
             };
         }
 
@@ -103,7 +115,9 @@ namespace FurnitureShop.Application.Services
             return new LoginResponseDto
             {
                 AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
+                RefreshToken = newRefreshToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(
+                    _configuration.GetValue<int>("JwtSettings:AccessTokenMinutes"))
             };
         }
 

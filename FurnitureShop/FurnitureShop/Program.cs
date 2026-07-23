@@ -9,22 +9,25 @@ using System.Text;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.API.Filters;
+using FurnitureShop.API.Middlewares;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var origins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()!;
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy
-            .WithOrigins("http://localhost:5173","https://furniture-shop-theta-one.vercel.app")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithExposedHeaders("refreshtoken");
+        policy.WithOrigins(origins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .WithExposedHeaders("refreshtoken");
     });
 });
-
 
 builder.Services
     .AddControllers(options =>
@@ -131,6 +134,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -138,8 +143,6 @@ app.UseStaticFiles();
 app.UseCors("FrontendPolicy");
 
 app.UseAuthentication();
-
-app.UseMiddleware<FurnitureShop.API.Middlewares.ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
