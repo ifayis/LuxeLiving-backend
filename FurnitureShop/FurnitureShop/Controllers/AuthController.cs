@@ -10,6 +10,7 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+    [Produces("application/json")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -19,52 +20,128 @@ namespace FurnitureShop.API.Controllers
             _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequestDto request)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register(
+            [FromBody] RegisterRequestDto request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
-                        400,
-                        ModelState.ToErrorDictionary()
-                    )
-                );
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
             }
 
             await _authService.RegisterAsync(request);
-            return Created("", ResponseMessages.UserRegistered);
+
+            return StatusCode(
+                StatusCodes.Status201Created,
+                ResponseMessages.UserRegistered);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequestDto request)
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Login(
+            [FromBody] LoginRequestDto request)
         {
-            var token = await _authService.LoginAsync(request);
-
-            return Ok(token);
+            return Ok(await _authService.LoginAsync(request));
         }
 
         [AllowAnonymous]
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto request)
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> RefreshToken(
+            [FromBody] RefreshTokenRequestDto request)
         {
-            var response = await _authService.RefreshTokenAsync(request.RefreshToken);
-            return Ok(response);
+            return Ok(await _authService.RefreshTokenAsync(request.RefreshToken));
         }
 
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var userId = Guid.Parse(User.FindFirstValue("UID")!);
+            var userId = GetCurrentUserId();
 
             await _authService.LogoutAsync(userId);
 
-            return Ok(new
-            {
-                message = "Logged out successfully"
-            });
+            return Ok(ResponseMessages.LogoutSuccessful);
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = GetCurrentUserId();
+
+            return Ok(await _authService.GetCurrentUserAsync(userId));
+        }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(
+            [FromBody] ChangePasswordRequestDto request)
+        {
+            var userId = GetCurrentUserId();
+
+            await _authService.ChangePasswordAsync(userId, request);
+
+            return Ok(ResponseMessages.PasswordChangedSuccessfully);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody] ForgotPasswordRequestDto request)
+        {
+            await _authService.ForgotPasswordAsync(request);
+
+            return Ok(ResponseMessages.PasswordResetEmailSent);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(
+            [FromBody] ResetPasswordRequestDto request)
+        {
+            await _authService.ResetPasswordAsync(request);
+
+            return Ok(ResponseMessages.PasswordResetSuccessful);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail(
+            [FromBody] VerifyEmailRequestDto request)
+        {
+            await _authService.VerifyEmailAsync(request);
+
+            return Ok(ResponseMessages.EmailVerifiedSuccessfully);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("resend-verification-email")]
+        public async Task<IActionResult> ResendVerificationEmail(
+            [FromBody] ResendVerificationRequestDto request)
+        {
+            await _authService.ResendVerificationEmailAsync(request);
+
+            return Ok(ResponseMessages.VerificationEmailSent);
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            var userId = User.FindFirstValue("UID");
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new UnauthorizedAccessException(ErrorMessages.InvalidToken);
+
+            return Guid.Parse(userId);
         }
     }
 }

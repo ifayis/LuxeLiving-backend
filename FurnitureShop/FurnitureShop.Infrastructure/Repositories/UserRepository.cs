@@ -2,11 +2,6 @@
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -19,23 +14,43 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users
-                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            email = email.Trim().ToLowerInvariant();
+
+            return await _context.Users
                 .FirstOrDefaultAsync(x => x.Email == email);
         }
 
-        public async Task AddAsync(User user)
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+        }
+
+        public async Task<User?> GetByPasswordResetTokenAsync(string resetToken)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.PasswordResetToken == resetToken);
+        }
+
+        public async Task<User?> GetByEmailVerificationTokenAsync(string verificationToken)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.EmailVerificationToken == verificationToken);
         }
 
         public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users
-                .OrderBy(u => u.FullName)
+                .AsNoTracking()
+                .OrderBy(x => x.FullName)
                 .ToListAsync();
         }
 
@@ -44,16 +59,19 @@ namespace FurnitureShop.Infrastructure.Repositories
             return await _context.Users.CountAsync();
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
+        public async Task AddAsync(User user)
         {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == id);
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+        public Task UpdateAsync(User user)
         {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+
+            return Task.CompletedTask;
         }
 
         public async Task SaveChangesAsync()

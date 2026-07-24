@@ -42,5 +42,11 @@
         // Auth
         public const string LoginSuccess = "Login successful";
         public const string UserRegistered = "User registered successfully";
+        public const string LogoutSuccessful = "Logged out successfully.";
+        public const string PasswordChangedSuccessfully = "Password changed successfully.";
+        public const string PasswordResetEmailSent = "Password reset email has been sent.";
+        public const string PasswordResetSuccessful = "Password reset successfully.";
+        public const string EmailVerifiedSuccessfully = "Email verified successfully.";
+        public const string VerificationEmailSent = "Verification email sent successfully.";
     }
 }

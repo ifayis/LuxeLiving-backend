@@ -1,18 +1,22 @@
+using FurnitureShop.API.Filters;
+using FurnitureShop.API.Middlewares;
+using FurnitureShop.API.Services;
+using FurnitureShop.Application.Common;
+using FurnitureShop.Application.Interfaces.Repositories;
+using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Application.Services;
 using FurnitureShop.Infrastructure.Data;
 using FurnitureShop.Infrastructure.Repositories;
-using FurnitureShop.API.Services;
+using FurnitureShop.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using FurnitureShop.Application.Interfaces.Repositories;
-using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.API.Filters;
-using FurnitureShop.API.Middlewares;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection(EmailSettings.SectionName));
 
 var origins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -106,23 +110,40 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 ;
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IWishlistService, WishlistService>();
-builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
-builder.Services.AddScoped<ICheckoutService, CheckoutService>();
-builder.Services.AddScoped<IShippingAddressRepository, ShippingAddressRepository>();
-builder.Services.AddScoped<IShippingAddressService, ShippingAddressService>();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+builder.Services.AddScoped<ICartService, CartService>();
+
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+
+builder.Services.AddScoped<IShippingAddressRepository, ShippingAddressRepository>();
+
+builder.Services.AddScoped<IShippingAddressService, ShippingAddressService>();
 
 
 

@@ -1,6 +1,5 @@
 ﻿using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
-using FurnitureShop.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,49 +17,59 @@ namespace FurnitureShop.API.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateAccessToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
-            );
+                Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
 
             var credentials = new SigningCredentials(
                 key,
-                SecurityAlgorithms.HmacSha256
-            );
+                SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new Claim("UID", user.Id.ToString()),
-                new Claim("Email", user.Email),
-                new Claim("Role", user.Role)
+                new("UID", user.Id.ToString()),
+                new(ClaimTypes.Name, user.FullName),
+                new(ClaimTypes.Email, user.Email),
+                new(ClaimTypes.Role, user.Role)
             };
+
+            var expires =
+                DateTime.UtcNow.AddMinutes(
+                    jwtSettings.GetValue<int>("AccessTokenMinutes"));
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(
-                    double.Parse(jwtSettings["AccessTokenMinutes"]!)
-                ),
-                signingCredentials: credentials
-            );
+                expires: expires,
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public string GenerateRefreshToken()
         {
-            var randomNumber = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
+            return GenerateSecureToken(64);
         }
-        public string GenerateAccessToken(User user)
+
+        public string GenerateEmailVerificationToken()
         {
-            return GenerateToken(user);
+            return GenerateSecureToken(64);
+        }
+
+        public string GeneratePasswordResetToken()
+        {
+            return GenerateSecureToken(64);
+        }
+
+        private static string GenerateSecureToken(int byteLength)
+        {
+            var bytes = RandomNumberGenerator.GetBytes(byteLength);
+
+            return Convert.ToHexString(bytes);
         }
     }
 }
