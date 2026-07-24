@@ -4,24 +4,40 @@ namespace FurnitureShop.Application.DTOs.Product
 {
     public class CreateProductRequestDto
     {
-        [Required]
-        [StringLength(100, MinimumLength = 2)]
+        [Required(ErrorMessage = "Product name is required.")]
+        [StringLength(
+            150,
+            MinimumLength = 2,
+            ErrorMessage = "Product name must be between 2 and 150 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000)]
-        public string? Description { get; set; }
+        [StringLength(
+            3000,
+            ErrorMessage = "Description cannot exceed 3000 characters.")]
+        public string Description { get; set; } = string.Empty;
 
         [Required]
-        [Range(0.01, 9999999)]
+        [Range(0.01, 99999999)]
+        public decimal OriginalPrice { get; set; }
+
+        [Required]
+        [Range(0.01, 99999999)]
         public decimal Price { get; set; }
-
-        public string? ImageUrl { get; set; }
-
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int StockQuantity { get; set; }
 
         [Required]
         public Guid CategoryId { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int StockQuantity { get; set; }
+
+        [Url]
+        [StringLength(500)]
+        public string? ImageUrl { get; set; }
+
+        public bool IsFeatured { get; set; }
+
+        public bool IsNewArrival { get; set; }
+
+        public bool IsBestSeller { get; set; }
     }
 }

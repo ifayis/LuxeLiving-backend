@@ -1,173 +1,194 @@
-﻿using FurnitureShop.Application.common;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Product;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Domain.Enitities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 
 namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/products")]
+    [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(
+            IProductService productService)
         {
             _productService = productService;
         }
 
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPost("Add")]
-        public async Task<IActionResult> Create(CreateProductRequestDto request)
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetActive()
         {
-            var product = await _productService.CreateAsync(request);
-
-            return Ok(product);
+            return Ok(await _productService.GetActiveAsync());
         }
 
-
+        [AllowAnonymous]
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productService.GetAllProducts();
-
-            return Ok(products);
+            return Ok(await _productService.GetAllAsync());
         }
 
-        [HttpGet("single/{id:guid}")]
+        [AllowAnonymous]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
 
             if (product == null)
             {
-                return NotFound();
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ProductNotFound,
+                        StatusCodes.Status404NotFound));
             }
 
             return Ok(product);
         }
 
-        [HttpGet("{categoryId:guid}")]
+        [AllowAnonymous]
+        [HttpGet("slug/{slug}")]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var product = await _productService.GetBySlugAsync(slug);
+
+            if (product == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ProductNotFound,
+                        StatusCodes.Status404NotFound));
+            }
+
+            return Ok(product);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("category/{categoryId:guid}")]
         public async Task<IActionResult> GetByCategory(Guid categoryId)
         {
-            var products = await _productService.GetProductsByCategoryAsync(categoryId);
-
-            return Ok(products);
+            return Ok(
+                await _productService.GetByCategoryAsync(categoryId));
         }
 
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Update/{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateProductRequestDto request)
+        [AllowAnonymous]
+        [HttpGet("featured")]
+        public async Task<IActionResult> Featured()
         {
-            var updated = await _productService.UpdateAsync(id, request);
+            return Ok(
+                await _productService.GetFeaturedProductsAsync());
+        }
 
-            if (!updated)
+        [AllowAnonymous]
+        [HttpGet("new-arrivals")]
+        public async Task<IActionResult> NewArrivals()
+        {
+            return Ok(
+                await _productService.GetNewArrivalProductsAsync());
+        }
+
+        [AllowAnonymous]
+        [HttpGet("best-sellers")]
+        public async Task<IActionResult> BestSellers()
+        {
+            return Ok(
+                await _productService.GetBestSellerProductsAsync());
+        }
+
+        [AllowAnonymous]
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+            [FromQuery] string keyword)
+        {
+            return Ok(
+                await _productService.SearchAsync(keyword));
+        }
+
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPost]
+        public async Task<IActionResult> Create(
+            [FromBody] CreateProductRequestDto request)
+        {
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
             }
 
-            return Ok(updated);
+            var product =
+                await _productService.CreateAsync(request);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = product.Id },
+                product);
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Deactivate/{id:guid}")]
-        public async Task<IActionResult> Deactivate(Guid id)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(
+            Guid id,
+            [FromBody] UpdateProductRequestDto request)
         {
-            await _productService.DeactivateProductAsync(id);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
 
             return Ok(
-                ApiResponse<object>.Success(
-                    null,
-                    ResponseMessages.ProductDeactivated
-                )
-            );
+                await _productService.UpdateAsync(
+                    id,
+                    request));
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpPut("Activate/{id:guid}")]
+        [HttpPatch("{id:guid}/activate")]
         public async Task<IActionResult> Activate(Guid id)
         {
-            await _productService.ActivateProductAsync(id);
+            await _productService.ActivateAsync(id);
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.ProductActivated
-                )
-            );
+                    ResponseMessages.ProductActivated));
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("Delete/{id:guid}")]
+        [HttpPatch("{id:guid}/deactivate")]
+        public async Task<IActionResult> Deactivate(Guid id)
+        {
+            await _productService.DeactivateAsync(id);
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.ProductDeactivated));
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var response = await _productService.DeleteByIdAsync(id);
-            return StatusCode(response.StatusCode, response);
-        }
+            await _productService.DeleteAsync(id);
 
-        [Authorize(Roles = Roles.Admin)]
-        [HttpDelete("Clear")]
-        public async Task<IActionResult> Clear()
-        {
-            var response = await _productService.DeleteAllAsync();
-            return StatusCode(response.StatusCode, response);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpPost("upload-image")]
-        public async Task<IActionResult> UploadImage(IFormFile image)
-        {
-            if (image == null || image.Length == 0)
-            {
-                return BadRequest("No image uploaded.");
-            }
-
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-
-            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
-            {
-                return BadRequest("Only jpg, jpeg, png and webp files are allowed.");
-            }
-
-            const long maxFileSize = 5 * 1024 * 1024;
-
-            if (image.Length > maxFileSize)
-            {
-                return BadRequest("Maximum file size is 5 MB.");
-            }
-
-            var uploadsFolder = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "uploads",
-                "products");
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            await using var stream = new FileStream(filePath, FileMode.Create);
-
-            await image.CopyToAsync(stream);
-
-            var imageUrl = $"/uploads/products/{fileName}";
-
-            return Ok(new UploadProductImageResponseDto
-            {
-                ImageUrl = imageUrl
-            });
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.ProductDeleted));
         }
     }
 }

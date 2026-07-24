@@ -1,24 +1,56 @@
-﻿using FurnitureShop.Application.Common;
-using FurnitureShop.Application.DTOs.Product;
-using FurnitureShop.Domain.Enitities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Application.DTOs.Product;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IProductService
     {
-        Task<ProductResponseDto> CreateAsync(CreateProductRequestDto request);
-        Task<ProductResponseDto?> GetProductByIdAsync(Guid id);
-        Task<List<ProductResponseDto>> GetProductsByCategoryAsync(Guid categoryId);
-        Task<List<ProductResponseDto>> GetAllProducts();
-        Task ActivateProductAsync(Guid productId);
-        Task DeactivateProductAsync(Guid productId);
-        Task<ApiResponse<object>> DeleteByIdAsync(Guid id);
-        Task<ApiResponse<object>> DeleteAllAsync();
-        Task<bool> UpdateAsync(Guid productId, UpdateProductRequestDto request);
+        #region Create
+
+        Task<ProductResponseDto> CreateAsync(
+            CreateProductRequestDto request);
+
+        #endregion
+
+        #region Read
+
+        Task<ProductResponseDto?> GetByIdAsync(Guid productId);
+
+        Task<ProductResponseDto?> GetBySlugAsync(string slug);
+
+        Task<ProductResponseDto?> GetBySkuAsync(string sku);
+
+        Task<List<ProductResponseDto>> GetAllAsync();
+
+        Task<List<ProductResponseDto>> GetActiveAsync();
+
+        Task<List<ProductResponseDto>> GetByCategoryAsync(Guid categoryId);
+
+        Task<List<ProductResponseDto>> GetFeaturedProductsAsync();
+
+        Task<List<ProductResponseDto>> GetNewArrivalProductsAsync();
+
+        Task<List<ProductResponseDto>> GetBestSellerProductsAsync();
+
+        Task<List<ProductResponseDto>> SearchAsync(string keyword);
+
+        #endregion
+
+        #region Update
+
+        Task<ProductResponseDto> UpdateAsync(
+            Guid productId,
+            UpdateProductRequestDto request);
+
+        Task ActivateAsync(Guid productId);
+
+        Task DeactivateAsync(Guid productId);
+
+        #endregion
+
+        #region Delete
+
+        Task DeleteAsync(Guid productId);
+
+        #endregion
     }
 }

@@ -38,6 +38,7 @@ namespace FurnitureShop.Infrastructure.Data
 
             ConfigureUsers(modelBuilder);
             ConfigureCategories(modelBuilder);
+            ConfigureProducts(modelBuilder);
             ConfigureCart(modelBuilder);
             ConfigureWishlist(modelBuilder);
         }
@@ -118,9 +119,90 @@ namespace FurnitureShop.Infrastructure.Data
 
                 entity.Property(x => x.RowVersion)
                     .IsRowVersion();
+            });
+        }
 
-                entity.HasMany(x => x.Products)
-                    .WithOne(x => x.Category)
+        private static void ConfigureProducts(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.HasIndex(x => x.Name);
+
+                entity.HasIndex(x => x.Slug)
+                    .IsUnique();
+
+                entity.HasIndex(x => x.SKU)
+                    .IsUnique();
+
+                entity.HasIndex(x => x.CategoryId);
+
+                entity.HasIndex(x => x.IsActive);
+
+                entity.HasIndex(x => x.IsFeatured);
+
+                entity.HasIndex(x => x.IsNewArrival);
+
+                entity.HasIndex(x => x.IsBestSeller);
+
+                entity.HasIndex(x => new
+                {
+                    x.CategoryId,
+                    x.IsActive
+                });
+
+                entity.Property(x => x.Name)
+                    .HasMaxLength(150)
+                    .IsRequired();
+
+                entity.Property(x => x.Slug)
+                    .HasMaxLength(180)
+                    .IsRequired();
+
+                entity.Property(x => x.SKU)
+                    .HasMaxLength(30)
+                    .IsRequired();
+
+                entity.Property(x => x.Description)
+                    .HasMaxLength(3000);
+
+                entity.Property(x => x.ImageUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.OriginalPrice)
+                    .HasPrecision(18, 2);
+
+                entity.Property(x => x.Price)
+                    .HasPrecision(18, 2);
+
+                entity.Property(x => x.DiscountPercentage)
+                    .HasPrecision(5, 2);
+
+                entity.Property(x => x.StockQuantity)
+                    .IsRequired();
+
+                entity.Property(x => x.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(x => x.IsFeatured)
+                    .HasDefaultValue(false);
+
+                entity.Property(x => x.IsNewArrival)
+                    .HasDefaultValue(false);
+
+                entity.Property(x => x.IsBestSeller)
+                    .HasDefaultValue(false);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.RowVersion)
+                    .IsRowVersion();
+
+                entity.HasOne(x => x.Category)
+                    .WithMany(x => x.Products)
                     .HasForeignKey(x => x.CategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
             });

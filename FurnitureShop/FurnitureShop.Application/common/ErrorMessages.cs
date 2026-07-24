@@ -30,13 +30,18 @@
         public const string InvalidToken = "Invalid authentication token.";
         public const string AccountLocked = "Your account has been temporarily locked due to multiple failed login attempts. Please try again later.";
 
-        //Cart
+        // Cart
         public const string CartNotFound = "Cart not found.";
         public const string CartItemNotFound = "Cart item not found.";
         public const string InvalidProduct = "Invalid product.";
         public const string InvalidQuantity = "Invalid quantity.";
-        public const string ProductUnavailable = "This product is currently unavailable.";
         public const string OutOfStock = "Product is out of stock.";
+
+        // Products
+        public const string ProductAlreadyExists = "Product already exists.";
+        public const string CategoryInactive = "Selected category is inactive.";
         public const string ProductNotFound = "product not found";
+        public const string ProductUnavailable = "This product is currently unavailable.";
+        public const string InvalidProductPrice = "Selling price cannot be greater than the original price.";
     }
 }
