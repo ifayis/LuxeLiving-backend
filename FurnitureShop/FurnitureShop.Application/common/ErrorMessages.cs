@@ -43,5 +43,12 @@
         public const string ProductNotFound = "product not found";
         public const string ProductUnavailable = "This product is currently unavailable.";
         public const string InvalidProductPrice = "Selling price cannot be greater than the original price.";
+
+        // Wishlist
+        public const string ProductInactive = "Product is inactive.";
+        public const string ProductAlreadyInWishlist = "Product already exists in your wishlist.";
+        public const string WishlistNotFound = "Wishlist not found.";
+        public const string WishlistItemNotFound = "Wishlist item not found.";
+        public const string WishlistEmpty = "Wishlist is empty.";
     }
 }

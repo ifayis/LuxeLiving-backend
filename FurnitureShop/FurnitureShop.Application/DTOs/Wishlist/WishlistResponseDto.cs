@@ -2,8 +2,11 @@
 {
     public class WishlistResponseDto
     {
-        public Guid Id { get; set; }
+        public Guid WishlistId { get; set; }
+
+        public int TotalItems { get; set; }
+
         public List<WishlistItemResponseDto> Items { get; set; }
-        public int ItemCount { get; set; }
+            = new();
     }
 }

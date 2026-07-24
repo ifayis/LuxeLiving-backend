@@ -4,7 +4,7 @@ namespace FurnitureShop.Application.DTOs.Wishlist
 {
     public class AddToWishlistRequestDto
     {
-        [Required]
+        [Required(ErrorMessage = "Product is required.")]
         public Guid ProductId { get; set; }
     }
 }

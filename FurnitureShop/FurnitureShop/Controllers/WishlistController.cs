@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.common;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Wishlist;
 using FurnitureShop.Application.Interfaces.Services;
@@ -10,13 +11,16 @@ namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/wishlist")]
+    [Authorize(Roles = Roles.User)]
+    [Produces("application/json")]
     public class WishlistController : ControllerBase
     {
-        private readonly IWishlistService _WishlistService;
+        private readonly IWishlistService _wishlistService;
 
-        public WishlistController(IWishlistService WishlistService)
+        public WishlistController(
+            IWishlistService wishlistService)
         {
-            _WishlistService = WishlistService;
+            _wishlistService = wishlistService;
         }
 
         private Guid GetUserId()
@@ -24,83 +28,134 @@ namespace FurnitureShop.API.Controllers
             var userId = User.FindFirstValue("UID");
 
             if (string.IsNullOrWhiteSpace(userId))
-                throw new UnauthorizedAccessException("User id not found in token");
+                throw new UnauthorizedAccessException();
 
             return Guid.Parse(userId);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpPost("add")]
-        public async Task<IActionResult> Add(AddToWishlistRequestDto request)
+
+        [HttpPost]
+        [ProducesResponseType(
+            typeof(WishlistResponseDto),
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> Add(
+            [FromBody] AddToWishlistRequestDto request)
         {
-           await _WishlistService.AddAsync(GetUserId(), request);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
+
+            var wishlist = await _wishlistService
+                .AddAsync(GetUserId(), request);
+
+            return Ok(wishlist);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(
+            typeof(WishlistResponseDto),
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMyWishlist()
+        {
+            var wishlist = await _wishlistService
+                .GetMyWishlistAsync(GetUserId());
+
+            return Ok(wishlist);
+        }
+
+        [HttpDelete("items/{wishlistItemId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RemoveItem(
+            Guid wishlistItemId)
+        {
+            await _wishlistService.RemoveItemAsync(
+                GetUserId(),
+                wishlistItemId);
 
             return Ok(
                 ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistAdded
-                )
-            );
+                    null,
+                    ResponseMessages.WishlistItemRemoved));
         }
 
-        [Authorize(Roles = Roles.User)]
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Clear()
+        {
+            await _wishlistService.ClearAsync(
+                GetUserId());
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.WishlistCleared));
+        }
+
         [HttpPost("move-to-cart")]
-        public async Task<IActionResult> MoveAllToCart()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> MoveToCart()
         {
-            await _WishlistService.MoveToCartAsync(GetUserId());
+            await _wishlistService.MoveToCartAsync(
+                GetUserId());
 
-            return Ok(ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistItemsMoved
-            ));
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.WishlistItemsMoved));
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpGet("my-wishlist")]
-        public async Task<IActionResult> GetMy()
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("users/{userId:guid}")]
+        [ProducesResponseType(
+            typeof(WishlistResponseDto),
+            StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByUserId(
+            Guid userId)
         {
-            var wishlist = await _WishlistService.GetMyAsync(GetUserId());
+            var wishlist =
+                await _wishlistService
+                    .GetWishlistByUserIdAsync(userId);
+
+            if (wishlist == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.WishlistNotFound,
+                        StatusCodes.Status404NotFound));
+            }
 
             return Ok(wishlist);
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("User/{userId:guid}")]
-        public async Task<IActionResult> GetUserWishlist(Guid userId)
+        [HttpGet("{wishlistId:guid}")]
+        [ProducesResponseType(
+            typeof(WishlistResponseDto),
+            StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(
+            Guid wishlistId)
         {
-            var wishlist = await _WishlistService.GetByUserIdAsync(userId);
+            var wishlist =
+                await _wishlistService
+                    .GetWishlistByIdAsync(wishlistId);
 
             if (wishlist == null)
-                return NotFound();
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.WishlistNotFound,
+                        StatusCodes.Status404NotFound));
+            }
 
             return Ok(wishlist);
-        }
-
-        [Authorize(Roles = Roles.User)]
-        [HttpDelete("item/{itemId:guid}")]
-        public async Task<IActionResult> RemoveItem(Guid itemId)
-        {
-            await _WishlistService.RemoveItemAsync(GetUserId(), itemId);
-
-            return Ok(ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.WishlistItemRemoved
-                 )
-            );
-        }
-
-        [Authorize(Roles = Roles.User)]
-        [HttpDelete("clear")]
-        public async Task<IActionResult> Clear()
-        {
-            await _WishlistService.ClearAsync(GetUserId());
-
-            return Ok(
-                ApiResponse<object>.Success(
-                null,
-                ResponseMessages.WishlistCleared
-                )
-            );
         }
     }
 }

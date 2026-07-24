@@ -260,17 +260,45 @@ namespace FurnitureShop.Infrastructure.Data
         }
         private static void ConfigureWishlist(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Wishlist>()
-                .HasMany(x => x.Items)
-                .WithOne(x => x.Wishlist)
-                .HasForeignKey(x => x.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Wishlist>(entity =>
+            {
+                entity.HasIndex(x => x.UserId)
+                    .IsUnique();
 
-            modelBuilder.Entity<WishlistItem>()
-                .HasOne(x => x.Product)
-                .WithMany()
-                .HasForeignKey(x => x.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasMany(x => x.Items)
+                    .WithOne(x => x.Wishlist)
+                    .HasForeignKey(x => x.WishlistId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<WishlistItem>(entity =>
+            {
+                entity.HasIndex(x => new
+                {
+                    x.WishlistId,
+                    x.ProductId
+                })
+                .IsUnique();
+
+                entity.HasIndex(x => x.ProductId);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.RowVersion)
+                    .IsRowVersion();
+
+                entity.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
