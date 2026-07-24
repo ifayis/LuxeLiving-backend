@@ -41,9 +41,6 @@ namespace FurnitureShop.Application.DTOs.ShippingAddress
         public string PinCode { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(
-            "^(Home|Office|Other)$",
-            ErrorMessage = "Address type must be Home, Office or Other.")]
         public AddressType AddressType { get; set; }
     }
 }
