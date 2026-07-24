@@ -1,18 +1,50 @@
 ﻿using FurnitureShop.Application.DTOs.ShippingAddress;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IShippingAddressService
     {
-        Task AddAsync(Guid userId, ShippingAddressRequestDto dto);
-        Task<List<ShippingAddressResponseDto>> GetMyAsync(Guid userId);
-        Task UpdateAsync(Guid userId, Guid addressId, ShippingAddressRequestDto dto);
-        Task DeleteAsync(Guid userId, Guid addressId);
-        Task SetDefaultAsync(Guid userId, Guid addressId);
+        #region Create
+
+        Task<ShippingAddressResponseDto> AddAsync(
+            Guid userId,
+            ShippingAddressRequestDto request);
+
+        #endregion
+
+        #region Read
+
+        Task<List<ShippingAddressResponseDto>> GetMyAddressesAsync(
+            Guid userId);
+
+        Task<ShippingAddressResponseDto?> GetByIdAsync(
+            Guid userId,
+            Guid addressId);
+
+        Task<ShippingAddressResponseDto?> GetDefaultAddressAsync(
+            Guid userId);
+
+        #endregion
+
+        #region Update
+
+        Task<ShippingAddressResponseDto> UpdateAsync(
+            Guid userId,
+            Guid addressId,
+            ShippingAddressRequestDto request);
+
+        Task SetDefaultAsync(
+            Guid userId,
+            Guid addressId);
+
+        #endregion
+
+        #region Delete
+
+        Task DeleteAsync(
+            Guid userId,
+            Guid addressId);
+
+        #endregion
     }
 }

@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using FurnitureShop.Domain.Enums;
 
 namespace FurnitureShop.Application.DTOs.ShippingAddress
 {
     public class ShippingAddressRequestDto
     {
         [Required]
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 2)]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(@"^[0-9]{10}$",
-            ErrorMessage = "Phone number must be 10 digits.")]
+        [RegularExpression(
+            @"^[6-9]\d{9}$",
+            ErrorMessage = "Enter a valid Indian mobile number.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
@@ -30,8 +27,23 @@ namespace FurnitureShop.Application.DTOs.ShippingAddress
         public string City { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(@"^[0-9]{6}$",
-            ErrorMessage = "Pincode must be 6 digits.")]
+        [StringLength(100)]
+        public string State { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100)]
+        public string Country { get; set; } = "India";
+
+        [Required]
+        [RegularExpression(
+            @"^\d{6}$",
+            ErrorMessage = "PIN code must contain exactly 6 digits.")]
         public string PinCode { get; set; } = string.Empty;
+
+        [Required]
+        [RegularExpression(
+            "^(Home|Office|Other)$",
+            ErrorMessage = "Address type must be Home, Office or Other.")]
+        public AddressType AddressType { get; set; }
     }
 }

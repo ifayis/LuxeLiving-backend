@@ -50,5 +50,9 @@
         public const string WishlistNotFound = "Wishlist not found.";
         public const string WishlistItemNotFound = "Wishlist item not found.";
         public const string WishlistEmpty = "Wishlist is empty.";
+
+        // Shipping Address
+        public const string MaximumShippingAddressesReached = "You can add a maximum of 5 shipping addresses.";
+        public const string AddressNotFound = "Shipping address not found.";
     }
 }

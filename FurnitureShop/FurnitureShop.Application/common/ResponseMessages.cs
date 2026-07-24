@@ -40,6 +40,7 @@
         public const string AddressAdded = "Address saved";
         public const string AddressUpdated = "Address Updated";
         public const string AddressDeleted = "Address Deleted";
+        public const string DefaultAddressUpdated = "Default shipping address updated successfully.";
 
         // Auth
         public const string LoginSuccess = "Login successful";

@@ -41,6 +41,7 @@ namespace FurnitureShop.Infrastructure.Data
             ConfigureProducts(modelBuilder);
             ConfigureCart(modelBuilder);
             ConfigureWishlist(modelBuilder);
+            ConfigureShippingAddresses(modelBuilder);
         }
 
         private static void ConfigureUsers(ModelBuilder modelBuilder)
@@ -298,6 +299,73 @@ namespace FurnitureShop.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+        }
+
+        private static void ConfigureShippingAddresses(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ShippingAddress>(entity =>
+            {
+                entity.HasIndex(x => x.UserId);
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.IsDefault
+                });
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.CreatedAt
+                });
+
+                entity.Property(x => x.FullName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.PhoneNumber)
+                    .HasMaxLength(10)
+                    .IsRequired();
+
+                entity.Property(x => x.AddressLine1)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.AddressLine2)
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.City)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.State)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.Country)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.PinCode)
+                    .HasMaxLength(6)
+                    .IsRequired();
+
+                entity.Property(x => x.AddressType)
+                    .HasMaxLength(20)
+                    .IsRequired();
+
+                entity.Property(x => x.IsDefault)
+                    .HasDefaultValue(false);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.RowVersion)
+                    .IsRowVersion();
             });
         }
     }

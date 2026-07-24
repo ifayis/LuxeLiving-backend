@@ -1,100 +1,197 @@
-﻿using FurnitureShop.Application.DTOs.ShippingAddress;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.ShippingAddress;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Services
 {
-    public class ShippingAddressService : IShippingAddressService
+    public partial class ShippingAddressService
+        : IShippingAddressService
     {
-        private readonly IShippingAddressRepository _shippingaddressrepository;
+        private readonly IShippingAddressRepository
+            _shippingAddressRepository;
 
-        public ShippingAddressService(IShippingAddressRepository repository)
+        public ShippingAddressService(
+            IShippingAddressRepository shippingAddressRepository)
         {
-            _shippingaddressrepository = repository;
+            _shippingAddressRepository =
+                shippingAddressRepository;
         }
 
-        public async Task AddAsync(Guid userId, ShippingAddressRequestDto dto)
+        public async Task<ShippingAddressResponseDto> AddAsync(
+            Guid userId,
+            ShippingAddressRequestDto request)
         {
             var existingAddresses =
-            await _shippingaddressrepository.GetByUserIdAsync(userId);
+                await _shippingAddressRepository
+                    .GetByUserIdAsync(userId);
 
             if (existingAddresses.Count >= 5)
             {
                 throw new InvalidOperationException(
-                    "Maximum 5 shipping addresses allowed.");
+                    ErrorMessages.MaximumShippingAddressesReached);
             }
 
             var address = new ShippingAddress
             {
                 Id = Guid.NewGuid(),
+
                 UserId = userId,
-                FullName = dto.FullName.Trim(),
-                PhoneNumber = dto.PhoneNumber.Trim(),
-                AddressLine1 = dto.AddressLine1.Trim(),
-                AddressLine2 = dto.AddressLine2?.Trim(),
-                City = dto.City.Trim(),
-                PinCode = dto.PinCode.Trim(),
-                CreatedAt = DateTime.UtcNow
+
+                FullName = request.FullName.Trim(),
+
+                PhoneNumber = request.PhoneNumber.Trim(),
+
+                AddressLine1 = request.AddressLine1.Trim(),
+
+                AddressLine2 = request.AddressLine2?.Trim(),
+
+                City = request.City.Trim(),
+
+                State = request.State.Trim(),
+
+                Country = request.Country.Trim(),
+
+                PinCode = request.PinCode.Trim(),
+
+                AddressType = request.AddressType,
+
+                IsDefault = !existingAddresses.Any(),
+
+                CreatedAt = DateTime.UtcNow,
+
+                UpdatedAt = DateTime.UtcNow
             };
 
-            await _shippingaddressrepository.AddAsync(address);
+            await _shippingAddressRepository
+                .AddAsync(address);
+
+            await _shippingAddressRepository
+                .SaveChangesAsync();
+
+            return Map(address);
         }
 
-        public async Task<List<ShippingAddressResponseDto>> GetMyAsync(Guid userId)
+        public async Task<List<ShippingAddressResponseDto>>GetMyAddressesAsync(Guid userId)
         {
-            var existingAddresses =
-            await _shippingaddressrepository.GetByUserIdAsync(userId);
+            var addresses =
+                await _shippingAddressRepository
+                    .GetByUserIdAsync(userId);
 
-            var isFirstAddress = !existingAddresses.Any();
-            var addresses = await _shippingaddressrepository.GetByUserIdAsync(userId);
+            return addresses
+                .Select(Map)
+                .ToList();
+        }
 
-            return addresses.Select(a => new ShippingAddressResponseDto
+        public async Task<ShippingAddressResponseDto?>GetByIdAsync(
+                Guid userId,
+                Guid addressId)
+        {
+            var address =
+                await _shippingAddressRepository
+                    .GetUserAddressAsync(
+                        userId,
+                        addressId);
+
+            if (address == null)
+                return null;
+
+            return Map(address);
+        }
+
+        public async Task<ShippingAddressResponseDto?>GetDefaultAddressAsync(Guid userId)
+        {
+            var address =
+                await _shippingAddressRepository
+                    .GetDefaultAsync(userId);
+
+            if (address == null)
+                return null;
+
+            return Map(address);
+        }
+
+        public async Task<ShippingAddressResponseDto> UpdateAsync(
+            Guid userId,
+            Guid addressId,
+            ShippingAddressRequestDto request)
+        {
+            var address = await _shippingAddressRepository
+                .GetUserAddressAsync(userId, addressId);
+
+            if (address == null)
             {
-                Id = a.Id,
-                FullName = a.FullName,
-                PhoneNumber = a.PhoneNumber,
-                AddressLine1 = a.AddressLine1,
-                AddressLine2 = a.AddressLine2,
-                City = a.City,
-                PinCode = a.PinCode,
-                IsDefault = a.IsDefault
-            }).ToList();
-        }
+                throw new KeyNotFoundException(
+                    ErrorMessages.AddressNotFound);
+            }
 
-        public async Task UpdateAsync(Guid userId, Guid addressId, ShippingAddressRequestDto dto)
-        {
-            var address = await _shippingaddressrepository.GetByIdAsync(addressId)
-                ?? throw new KeyNotFoundException("Address not found");
+            address.FullName = request.FullName.Trim();
 
-            if (address.UserId != userId)
-                throw new UnauthorizedAccessException();
+            address.PhoneNumber = request.PhoneNumber.Trim();
 
-            address.FullName = dto.FullName.Trim();
-            address.PhoneNumber = dto.PhoneNumber.Trim();
-            address.AddressLine1 = dto.AddressLine1.Trim();
-            address.AddressLine2 = dto.AddressLine2?.Trim();
-            address.City = dto.City.Trim();
-            address.PinCode = dto.PinCode.Trim();
+            address.AddressLine1 = request.AddressLine1.Trim();
+
+            address.AddressLine2 = request.AddressLine2?.Trim();
+
+            address.City = request.City.Trim();
+
+            address.State = request.State.Trim();
+
+            address.Country = request.Country.Trim();
+
+            address.PinCode = request.PinCode.Trim();
+
+            address.AddressType = request.AddressType;
+
             address.UpdatedAt = DateTime.UtcNow;
 
-            await _shippingaddressrepository.SaveChangesAsync();
+            await _shippingAddressRepository
+                .UpdateAsync(address);
+
+            await _shippingAddressRepository
+                .SaveChangesAsync();
+
+            return Map(address);
         }
-
-        public async Task DeleteAsync(Guid userId, Guid addressId)
+        public async Task DeleteAsync(
+            Guid userId,
+            Guid addressId)
         {
-            var address = await _shippingaddressrepository.GetByIdAsync(addressId)
-                ?? throw new KeyNotFoundException("Address not found");
+            var address = await _shippingAddressRepository
+                .GetUserAddressAsync(userId, addressId);
 
-            if (address.UserId != userId)
-                throw new UnauthorizedAccessException();
+            if (address == null)
+            {
+                throw new KeyNotFoundException(
+                    ErrorMessages.AddressNotFound);
+            }
 
-            await _shippingaddressrepository.DeleteAsync(address);
+            var wasDefault = address.IsDefault;
+
+            await _shippingAddressRepository
+                .DeleteAsync(address);
+
+            if (wasDefault)
+            {
+                var remainingAddresses =
+                    await _shippingAddressRepository
+                        .GetByUserIdAsync(userId);
+
+                var newDefault = remainingAddresses
+                    .FirstOrDefault(x => x.Id != addressId);
+
+                if (newDefault != null)
+                {
+                    newDefault.IsDefault = true;
+
+                    await _shippingAddressRepository
+                        .UpdateAsync(newDefault);
+                }
+            }
+
+            await _shippingAddressRepository
+                .SaveChangesAsync();
         }
 
         public async Task SetDefaultAsync(
@@ -102,26 +199,67 @@ namespace FurnitureShop.Application.Services
             Guid addressId)
         {
             var addresses =
-                await _shippingaddressrepository
+                await _shippingAddressRepository
                     .GetByUserIdAsync(userId);
 
             var selectedAddress =
-                addresses.FirstOrDefault(a => a.Id == addressId);
+                addresses.FirstOrDefault(x =>
+                    x.Id == addressId);
 
             if (selectedAddress == null)
             {
                 throw new KeyNotFoundException(
-                    "Address not found");
+                    ErrorMessages.AddressNotFound);
             }
 
             foreach (var address in addresses)
             {
                 address.IsDefault = false;
+
+                await _shippingAddressRepository
+                    .UpdateAsync(address);
             }
 
             selectedAddress.IsDefault = true;
 
-            await _shippingaddressrepository.SaveChangesAsync();
+            await _shippingAddressRepository
+                .UpdateAsync(selectedAddress);
+
+            await _shippingAddressRepository
+                .SaveChangesAsync();
+        }
+
+        private static ShippingAddressResponseDto Map(
+            ShippingAddress address)
+        {
+            return new ShippingAddressResponseDto
+            {
+                Id = address.Id,
+
+                FullName = address.FullName,
+
+                PhoneNumber = address.PhoneNumber,
+
+                AddressLine1 = address.AddressLine1,
+
+                AddressLine2 = address.AddressLine2,
+
+                City = address.City,
+
+                State = address.State,
+
+                Country = address.Country,
+
+                PinCode = address.PinCode,
+
+                AddressType = address.AddressType,
+
+                IsDefault = address.IsDefault,
+
+                CreatedAt = address.CreatedAt,
+
+                UpdatedAt = address.UpdatedAt
+            };
         }
     }
 }

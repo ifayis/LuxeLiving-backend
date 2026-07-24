@@ -1,80 +1,160 @@
-﻿using FurnitureShop.Application.common;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.ShippingAddress;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/shipping-addresses")]
+    [Authorize(Roles = Roles.User)]
+    [Produces("application/json")]
     public class ShippingAddressesController : ControllerBase
     {
-        private readonly IShippingAddressService _shippingaddressService;
+        private readonly IShippingAddressService
+            _shippingAddressService;
 
-        public ShippingAddressesController(IShippingAddressService service)
+        public ShippingAddressesController(
+            IShippingAddressService shippingAddressService)
         {
-            _shippingaddressService = service;
+            _shippingAddressService =
+                shippingAddressService;
         }
 
-        [Authorize(Roles = Roles.User)]
+        private Guid GetUserId()
+        {
+            var userId = User.FindFirstValue("UID");
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new UnauthorizedAccessException();
+
+            return Guid.Parse(userId);
+        }
+
+
         [HttpPost]
-        public async Task<IActionResult> Add(ShippingAddressRequestDto dto)
+        [ProducesResponseType(
+            typeof(ShippingAddressResponseDto),
+            StatusCodes.Status201Created)]
+        public async Task<IActionResult> Create(
+            [FromBody] ShippingAddressRequestDto request)
         {
-            await _shippingaddressService.AddAsync(GetUserId(), dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
+
+            var address =
+                await _shippingAddressService
+                    .AddAsync(GetUserId(), request);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { addressId = address.Id },
+                address);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(
+            typeof(List<ShippingAddressResponseDto>),
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMyAddresses()
+        {
             return Ok(
-                ApiResponse<object>.Success(
-                null,
-                ResponseMessages.AddressAdded
-                ));
+                await _shippingAddressService
+                    .GetMyAddressesAsync(GetUserId()));
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpGet("my")]
-        public async Task<IActionResult> GetMy()
+        [HttpGet("{addressId:guid}")]
+        [ProducesResponseType(
+            typeof(ShippingAddressResponseDto),
+            StatusCodes.Status200OK)]
+        [ProducesResponseType(
+            StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(
+            Guid addressId)
         {
-            return Ok(await _shippingaddressService.GetMyAsync(GetUserId()));
+            var address =
+                await _shippingAddressService
+                    .GetByIdAsync(
+                        GetUserId(),
+                        addressId);
+
+            if (address == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.AddressNotFound,
+                        StatusCodes.Status404NotFound));
+            }
+
+            return Ok(address);
         }
 
-        [Authorize(Roles = Roles.Admin)]
-        [HttpGet("User/{userId}")]
-        public async Task<IActionResult> GetByUser(Guid userId)
+        [HttpGet("default")]
+        [ProducesResponseType(
+            typeof(ShippingAddressResponseDto),
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetDefault()
         {
-            return Ok(await _shippingaddressService.GetMyAsync(userId));
+            var address =
+                await _shippingAddressService
+                    .GetDefaultAddressAsync(
+                        GetUserId());
+
+            if (address == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.AddressNotFound,
+                        StatusCodes.Status404NotFound));
+            }
+
+            return Ok(address);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpPut("{addressId}")]
-        public async Task<IActionResult> Update(Guid addressId, ShippingAddressRequestDto dto)
+        [HttpPut("{addressId:guid}")]
+        [ProducesResponseType(
+            typeof(ShippingAddressResponseDto),
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(
+            Guid addressId,
+            [FromBody] ShippingAddressRequestDto request)
         {
-            await _shippingaddressService.UpdateAsync(GetUserId(), addressId, dto);
-            return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.AddressUpdated
-                 ));
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
+
+            var address =
+                await _shippingAddressService
+                    .UpdateAsync(
+                        GetUserId(),
+                        addressId,
+                        request);
+
+            return Ok(address);
         }
 
-        [Authorize(Roles = Roles.User)]
-        [HttpDelete("{addressId}")]
-        public async Task<IActionResult> Delete(Guid addressId)
-        {
-            await _shippingaddressService.DeleteAsync(GetUserId(), addressId);
-            return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.AddressDeleted
-                 ));
-        }
-
-        [Authorize(Roles = Roles.User)]
-        [HttpPut("{addressId}/set-default")]
+        [HttpPatch("{addressId:guid}/default")]
+        [ProducesResponseType(
+            StatusCodes.Status200OK)]
         public async Task<IActionResult> SetDefault(
             Guid addressId)
         {
-            await _shippingaddressService
+            await _shippingAddressService
                 .SetDefaultAsync(
                     GetUserId(),
                     addressId);
@@ -82,10 +162,35 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "Default address updated"));
+                    ResponseMessages.DefaultAddressUpdated));
         }
 
-        private Guid GetUserId()
-            => Guid.Parse(User.FindFirst("UID")!.Value);
+        [HttpDelete("{addressId:guid}")]
+        [ProducesResponseType(
+            StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(
+            Guid addressId)
+        {
+            await _shippingAddressService
+                .DeleteAsync(
+                    GetUserId(),
+                    addressId);
+
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    ResponseMessages.AddressDeleted));
+        }
+
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("users/{userId:guid}")]
+        public async Task<IActionResult> GetUserAddresses(
+            Guid userId)
+        {
+            return Ok(
+                await _shippingAddressService
+                    .GetMyAddressesAsync(userId));
+        }
     }
 }
