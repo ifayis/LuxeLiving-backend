@@ -27,5 +27,14 @@
         public const string VerificationTokenExpired = "Email verification token has expired.";
         public const string InvalidToken = "Invalid authentication token.";
         public const string AccountLocked = "Your account has been temporarily locked due to multiple failed login attempts. Please try again later.";
+
+        //Cart
+        public const string CartNotFound = "Cart not found.";
+        public const string CartItemNotFound = "Cart item not found.";
+        public const string InvalidProduct = "Invalid product.";
+        public const string InvalidQuantity = "Invalid quantity.";
+        public const string ProductUnavailable = "This product is currently unavailable.";
+        public const string OutOfStock = "Product is out of stock.";
+        public const string ProductNotFound = "product not found";
     }
 }

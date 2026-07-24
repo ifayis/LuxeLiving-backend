@@ -8,6 +8,7 @@
         // Cart
         public const string CartRemoved = "Item removed from the cart successful";
         public const string CartCleared = "Cart cleared";
+        public const string CartUpdated = "Cart updated successfully.";
 
         // Category
         public const string CategoryCreated = "Category created successfully";
@@ -30,6 +31,7 @@
 
         // Orders
         public const string NoOrders = "No orders yet";
+
         // Checkout
         public const string CheckoutPayment = "Payment under process";
         public const string ExecutePayment = "Order created";

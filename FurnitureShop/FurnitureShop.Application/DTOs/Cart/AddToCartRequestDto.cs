@@ -1,14 +1,17 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FurnitureShop.Application.DTOs.Cart
 {
     public class AddToCartRequestDto
     {
-        [Required]
+        [Required(ErrorMessage = "Product is required.")]
         public Guid ProductId { get; set; }
 
-        [Range(0, 100)]
+        [Required]
+        [Range(
+            1,
+            20,
+            ErrorMessage = "Quantity must be between 1 and 20.")]
         public int Quantity { get; set; }
     }
 }

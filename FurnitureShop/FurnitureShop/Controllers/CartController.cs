@@ -1,16 +1,18 @@
-﻿using FurnitureShop.Application.common;
+﻿using FurnitureShop.API.Common;
+using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Cart;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Security.Claims;
 
 namespace FurnitureShop.API.Controllers
 {
     [ApiController]
     [Route("api/cart")]
+    [Authorize]
+    [Produces("application/json")]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -20,87 +22,112 @@ namespace FurnitureShop.API.Controllers
             _cartService = cartService;
         }
 
-        private Guid GetUserId()
+        private Guid GetCurrentUserId()
         {
             var userId = User.FindFirstValue("UID");
 
             if (string.IsNullOrWhiteSpace(userId))
-                throw new UnauthorizedAccessException("User id not found in token");
+                throw new UnauthorizedAccessException(ErrorMessages.InvalidToken);
 
             return Guid.Parse(userId);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpPost("add")]
-        public async Task<IActionResult> Add(AddToCartRequestDto request)
+        [HttpPost("items")]
+        public async Task<IActionResult> AddToCart(
+            [FromBody] AddToCartRequestDto request)
         {
-            var result = await _cartService.AddToCartAsync(GetUserId(), request);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
 
-            return Ok(result);
+            var response = await _cartService.AddToCartAsync(
+                GetCurrentUserId(),
+                request);
+
+            return Ok(response);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpGet("my-cart")]
+        [HttpGet]
         public async Task<IActionResult> GetMyCart()
         {
-            var cart = await _cartService.GetMyCartAsync(GetUserId());
+            var cart = await _cartService.GetMyCartAsync(
+                GetCurrentUserId());
 
             return Ok(cart);
         }
 
         [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Individual/{userId:guid}")]
+        [HttpGet("users/{userId:guid}")]
         public async Task<IActionResult> GetUserCart(Guid userId)
         {
             var cart = await _cartService.GetCartByIdAsync(userId);
 
             if (cart == null)
-                return NotFound();
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.CartNotFound,
+                        StatusCodes.Status404NotFound));
+            }
 
             return Ok(cart);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateItem(UpdateCartItemRequestDto request)
+        [HttpPut("items")]
+        public async Task<IActionResult> UpdateCartItem(
+            [FromBody] UpdateCartItemRequestDto request)
         {
-            var updated = await _cartService.UpdateItemAsync(GetUserId(), request);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.ValidationFailed,
+                        StatusCodes.Status400BadRequest,
+                        ModelState.ToErrorDictionary()));
+            }
+
+            var updated = await _cartService.UpdateItemAsync(
+                GetCurrentUserId(),
+                request);
 
             if (!updated)
             {
-                return NotFound(ApiResponse<object>.Fail(
-                    null
-                    ));
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.CartItemNotFound,
+                        StatusCodes.Status404NotFound));
             }
 
-            return Ok(updated);
+            return Ok(ResponseMessages.CartUpdated);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpDelete("remove/{productId:guid}")]
-        public async Task<IActionResult> Remove(Guid productId)
+        [HttpDelete("items/{productId:guid}")]
+        public async Task<IActionResult> RemoveItem(Guid productId)
         {
-            await _cartService.RemoveItemAsync(GetUserId(), productId);
+            await _cartService.RemoveItemAsync(
+                GetCurrentUserId(),
+                productId);
 
-            return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.CartRemoved
-                 ));
+            return Ok(ResponseMessages.CartRemoved);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpDelete("clear")]
-        public async Task<IActionResult> Clear()
+        [HttpDelete]
+        public async Task<IActionResult> ClearCart()
         {
-            await _cartService.ClearCartAsync(GetUserId());
+            await _cartService.ClearCartAsync(
+                GetCurrentUserId());
 
-            return Ok(
-                 ApiResponse<object>.Success(
-                 null,
-                 ResponseMessages.CartCleared
-                 )
-            );
+            return Ok(ResponseMessages.CartCleared);
         }
     }
 }

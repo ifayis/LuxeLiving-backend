@@ -95,19 +95,54 @@ namespace FurnitureShop.Infrastructure.Data
 
         private static void ConfigureCart(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Cart>()
-                .HasMany(x => x.Items)
-                .WithOne(x => x.Cart)
-                .HasForeignKey(x => x.CartId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasIndex(x => x.UserId)
+                    .IsUnique();
 
-            modelBuilder.Entity<CartItem>()
-                .HasOne(x => x.Product)
-                .WithMany()
-                .HasForeignKey(x => x.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.LastActivityAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.IsCheckedOut)
+                    .HasDefaultValue(false);
+
+                entity.Property(x => x.RowVersion)
+                    .IsRowVersion();
+
+                entity.HasMany(x => x.Items)
+                    .WithOne(x => x.Cart)
+                    .HasForeignKey(x => x.CartId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasIndex(x => x.CartId);
+
+                entity.HasIndex(x => x.ProductId);
+
+                entity.HasIndex(x => new
+                {
+                    x.CartId,
+                    x.ProductId
+                })
+                .IsUnique();
+
+                entity.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(x => x.Quantity)
+                    .IsRequired();
+            });
         }
-
         private static void ConfigureWishlist(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Wishlist>()
