@@ -37,7 +37,7 @@ namespace FurnitureShop.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             ConfigureUsers(modelBuilder);
-            ConfigureProducts(modelBuilder);
+            ConfigureCategories(modelBuilder);
             ConfigureCart(modelBuilder);
             ConfigureWishlist(modelBuilder);
         }
@@ -78,19 +78,52 @@ namespace FurnitureShop.Infrastructure.Data
             });
         }
 
-        private static void ConfigureProducts(ModelBuilder modelBuilder)
+        private static void ConfigureCategories(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>()
-                .HasOne(x => x.Category)
-                .WithMany(x => x.Products)
-                .HasForeignKey(x => x.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasIndex(x => x.Name)
+                    .IsUnique();
 
-            // Uncomment when Product.Price is decimal.
-            //
-            // modelBuilder.Entity<Product>()
-            //     .Property(x => x.Price)
-            //     .HasPrecision(18,2);
+                entity.HasIndex(x => x.Slug)
+                    .IsUnique();
+
+                entity.HasIndex(x => x.DisplayOrder);
+
+                entity.Property(x => x.Name)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.Slug)
+                    .HasMaxLength(80)
+                    .IsRequired();
+
+                entity.Property(x => x.Description)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.ImageUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.DisplayOrder)
+                    .HasDefaultValue(0);
+
+                entity.Property(x => x.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(x => x.RowVersion)
+                    .IsRowVersion();
+
+                entity.HasMany(x => x.Products)
+                    .WithOne(x => x.Category)
+                    .HasForeignKey(x => x.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
         private static void ConfigureCart(ModelBuilder modelBuilder)

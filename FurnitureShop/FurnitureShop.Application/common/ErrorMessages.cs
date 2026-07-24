@@ -10,6 +10,8 @@
 
         // Category
         public const string InvalidId = "Enter a valid Id";
+        public const string CategoryAlreadyExists = "Category already exists.";
+        public const string CategoryNotFound = "Category not found.";
 
         // Auth
         public const string InvalidCredentials = "Invalid credentials";

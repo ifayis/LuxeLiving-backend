@@ -67,7 +67,7 @@ namespace FurnitureShop.API.Controllers
         [HttpGet("users/{userId:guid}")]
         public async Task<IActionResult> GetUserCart(Guid userId)
         {
-            var cart = await _cartService.GetCartByIdAsync(userId);
+            var cart = await _cartService.GetUserCartAsync(userId);
 
             if (cart == null)
             {

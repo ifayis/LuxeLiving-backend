@@ -1,5 +1,4 @@
 ﻿using FurnitureShop.Application.Interfaces.Repositories;
-using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Domain.Entities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -15,50 +14,119 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<bool> ExistsByNameAsync(string name)
-        {
-            return await _context.Categories
-                .AnyAsync(c => c.Name.ToLower() == name.ToLower());
-        }
+        #region Create
 
         public async Task AddAsync(Category category)
         {
             await _context.Categories.AddAsync(category);
         }
 
+        #endregion
+
+        #region Read
+
         public async Task<Category?> GetByIdAsync(Guid id)
         {
-            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Categories
+                .Include(x => x.Products)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Category?> GetBySlugAsync(string slug)
+        {
+            return await _context.Categories
+                .AsNoTracking()
+                .Include(x => x.Products)
+                .FirstOrDefaultAsync(x => x.Slug == slug);
         }
 
         public async Task<List<Category>> GetAllAsync()
         {
             return await _context.Categories
-                .Where(c => c.IsActive)
+                .AsNoTracking()
+                .OrderBy(x => x.DisplayOrder)
+                .ThenBy(x => x.Name)
+                .Include(x => x.Products)
                 .ToListAsync();
         }
-        public async Task<bool> ExistsByNameExceptIdAsync(
-            string name,
-            Guid categoryId)
+
+        public async Task<List<Category>> GetActiveAsync()
         {
-            return await _context.Categories.AnyAsync(c =>
-                c.Id != categoryId &&
-                c.Name.ToLower() == name.ToLower());
+            return await _context.Categories
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.DisplayOrder)
+                .ThenBy(x => x.Name)
+                .Include(x => x.Products)
+                .ToListAsync();
         }
 
-        public async Task DeleteAllAsync()
+        #endregion
+
+        #region Validation
+
+        public async Task<bool> ExistsByNameAsync(string name)
         {
-            _context.Categories.RemoveRange(_context.Categories);
+            name = name.Trim().ToLower();
+
+            return await _context.Categories
+                .AnyAsync(x =>
+                    x.Name.ToLower() == name);
         }
+
+        public async Task<bool> ExistsByNameAsync(
+            string name,
+            Guid excludeCategoryId)
+        {
+            name = name.Trim().ToLower();
+
+            return await _context.Categories
+                .AnyAsync(x =>
+                    x.Id != excludeCategoryId &&
+                    x.Name.ToLower() == name);
+        }
+
+        public async Task<bool> ExistsBySlugAsync(string slug)
+        {
+            slug = slug.Trim().ToLower();
+
+            return await _context.Categories
+                .AnyAsync(x =>
+                    x.Slug == slug);
+        }
+
+        #endregion
+
+        #region Update
+
+        public Task UpdateAsync(Category category)
+        {
+            category.UpdatedAt = DateTime.UtcNow;
+
+            _context.Categories.Update(category);
+
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region Delete
+
+        public Task DeleteAsync(Category category)
+        {
+            category.IsActive = false;
+            category.UpdatedAt = DateTime.UtcNow;
+
+            _context.Categories.Update(category);
+
+            return Task.CompletedTask;
+        }
+
+        #endregion
 
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
-        }
-
-        public Task<bool> ExistsByNameExceptIdAsync(string v, object categoryId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

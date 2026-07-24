@@ -1,21 +1,23 @@
-﻿using FurnitureShop.Domain.Enitities;
-using FurnitureShop.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<bool> ExistsByNameAsync(string name);
         Task AddAsync(Category category);
         Task<Category?> GetByIdAsync(Guid id);
+        Task<Category?> GetBySlugAsync(string slug);
         Task<List<Category>> GetAllAsync();
-        Task<bool> ExistsByNameExceptIdAsync(string name, Guid categoryId);
-        Task DeleteAllAsync();
+        Task<List<Category>> GetActiveAsync();
+        Task<bool> ExistsByNameAsync(string name);
+
+        Task<bool> ExistsByNameAsync(
+            string name,
+            Guid excludeCategoryId);
+
+        Task<bool> ExistsBySlugAsync(string slug);
+        Task UpdateAsync(Category category);
+        Task DeleteAsync(Category category);
         Task SaveChangesAsync();
     }
 }

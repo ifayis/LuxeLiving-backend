@@ -3,119 +3,186 @@ using FurnitureShop.Application.DTOs.Category;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Entities;
+using System.Text.RegularExpressions;
 
 namespace FurnitureShop.Application.Services
 {
-    public class CategoryService : ICategoryService
+    public partial class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _CategoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(ICategoryRepository CategoryRepository)
+        public CategoryService(ICategoryRepository categoryRepository)
         {
-            _CategoryRepository = CategoryRepository;
+            _categoryRepository = categoryRepository;
         }
 
-        public async Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request, Guid categoryId)
+        public async Task<CategoryResponseDto> CreateAsync(
+            CreateCategoryRequestDto request)
         {
-            if (await _CategoryRepository
-                .ExistsByNameExceptIdAsync(
-                    request.Name.Trim(),
-                    categoryId))
-            {
+            var name = request.Name.Trim();
+
+            if (await _categoryRepository.ExistsByNameAsync(name))
                 throw new InvalidOperationException(
-                    "Category already exists");
-            }
+                    ErrorMessages.CategoryAlreadyExists);
+
+            var slug = await GenerateUniqueSlugAsync(name);
+
             var category = new Category
             {
                 Id = Guid.NewGuid(),
-                Name = request.Name.Trim(),
-                IsActive = true
+                Name = name,
+                Slug = slug,
+                Description = request.Description?.Trim(),
+                ImageUrl = request.ImageUrl?.Trim(),
+                DisplayOrder = request.DisplayOrder,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
-            await _CategoryRepository.AddAsync(category);
-            await _CategoryRepository.SaveChangesAsync();
+            await _categoryRepository.AddAsync(category);
+
+            await _categoryRepository.SaveChangesAsync();
 
             return Map(category);
         }
 
+        private async Task<string> GenerateUniqueSlugAsync(
+            string name)
+        {
+            var slug = GenerateSlug(name);
+
+            var originalSlug = slug;
+
+            var count = 1;
+
+            while (await _categoryRepository.ExistsBySlugAsync(slug))
+            {
+                slug = $"{originalSlug}-{count++}";
+            }
+
+            return slug;
+        }
+
+        private static string GenerateSlug(string text)
+        {
+            text = text.Trim().ToLowerInvariant();
+
+            text = Regex.Replace(text, @"[^a-z0-9\s-]", "");
+
+            text = Regex.Replace(text, @"\s+", "-");
+
+            text = Regex.Replace(text, @"-+", "-");
+
+            return text;
+        }
+
+        public async Task<CategoryResponseDto> UpdateAsync(
+    Guid categoryId,
+    UpdateCategoryRequestDto request)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
+                throw new KeyNotFoundException(
+                    ErrorMessages.CategoryNotFound);
+
+            var name = request.Name.Trim();
+
+            if (await _categoryRepository.ExistsByNameAsync(
+                name,
+                categoryId))
+            {
+                throw new InvalidOperationException(
+                    ErrorMessages.CategoryAlreadyExists);
+            }
+
+            if (!string.Equals(
+                    category.Name,
+                    name,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                category.Slug = await GenerateUniqueSlugAsync(name);
+            }
+
+            category.Name = name;
+            category.Description = request.Description?.Trim();
+            category.ImageUrl = request.ImageUrl?.Trim();
+            category.DisplayOrder = request.DisplayOrder;
+            category.IsActive = request.IsActive;
+            category.UpdatedAt = DateTime.UtcNow;
+
+            await _categoryRepository.UpdateAsync(category);
+
+            await _categoryRepository.SaveChangesAsync();
+
+            return Map(category);
+        }
+
+        public async Task DeleteAsync(Guid categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
+                throw new KeyNotFoundException(
+                    ErrorMessages.CategoryNotFound);
+
+            await _categoryRepository.DeleteAsync(category);
+
+            await _categoryRepository.SaveChangesAsync();
+        }
+
         public async Task<List<CategoryResponseDto>> GetAllAsync()
         {
-            return (await _CategoryRepository.GetAllAsync())
+            var categories = await _categoryRepository.GetAllAsync();
+
+            return categories
                 .Select(Map)
                 .ToList();
         }
 
-        public async Task<CategoryResponseDto?> GetByIdAsync(Guid id)
+        public async Task<List<CategoryResponseDto>> GetActiveAsync()
         {
-            var category = await _CategoryRepository.GetByIdAsync(id);
-            return category == null ? null : Map(category);
+            var categories = await _categoryRepository.GetActiveAsync();
+
+            return categories
+                .Select(Map)
+                .ToList();
         }
 
-        public async Task<bool> UpdateAsync(Guid categoryId, UpdateCategoryRequestDto request)
+        public async Task<CategoryResponseDto?> GetByIdAsync(Guid categoryId)
         {
-            var category = await _CategoryRepository.GetByIdAsync(categoryId);
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+
             if (category == null)
-                return false;
+                return null;
 
-            if (await _CategoryRepository.ExistsByNameAsync(request.Name))
-                throw new InvalidOperationException("Category already exists");
-
-            category.Name = request.Name.Trim();
-            category.IsActive = request.IsActive;
-
-            await _CategoryRepository.SaveChangesAsync();
-            return true;
+            return Map(category);
         }
 
-
-        public async Task<ApiResponse<object>> DeleteByIdAsync(Guid id)
+        public async Task<CategoryResponseDto?> GetBySlugAsync(string slug)
         {
-            if (id == Guid.Empty)
+            var category = await _categoryRepository.GetBySlugAsync(slug);
+
+            if (category == null)
+                return null;
+
+            return Map(category);
+        }
+
+        private static CategoryResponseDto Map(Category category)
+        {
+            return new CategoryResponseDto
             {
-                return ApiResponse<object>.Fail(
-                    ErrorMessages.InvalidId,
-                    400
-                    );
-            }
-
-            var entity = await _CategoryRepository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                return ApiResponse<object>.Fail(
-                    ErrorMessages.NotFound,
-                    400);
-            }
-
-            entity.IsActive = false;
-
-            await _CategoryRepository.SaveChangesAsync();
-            
-            return ApiResponse<object>.Success(
-                null,
-                ResponseMessages.CategoryDeleted,
-                200);
-        }
-
-        public async Task<ApiResponse<object>> DeleteAllAsync()
-        {
-            await _CategoryRepository.DeleteAllAsync();
-            await _CategoryRepository.SaveChangesAsync();
-
-            return ApiResponse<object>.Success(
-                null,
-                ResponseMessages.CategoriesDeleted,
-                200);
-        }
-        private static CategoryResponseDto Map(Category c) => new()
-        {
-            Id = c.Id,
-            Name = c.Name,
-            IsActive = c.IsActive
-        };
-
-        public Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request)
-        {
-            throw new NotImplementedException();
+                Id = category.Id,
+                Name = category.Name,
+                Slug = category.Slug,
+                Description = category.Description,
+                ImageUrl = category.ImageUrl,
+                DisplayOrder = category.DisplayOrder,
+                ProductCount = category.Products?.Count ?? 0,
+                IsActive = category.IsActive
+            };
         }
     }
 }

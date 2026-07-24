@@ -5,11 +5,17 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface ICategoryService
     {
-        Task<CategoryResponseDto> CreateAsync(CreateCategoryRequestDto request);
+        Task<CategoryResponseDto> CreateAsync(
+            CreateCategoryRequestDto request);
+
+        Task<CategoryResponseDto> UpdateAsync(
+            Guid categoryId,
+            UpdateCategoryRequestDto request);
+
+        Task DeleteAsync(Guid categoryId);
         Task<List<CategoryResponseDto>> GetAllAsync();
-        Task<CategoryResponseDto?> GetByIdAsync(Guid id);
-        Task<bool> UpdateAsync(Guid id, UpdateCategoryRequestDto request);
-        Task<ApiResponse<object>> DeleteByIdAsync(Guid id);
-        Task<ApiResponse<object>> DeleteAllAsync();
+        Task<List<CategoryResponseDto>> GetActiveAsync();
+        Task<CategoryResponseDto?> GetByIdAsync(Guid categoryId);
+        Task<CategoryResponseDto?> GetBySlugAsync(string slug);
     }
 }
