@@ -1,15 +1,22 @@
 ﻿using FurnitureShop.Application.DTOs.Checkout;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface ICheckoutService
     {
-        Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId);
-        Task ExecutePaymentAsync(Guid userId, PaymentRequestDto request);
+        #region Checkout Summary
+
+        Task<CheckoutSummaryDto> GetSummaryAsync(
+            Guid userId);
+
+        #endregion
+
+        #region Checkout
+
+        Task<PaymentResponseDto> CheckoutAsync(
+            Guid userId,
+            CheckoutRequestDto request);
+
+        #endregion
     }
 }

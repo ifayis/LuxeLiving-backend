@@ -1,111 +1,227 @@
-﻿using FurnitureShop.Application.DTOs.Checkout;
+﻿using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Checkout;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
-using FurnitureShop.Application.common;
+using FurnitureShop.Domain.Enums;
 
 namespace FurnitureShop.Application.Services
 {
-    public class CheckoutService : ICheckoutService
+    public partial class CheckoutService : ICheckoutService
     {
         private readonly ICartRepository _cartRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IShippingAddressRepository _shippingAddressRepository;
+        private readonly IOrderRepository _orderRepository;
 
         public CheckoutService(
             ICartRepository cartRepository,
-            IOrderRepository orderRepository,
-            IProductRepository productRepository)
+            IProductRepository productRepository,
+            IShippingAddressRepository shippingAddressRepository,
+            IOrderRepository orderRepository)
         {
             _cartRepository = cartRepository;
-            _orderRepository = orderRepository;
             _productRepository = productRepository;
+            _shippingAddressRepository = shippingAddressRepository;
+            _orderRepository = orderRepository;
         }
 
-        public async Task<CheckoutResponseDto> GetCheckoutAsync(Guid userId)
+        public async Task<CheckoutSummaryDto> GetSummaryAsync(
+            Guid userId)
         {
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
 
             if (cart == null || !cart.Items.Any())
-                return new CheckoutResponseDto();
-
-            var items = cart.Items
-                .Where(i =>
-                    i.Product != null &&
-                    i.Product.IsActive)
-                .Select(i => new CheckOutItemDto
-                {
-                    ProductId = i.ProductId,
-                    ProductName = i.Product.Name,
-                    ImageUrl = i.Product.ImageUrl,
-                    Price = i.Product.Price,
-                    Quantity = i.Quantity
-                })
-                .ToList(); return new CheckoutResponseDto
             {
-                Items = items,
-                GrossTotal = items.Sum(i => i.Total)
-            };
-        }
+                throw new InvalidOperationException(
+                    ErrorMessages.CartEmpty);
+            }
 
-        public async Task ExecutePaymentAsync(Guid userId, PaymentRequestDto request)
-        {
-            if (request.PaymentMethod != PaymentMethods.OnlinePay &&
-                request.PaymentMethod != PaymentMethods.CashOnDelivery)
-                throw new ArgumentException("Invalid payment method");
-
-            var cart = await _cartRepository.GetByUserIdAsync(userId);
-
-            if (cart == null || !cart.Items.Any())
-                throw new InvalidOperationException("Cart is empty");
+            var checkoutItems = new List<CheckoutItemDto>();
 
             foreach (var cartItem in cart.Items)
             {
-                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+                var product = await _productRepository
+                    .GetByIdAsync(cartItem.ProductId);
 
                 if (product == null)
-                    throw new InvalidOperationException("Product not found.");
+                {
+                    throw new InvalidOperationException(
+                        ErrorMessages.ProductNotFound);
+                }
 
                 if (!product.IsActive)
+                {
                     throw new InvalidOperationException(
                         $"{product.Name} is unavailable.");
+                }
 
                 if (product.StockQuantity < cartItem.Quantity)
+                {
                     throw new InvalidOperationException(
                         $"{product.Name} has only {product.StockQuantity} item(s) remaining.");
+                }
+
+                checkoutItems.Add(new CheckoutItemDto
+                {
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    ImageUrl = product.ImageUrl,
+                    UnitPrice = product.Price,
+                    Quantity = cartItem.Quantity
+                });
+            }
+
+            var defaultAddress =
+                await _shippingAddressRepository
+                    .GetDefaultAsync(userId);
+
+            return new CheckoutSummaryDto
+            {
+                Items = checkoutItems,
+
+                ShippingAddress =
+                    defaultAddress == null
+                        ? null
+                        : new Application.DTOs.ShippingAddress
+                            .ShippingAddressResponseDto
+                        {
+                            Id = defaultAddress.Id,
+                            FullName = defaultAddress.FullName,
+                            PhoneNumber = defaultAddress.PhoneNumber,
+                            AddressLine1 = defaultAddress.AddressLine1,
+                            AddressLine2 = defaultAddress.AddressLine2,
+                            City = defaultAddress.City,
+                            State = defaultAddress.State,
+                            Country = defaultAddress.Country,
+                            PinCode = defaultAddress.PinCode,
+                            AddressType = defaultAddress.AddressType,
+                            IsDefault = defaultAddress.IsDefault,
+                            CreatedAt = defaultAddress.CreatedAt,
+                            UpdatedAt = defaultAddress.UpdatedAt
+                        },
+
+                TotalItems = checkoutItems.Sum(x => x.Quantity),
+
+                SubTotal = checkoutItems.Sum(x => x.SubTotal),
+
+                ShippingCharge = 0,
+
+                Discount = 0,
+
+                Tax = 0,
+
+                GrandTotal = checkoutItems.Sum(x => x.SubTotal)
+            };
+        }
+
+        public async Task<PaymentResponseDto> CheckoutAsync(
+    Guid userId,
+    CheckoutRequestDto request)
+        {
+            var cart = await _cartRepository
+                .GetByUserIdAsync(userId);
+
+            if (cart == null || !cart.Items.Any())
+            {
+                throw new InvalidOperationException(
+                    ErrorMessages.CartEmpty);
+            }
+
+            var shippingAddress =
+                await _shippingAddressRepository
+                    .GetUserAddressAsync(
+                        userId,
+                        request.ShippingAddressId);
+
+            if (shippingAddress == null)
+            {
+                throw new KeyNotFoundException(
+                    ErrorMessages.AddressNotFound);
+            }
+
+            decimal grandTotal = 0;
+
+            var orderItems = new List<OrderItem>();
+
+            foreach (var cartItem in cart.Items)
+            {
+                var product = await _productRepository
+                    .GetByIdAsync(cartItem.ProductId);
+
+                if (product == null)
+                {
+                    throw new InvalidOperationException(
+                        ErrorMessages.ProductNotFound);
+                }
+
+                if (!product.IsActive)
+                {
+                    throw new InvalidOperationException(
+                        $"{product.Name} is unavailable.");
+                }
+
+                if (product.StockQuantity < cartItem.Quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"{product.Name} has only {product.StockQuantity} item(s) remaining.");
+                }
+
+                grandTotal +=
+                    product.Price * cartItem.Quantity;
+
+                orderItems.Add(new OrderItem
+                {
+                    Id = Guid.NewGuid(),
+
+                    ProductId = product.Id,
+
+                    Quantity = cartItem.Quantity,
+
+                    Price = product.Price
+                });
+
+                product.StockQuantity -= cartItem.Quantity;
             }
 
             var order = new Order
             {
                 Id = Guid.NewGuid(),
+
                 UserId = userId,
-                Status = OrderStatuses.Pending,
+
+                Status = OrderStatus.Pending,
+
                 PaymentMethod = request.PaymentMethod,
-                TotalAmount = cart.Items.Sum(i => i.Product.Price * i.Quantity),
-                Items = cart.Items.Select(i => new OrderItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    Price = i.Product.Price
-                }).ToList()
+
+                TotalAmount = grandTotal,
+
+                ShippingAddressId = shippingAddress.Id,
+
+                Items = orderItems
             };
 
             await _orderRepository.AddAsync(order);
 
-            foreach (var cartItem in cart.Items)
-            {
-                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
-
-                if (product == null)
-                    continue;
-
-                product.StockQuantity -= cartItem.Quantity;
-            }
-
             await _productRepository.SaveChangesAsync();
 
             await _cartRepository.ClearCartAsync(userId);
+
+            return new PaymentResponseDto
+            {
+                OrderId = order.Id,
+
+                Amount = grandTotal,
+
+                PaymentMethod = request.PaymentMethod,
+
+                Message =
+                    request.PaymentMethod ==
+                    PaymentMethod.CashOnDelivery
+                        ? "Order placed successfully."
+                        : "Proceed to online payment."
+            };
         }
     }
 }

@@ -54,5 +54,8 @@
         // Shipping Address
         public const string MaximumShippingAddressesReached = "You can add a maximum of 5 shipping addresses.";
         public const string AddressNotFound = "Shipping address not found.";
+
+        // Checkout
+        public const string CartEmpty ="Your cart is empty.";
     }
 }

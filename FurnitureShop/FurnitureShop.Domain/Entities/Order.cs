@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Entities;
+using FurnitureShop.Domain.Enums;
 
-namespace FurnitureShop.Domain.Enitities
+public class Order
 {
-    public class Order
-    {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Status { get; set; } = "Pending";
-        public string PaymentMethod { get; set; } = string.Empty;
+    public Guid Id { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public Guid UserId { get; set; }
 
-        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
-    }
+    public Guid ShippingAddressId { get; set; }
+
+    public ShippingAddress ShippingAddress { get; set; } = null!;
+
+    public PaymentMethod PaymentMethod { get; set; }
+
+    public OrderStatus Status { get; set; }
+
+    public decimal TotalAmount { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public ICollection<OrderItem> Items { get; set; }
+        = new List<OrderItem>();
 }
