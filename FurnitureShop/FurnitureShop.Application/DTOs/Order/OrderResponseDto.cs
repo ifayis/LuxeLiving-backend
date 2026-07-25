@@ -1,21 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FurnitureShop.Application.DTOs.ShippingAddress;
+using FurnitureShop.Domain.Enums;
 
 namespace FurnitureShop.Application.DTOs.Order
 {
     public class OrderResponseDto
     {
-
         public Guid OrderId { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string PaymentMethod { get; set; } = string.Empty;
+
+        public string OrderNumber { get; set; } = string.Empty;
+
+        public OrderStatus Status { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
+
+        public decimal SubTotal { get; set; }
+
+        public decimal ShippingCharge { get; set; }
+
+        public decimal Discount { get; set; }
+
+        public decimal Tax { get; set; }
+
+        public decimal GrandTotal { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
-        public List<OrderItemResponseDto> Items { get; set; } = new();
+        public ShippingAddressResponseDto ShippingAddress { get; set; }
+            = null!;
+
+        public List<OrderItemResponseDto> Items { get; set; }
+            = new();
     }
 }

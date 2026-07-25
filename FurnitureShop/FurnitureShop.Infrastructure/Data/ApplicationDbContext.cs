@@ -42,6 +42,8 @@ namespace FurnitureShop.Infrastructure.Data
             ConfigureCart(modelBuilder);
             ConfigureWishlist(modelBuilder);
             ConfigureShippingAddresses(modelBuilder);
+            ConfigureOrders(modelBuilder);
+            ConfigureOrderItems(modelBuilder);
         }
 
         private static void ConfigureUsers(ModelBuilder modelBuilder)
@@ -366,6 +368,75 @@ namespace FurnitureShop.Infrastructure.Data
 
                 entity.Property(x => x.RowVersion)
                     .IsRowVersion();
+            });
+        }
+
+        private static void ConfigureOrders(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.OrderNumber)
+                    .HasMaxLength(30)
+                    .IsRequired();
+
+                entity.HasIndex(x => x.OrderNumber)
+                    .IsUnique();
+
+                entity.Property(x => x.SubTotal)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.ShippingCharge)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Discount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Tax)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.GrandTotal)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Status)
+                    .HasConversion<string>();
+
+                entity.Property(x => x.PaymentMethod)
+                    .HasConversion<string>();
+
+                entity.Property(x => x.CreatedAt)
+                    .IsRequired();
+
+                entity.HasOne(x => x.ShippingAddress)
+                    .WithMany()
+                    .HasForeignKey(x => x.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.Items)
+                    .WithOne(x => x.Order)
+                    .HasForeignKey(x => x.OrderId);
+            });
+        }
+
+        private static void ConfigureOrderItems(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OrderItem>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.ProductName)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.ProductImageUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.UnitPrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.LineTotal)
+                    .HasColumnType("decimal(18,2)");
             });
         }
     }

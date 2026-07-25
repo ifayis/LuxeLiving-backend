@@ -1,13 +1,7 @@
-﻿using FurnitureShop.Application.common;
-using FurnitureShop.Application.Interfaces.Repositories;
+﻿using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Domain.Enitities;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Infrastructure.Repositories
 {
@@ -15,65 +9,122 @@ namespace FurnitureShop.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public OrderRepository(ApplicationDbContext context)
+        public OrderRepository(
+            ApplicationDbContext context)
         {
             _context = context;
         }
 
+        #region Create
+
         public async Task AddAsync(Order order)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            await _context.Orders.AddAsync(order);
         }
 
-        public async Task<List<Order>> GetOrdersByUserIdAsync(Guid userId)
+        #endregion
+
+        #region Read
+
+        public async Task<Order?> GetByIdAsync(
+            Guid orderId)
         {
             return await _context.Orders
-                .Include(o => o.Items)
-                   .ThenInclude(i => i.Product)
-                .Where(o => o.UserId == userId)
-                .OrderByDescending(o => o.CreatedAt)
+                .Include(x => x.Items)
+                .Include(x => x.ShippingAddress)
+                .FirstOrDefaultAsync(x =>
+                    x.Id == orderId);
+        }
+
+        public async Task<Order?> GetByOrderNumberAsync(
+            string orderNumber)
+        {
+            return await _context.Orders
+                .Include(x => x.Items)
+                .Include(x => x.ShippingAddress)
+                .FirstOrDefaultAsync(x =>
+                    x.OrderNumber == orderNumber);
+        }
+
+        public async Task<Order?> GetByIdAsync(
+            Guid orderId,
+            Guid userId)
+        {
+            return await _context.Orders
+                .Include(x => x.Items)
+                .Include(x => x.ShippingAddress)
+                .FirstOrDefaultAsync(x =>
+                    x.Id == orderId &&
+                    x.UserId == userId);
+        }
+
+        public async Task<bool> ExistsOrderNumberAsync(
+            string orderNumber)
+        {
+            return await _context.Orders
+                .AnyAsync(x =>
+                    x.OrderNumber == orderNumber);
+        }
+
+        public async Task<List<Order>> GetByUserIdAsync(
+            Guid userId)
+        {
+            return await _context.Orders
+                .Include(x => x.Items)
+                .Include(x => x.ShippingAddress)
+                .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
         }
 
-        public async Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId)
+        public async Task<List<Order>> GetAllAsync()
         {
             return await _context.Orders
-                .Include(o => o.Items)
-                   .ThenInclude(i => i.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
+                .Include(x => x.Items)
+                .Include(x => x.ShippingAddress)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
         }
 
-        public async Task UpdateAsync(Order order)
+        #endregion
+
+        #region Update
+
+        public Task UpdateAsync(Order order)
         {
             _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
+
+            return Task.CompletedTask;
         }
+
+        #endregion
+
+        #region Analytics
 
         public async Task<int> GetTotalProductsPurchasedAsync()
         {
-            return await _context.OrderItems.SumAsync(i => i.Quantity);
+            return await _context.OrderItems
+                .SumAsync(x => x.Quantity);
         }
 
         public async Task<decimal> GetTotalRevenueAsync()
         {
             return await _context.Orders
-                .Where(o => o.Status == OrderStatuses.Delivered)
-                .SumAsync(o => o.TotalAmount);
+                .Where(x =>
+                    x.Status ==
+                    Domain.Enums.OrderStatus.Delivered)
+                .SumAsync(x => x.GrandTotal);
         }
 
-        public async Task<Order?> GetOrderDetailsAsync(Guid orderId)
-        {
-            return await _context.Orders
-                .Include(o => o.Items)
-                .ThenInclude(i => i.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-        }
+        #endregion
+
+        #region Persistence
 
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
 
+        #endregion
     }
 }

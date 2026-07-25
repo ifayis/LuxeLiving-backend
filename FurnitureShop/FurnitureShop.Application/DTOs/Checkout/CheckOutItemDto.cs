@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FurnitureShop.Application.DTOs.Checkout
+﻿namespace FurnitureShop.Application.DTOs.Checkout
 {
-    public class CheckOutItemDto
+    public class CheckoutItemDto
     {
         public Guid ProductId { get; set; }
-        public string ProductName { get; set; }
-        public string ImageUrl { get; set; }
-        public decimal Price { get; set; }
+
+        public string ProductName { get; set; } = string.Empty;
+
+        public string? ImageUrl { get; set; }
+
+        public decimal UnitPrice { get; set; }
+
         public int Quantity { get; set; }
-        public decimal Total => Price * Quantity;
+
+        public decimal SubTotal => UnitPrice * Quantity;
     }
 }

@@ -1,25 +1,41 @@
-﻿using FurnitureShop.Domain.Enitities;
-using FurnitureShop.Domain.Entities;
+﻿using FurnitureShop.Domain.Entities;
 using FurnitureShop.Domain.Enums;
 
-public class Order
+namespace FurnitureShop.Domain.Enitities
 {
-    public Guid Id { get; set; }
+    public class Order
+    {
+        public Guid Id { get; set; }
 
-    public Guid UserId { get; set; }
+        public string OrderNumber { get; set; } = string.Empty;
 
-    public Guid ShippingAddressId { get; set; }
+        public Guid UserId { get; set; }
 
-    public ShippingAddress ShippingAddress { get; set; } = null!;
+        public Guid ShippingAddressId { get; set; }
 
-    public PaymentMethod PaymentMethod { get; set; }
+        public ShippingAddress ShippingAddress { get; set; } = null!;
 
-    public OrderStatus Status { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
 
-    public decimal TotalAmount { get; set; }
+        public OrderStatus Status { get; set; }
+            = OrderStatus.Pending;
 
-    public DateTime CreatedAt { get; set; }
+        public decimal SubTotal { get; set; }
 
-    public ICollection<OrderItem> Items { get; set; }
-        = new List<OrderItem>();
+        public decimal ShippingCharge { get; set; }
+
+        public decimal Discount { get; set; }
+
+        public decimal Tax { get; set; }
+
+        public decimal GrandTotal { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+            = DateTime.UtcNow;
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public ICollection<OrderItem> Items { get; set; }
+            = new List<OrderItem>();
+    }
 }

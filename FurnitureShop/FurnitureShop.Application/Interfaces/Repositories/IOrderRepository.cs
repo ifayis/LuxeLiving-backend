@@ -1,22 +1,54 @@
 ﻿using FurnitureShop.Domain.Enitities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FurnitureShop.Domain.Enums;
 
 namespace FurnitureShop.Application.Interfaces.Repositories
 {
     public interface IOrderRepository
     {
+        #region Create
+
         Task AddAsync(Order order);
-        Task<List<Order>> GetOrdersByUserIdAsync(Guid userId);
-        Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId);
+
+        #endregion
+
+        #region Read
+
+        Task<Order?> GetByIdAsync(Guid orderId);
+
+        Task<bool> ExistsOrderNumberAsync(string orderNumber);
+
+        Task<Order?> GetByOrderNumberAsync(
+            string orderNumber);
+
+        Task<Order?> GetByIdAsync(
+            Guid orderId,
+            Guid userId);
+
+        Task<List<Order>> GetByUserIdAsync(
+            Guid userId);
+
+        Task<List<Order>> GetAllAsync();
+
+        #endregion
+
+        #region Update
+
         Task UpdateAsync(Order order);
+
+        #endregion
+
+        #region Analytics
+
         Task<int> GetTotalProductsPurchasedAsync();
+
         Task<decimal> GetTotalRevenueAsync();
-        Task<Order?> GetOrderDetailsAsync(Guid orderId);
+
+        #endregion
+
+        #region Persistence
+
         Task SaveChangesAsync();
 
+        #endregion
     }
 }

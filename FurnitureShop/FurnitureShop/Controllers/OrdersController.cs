@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Order;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,8 @@ namespace FurnitureShop.API.Controllers
     {
         private readonly IOrderService _orderService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(
+            IOrderService orderService)
         {
             _orderService = orderService;
         }
@@ -23,80 +25,162 @@ namespace FurnitureShop.API.Controllers
             var userId = User.FindFirstValue("UID");
 
             if (string.IsNullOrWhiteSpace(userId))
-                throw new UnauthorizedAccessException();
+            {
+                throw new UnauthorizedAccessException(
+                    "User not found.");
+            }
 
             return Guid.Parse(userId);
         }
+
+        #region Customer
 
         [Authorize(Roles = Roles.User)]
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetMyOrders()
         {
-            var orders = await _orderService.GetMyOrdersAsync(GetUserId());
+            var orders = await _orderService
+                .GetMyOrdersAsync(GetUserId());
 
-            if (orders == null || !orders.Any())
+            return Ok(orders);
+        }
+
+        [Authorize(Roles = Roles.User)]
+        [HttpGet("my-orders/{orderId:guid}")]
+        public async Task<IActionResult> GetMyOrder(
+            Guid orderId)
+        {
+            var order = await _orderService
+                .GetMyOrderAsync(
+                    GetUserId(),
+                    orderId);
+
+            if (order == null)
             {
-                return Ok(
-                        ApiResponse<object>.Success(
-                        Array.Empty<object>(),
-                        ResponseMessages.NoOrders
-                        )
-                );
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.OrderNotFound,
+                        404));
             }
-
-            return Ok(orders);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Individual/{userId:guid}")]
-        public async Task<IActionResult> GetOrdersByUser(Guid userId)
-        {
-            var orders = await _orderService.GetOrdersByUserAsync(userId);
-
-            if (orders == null || !orders.Any())
-                return NotFound();
-
-            return Ok(orders);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Total-Products")]
-        public async Task<IActionResult> TotalProductsPurchased()
-        {
-            var total = await _orderService.GetTotalProductsPurchasedAsync();
-            return Ok(total);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Total-Revenue")]
-        public async Task<IActionResult> TotalRevenue()
-        {
-            var revenue = await _orderService.GetTotalRevenueAsync();
-            return Ok(revenue);
-        }
-
-        [Authorize(Roles = Roles.Admin)]
-        [HttpGet("Order-Details/{orderId}")]
-        public async Task<IActionResult> OrderDetails(Guid orderId)
-        {
-            var order = await _orderService.GetOrderDetailsAsync(orderId);
-            if (order == null) return NotFound("Order not found");
 
             return Ok(order);
         }
 
         [Authorize(Roles = Roles.User)]
-        [HttpPut("cancel/{orderId:guid}")]
-        public async Task<IActionResult> CancelOrder(Guid orderId)
+        [HttpPatch("{orderId:guid}/cancel")]
+        public async Task<IActionResult> CancelOrder(
+            Guid orderId,
+            CancelOrderRequestDto request)
         {
-            var order = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+            var order = await _orderService
+                .CancelOrderAsync(
+                    GetUserId(),
+                    orderId,
+                    request);
 
             if (order == null)
             {
-                return NotFound();
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.OrderNotFound,
+                        404));
+            }
+
+            return Ok(ApiResponse<OrderResponseDto>.Success(
+                order,
+                "Order cancelled successfully."));
+        }
+
+        #endregion
+
+        #region Admin
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var orders = await _orderService
+                .GetAllOrdersAsync();
+
+            return Ok(orders);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("users/{userId:guid}")]
+        public async Task<IActionResult> GetOrdersByUser(
+            Guid userId)
+        {
+            var orders = await _orderService
+                .GetOrdersByUserAsync(userId);
+
+            return Ok(orders);
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("{orderId:guid}")]
+        public async Task<IActionResult> GetOrder(
+            Guid orderId)
+        {
+            var order = await _orderService
+                .GetOrderAsync(orderId);
+
+            if (order == null)
+            {
+                return NotFound(
+                    ApiResponse<object>.Fail(
+                        ErrorMessages.OrderNotFound,
+                        404));
             }
 
             return Ok(order);
         }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPatch("{orderId:guid}/status")]
+        public async Task<IActionResult> UpdateStatus(
+            Guid orderId,
+            UpdateOrderStatusRequestDto request)
+        {
+            var order = await _orderService
+                .UpdateStatusAsync(
+                    orderId,
+                    request);
+
+            return Ok(ApiResponse<OrderResponseDto>.Success(
+                order,
+                "Order status updated successfully."));
+        }
+
+        #endregion
+
+        #region Dashboard
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("dashboard/total-products")]
+        public async Task<IActionResult> TotalProductsPurchased()
+        {
+            var total = await _orderService
+                .GetTotalProductsPurchasedAsync();
+
+            return Ok(new ProductSalesSummaryDto
+            {
+                TotalProductsPurchased = total
+            });
+        }
+
+        [Authorize(Roles = Roles.Admin)]
+        [HttpGet("dashboard/total-revenue")]
+        public async Task<IActionResult> TotalRevenue()
+        {
+            var revenue = await _orderService
+                .GetTotalRevenueAsync();
+
+            return Ok(new RevenueSummaryDto
+            {
+                TotalRevenue = revenue
+            });
+        }
+
+        #endregion
     }
 }

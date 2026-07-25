@@ -117,8 +117,8 @@ namespace FurnitureShop.Application.Services
         }
 
         public async Task<PaymentResponseDto> CheckoutAsync(
-    Guid userId,
-    CheckoutRequestDto request)
+            Guid userId,
+            CheckoutRequestDto request)
         {
             var cart = await _cartRepository
                 .GetByUserIdAsync(userId);
@@ -179,29 +179,48 @@ namespace FurnitureShop.Application.Services
 
                     Quantity = cartItem.Quantity,
 
-                    Price = product.Price
+                    UnitPrice = product.Price
                 });
 
                 product.StockQuantity -= cartItem.Quantity;
             }
 
+            string orderNumber;
+
+            do
+            {
+                orderNumber =
+                    OrderNumberGenerator.Generate();
+            }
+            while (await _orderRepository
+                .ExistsOrderNumberAsync(orderNumber));
+
             var order = new Order
             {
                 Id = Guid.NewGuid(),
 
+                OrderNumber = orderNumber,
+
                 UserId = userId,
+
+                ShippingAddressId = shippingAddress.Id,
 
                 Status = OrderStatus.Pending,
 
                 PaymentMethod = request.PaymentMethod,
 
-                TotalAmount = grandTotal,
+                SubTotal = grandTotal,
 
-                ShippingAddressId = shippingAddress.Id,
+                ShippingCharge = 0,
+
+                Discount = 0,
+
+                Tax = 0,
+
+                GrandTotal = grandTotal,
 
                 Items = orderItems
             };
-
             await _orderRepository.AddAsync(order);
 
             await _productRepository.SaveChangesAsync();

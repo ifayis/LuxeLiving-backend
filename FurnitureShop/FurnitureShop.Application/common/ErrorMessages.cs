@@ -57,5 +57,8 @@
 
         // Checkout
         public const string CartEmpty ="Your cart is empty.";
+
+        //Order
+        public const string OrderNotFound = "Order not found.";
     }
 }
