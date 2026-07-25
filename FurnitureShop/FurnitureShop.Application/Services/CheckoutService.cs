@@ -171,15 +171,26 @@ namespace FurnitureShop.Application.Services
                 grandTotal +=
                     product.Price * cartItem.Quantity;
 
+                var lineTotal =
+                    product.Price * cartItem.Quantity;
+
+                grandTotal += lineTotal;
+
                 orderItems.Add(new OrderItem
                 {
                     Id = Guid.NewGuid(),
 
                     ProductId = product.Id,
 
+                    ProductName = product.Name,
+
+                    ProductImageUrl = product.ImageUrl,
+
                     Quantity = cartItem.Quantity,
 
-                    UnitPrice = product.Price
+                    UnitPrice = product.Price,
+
+                    LineTotal = lineTotal
                 });
 
                 product.StockQuantity -= cartItem.Quantity;
@@ -219,17 +230,26 @@ namespace FurnitureShop.Application.Services
 
                 GrandTotal = grandTotal,
 
-                Items = orderItems
+                Items = orderItems,
+
+                CreatedAt = DateTime.UtcNow,
             };
+
             await _orderRepository.AddAsync(order);
 
             await _productRepository.SaveChangesAsync();
 
             await _cartRepository.ClearCartAsync(userId);
 
+            await _cartRepository.SaveChangesAsync();
+
+            await _orderRepository.SaveChangesAsync();
+
             return new PaymentResponseDto
             {
                 OrderId = order.Id,
+
+                OrderNumber = order.OrderNumber,
 
                 Amount = grandTotal,
 

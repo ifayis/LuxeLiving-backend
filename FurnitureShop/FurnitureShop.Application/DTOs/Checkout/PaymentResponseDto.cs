@@ -6,6 +6,8 @@ namespace FurnitureShop.Application.DTOs.Checkout
     {
         public Guid OrderId { get; set; }
 
+        public string OrderNumber { get; set; } = string.Empty;
+
         public decimal Amount { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }

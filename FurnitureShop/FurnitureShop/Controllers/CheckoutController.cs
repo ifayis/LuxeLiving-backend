@@ -15,7 +15,8 @@ namespace FurnitureShop.API.Controllers
     {
         private readonly ICheckoutService _checkoutService;
 
-        public CheckoutController(ICheckoutService checkoutService)
+        public CheckoutController(
+            ICheckoutService checkoutService)
         {
             _checkoutService = checkoutService;
         }
@@ -23,28 +24,37 @@ namespace FurnitureShop.API.Controllers
         private Guid GetUserId()
         {
             var id = User.FindFirstValue("UID");
+
             if (string.IsNullOrWhiteSpace(id))
-                throw new UnauthorizedAccessException("User not found");
+            {
+                throw new UnauthorizedAccessException(
+                    "User not found.");
+            }
 
             return Guid.Parse(id);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCheckout()
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetSummary()
         {
-            var result = await _checkoutService.GetCheckoutAsync(GetUserId());
+            var result = await _checkoutService
+                .GetSummaryAsync(GetUserId());
+
             return Ok(result);
         }
 
-        [HttpPost("payment")]
-        public async Task<IActionResult> Pay(PaymentRequestDto request)
+        [HttpPost]
+        public async Task<IActionResult> Checkout(
+            CheckoutRequestDto request)
         {
-            await _checkoutService.ExecutePaymentAsync(GetUserId(), request);
+            var result = await _checkoutService
+                .CheckoutAsync(
+                    GetUserId(),
+                    request);
 
-            return Ok(ApiResponse<object>.Success(
-                null,
-                ResponseMessages.ExecutePayment
-            ));
+            return Ok(ApiResponse<PaymentResponseDto>.Success(
+                result,
+                ResponseMessages.ExecutePayment));
         }
     }
 }
