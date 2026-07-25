@@ -2,6 +2,7 @@ using FurnitureShop.API.Filters;
 using FurnitureShop.API.Middlewares;
 using FurnitureShop.API.Services;
 using FurnitureShop.Application.Common;
+using FurnitureShop.Application.Interfaces.Common;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Application.Services;
@@ -111,6 +112,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 ;
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
