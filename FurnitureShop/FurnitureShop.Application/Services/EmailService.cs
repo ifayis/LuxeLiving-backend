@@ -23,23 +23,23 @@ namespace FurnitureShop.Infrastructure.Services
             var subject = "Welcome to Luxe Living";
 
             var body = $@"
-<h2>Welcome to Luxe Living</h2>
+            <h2>Welcome to Luxe Living</h2>
 
-<p>Hello <b>{fullName}</b>,</p>
+            <p>Hello <b>{fullName}</b>,</p>
 
-<p>
-Thank you for creating your account.
-We are excited to have you with us.
-</p>
+            <p>
+            Thank you for creating your account.
+            We are excited to have you with us.
+            </p>
 
-<p>
-Start exploring premium furniture designed to transform your home.
-</p>
+            <p>
+            Start exploring premium furniture designed to transform your home.
+            </p>
 
-<p>
-Regards,<br/>
-<b>Luxe Living Team</b>
-</p>";
+            <p>
+            Regards,<br/>
+            <b>Luxe Living Team</b>
+            </p>";
 
             await SendEmailAsync(email, subject, body);
         }
@@ -55,29 +55,29 @@ Regards,<br/>
             var subject = "Verify your email";
 
             var body = $@"
-<h2>Email Verification</h2>
+            <h2>Email Verification</h2>
 
-<p>Hello <b>{fullName}</b>,</p>
+            <p>Hello <b>{fullName}</b>,</p>
 
-<p>
-Click the button below to verify your account.
-</p>
+            <p>
+            Click the button below to verify your account.
+            </p>
 
-<p>
-<a href='{verificationLink}'
-style='background:#000;
-padding:12px 20px;
-color:white;
-text-decoration:none;
-border-radius:5px'>
-Verify Email
-</a>
-</p>
+            <p>
+            <a href='{verificationLink}'
+            style='background:#000;
+            padding:12px 20px;
+            color:white;
+            text-decoration:none;
+            border-radius:5px'>
+            Verify Email
+            </a>
+            </p>
 
-<p>
-If you didn't create this account,
-please ignore this email.
-</p>";
+            <p>
+            If you didn't create this account,
+            please ignore this email.
+            </p>";
 
             await SendEmailAsync(email, subject, body);
         }
@@ -93,29 +93,29 @@ please ignore this email.
             var subject = "Reset your password";
 
             var body = $@"
-<h2>Password Reset</h2>
+            <h2>Password Reset</h2>
 
-<p>Hello <b>{fullName}</b>,</p>
+            <p>Hello <b>{fullName}</b>,</p>
 
-<p>
-You requested a password reset.
-</p>
+            <p>
+            You requested a password reset.
+            </p>
 
-<p>
-<a href='{resetLink}'
-style='background:#000;
-padding:12px 20px;
-color:white;
-text-decoration:none;
-border-radius:5px'>
-Reset Password
-</a>
-</p>
+            <p>
+            <a href='{resetLink}'
+            style='background:#000;
+            padding:12px 20px;
+            color:white;
+            text-decoration:none;
+            border-radius:5px'>
+            Reset Password
+            </a>
+            </p>
 
-<p>
-If you didn't request this,
-please ignore this email.
-</p>";
+            <p>
+            If you didn't request this,
+            please ignore this email.
+            </p>";
 
             await SendEmailAsync(email, subject, body);
         }

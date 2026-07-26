@@ -12,6 +12,6 @@ namespace FurnitureShop.Application.DTOs.Auth
 
         public string RefreshToken { get; set; } = string.Empty;
 
-        public DateTime ExpiresAt { get; set; }
+        public int ExpiresIn { get; set; }
     }
 }

@@ -131,7 +131,7 @@ namespace FurnitureShop.Application.Services
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(accessTokenMinutes)
+                ExpiresIn = accessTokenMinutes * 60
             };
         }
 
@@ -179,7 +179,7 @@ namespace FurnitureShop.Application.Services
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(accessTokenMinutes)
+                ExpiresIn = accessTokenMinutes * 60
             };
         }
 
@@ -327,7 +327,6 @@ namespace FurnitureShop.Application.Services
                 return;
 
             user.IsEmailVerified = true;
-            user.LastLoginAt = DateTime.UtcNow;
             user.EmailVerificationToken = null;
             user.EmailVerificationTokenExpiry = null;
             user.UpdatedAt = DateTime.UtcNow;
