@@ -46,11 +46,15 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.EmailVerificationToken == verificationToken);
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public async Task<List<User>> GetPagedAsync(
+            int pageNumber,
+            int pageSize)
         {
             return await _context.Users
                 .AsNoTracking()
                 .OrderBy(x => x.FullName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 

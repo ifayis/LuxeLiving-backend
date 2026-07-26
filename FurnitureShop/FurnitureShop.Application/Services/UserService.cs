@@ -1,4 +1,6 @@
 ﻿using FurnitureShop.Application.common;
+using FurnitureShop.Application.Common;
+using FurnitureShop.Application.DTOs.Common;
 using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
@@ -28,24 +30,57 @@ namespace FurnitureShop.Application.Services
             _wishlistRepository = wishlistRepository;
         }
 
-        public async Task<List<UserResponseDto>> GetAllUsersAsync()
+        public async Task<PagedResponseDto<UserResponseDto>>GetAllUsersAsync(
+                int pageNumber,
+                int pageSize)
         {
-            var users = await _userRepository.GetAllAsync();
+            pageNumber = Math.Max(pageNumber, 1);
 
-            return users.Select(u => new UserResponseDto
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
+            var totalRecords =
+                await _userRepository.CountAsync();
+
+            var users =
+                await _userRepository.GetPagedAsync(
+                    pageNumber,
+                    pageSize);
+
+            return new PagedResponseDto<UserResponseDto>
             {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                Role = u.Role,
-                IsBlocked = u.IsBlocked
-            }).ToList();
+                Items = users
+                    .Select(u => new UserResponseDto
+                    {
+                        Id = u.Id,
+                        FullName = u.FullName,
+                        Email = u.Email,
+                        Role = u.Role,
+                        IsBlocked = u.IsBlocked
+                    })
+                    .ToList(),
+
+                PageNumber = pageNumber,
+
+                PageSize = pageSize,
+
+                TotalRecords = totalRecords,
+
+                TotalPages =
+                    (int)Math.Ceiling(
+                        totalRecords /
+                        (double)pageSize)
+            };
         }
 
         public async Task<SingleUserResponseDto?> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) return null;
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException(
+                    ErrorMessages.UserNotFound);
+            }
 
             var cart = await _cartRepository.GetByUserIdAsync(user.Id);
             var wishlist = await _wishlistRepository.GetByUserIdAsync(user.Id);
@@ -59,10 +94,13 @@ namespace FurnitureShop.Application.Services
                 CartId = cart?.Id,
                 WishlistId = wishlist?.Id,
                 IsBlocked = user.IsBlocked,
+                CreatedAt = user.CreatedAt,
+                LastLoginAt = user.LastLoginAt,
+                IsEmailVerified = user.IsEmailVerified
             };
         }
 
-        public async Task<bool> BlockUserAsync(
+        public async Task BlockUserAsync(
             Guid userId,
             Guid currentAdminId)
         {
@@ -76,7 +114,10 @@ namespace FurnitureShop.Application.Services
             var user = await _userRepository.GetByIdAsync(userId);
 
             if (user == null)
-                return false;
+            {
+                throw new KeyNotFoundException(
+                    ErrorMessages.UserNotFound);
+            }
 
             if (user.Role == Roles.Admin)
             {
@@ -88,17 +129,20 @@ namespace FurnitureShop.Application.Services
 
             await _userRepository.SaveChangesAsync();
 
-            return true;
         }
 
-        public async Task<bool> UnblockUserAsync(Guid userId)
+        public async Task UnblockUserAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null) return false;
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException(
+                    ErrorMessages.UserNotFound);
+            }
 
             user.IsBlocked = false;
             await _userRepository.SaveChangesAsync();
-            return true;
         }
     }
 }

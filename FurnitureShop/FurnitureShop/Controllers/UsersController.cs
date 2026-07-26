@@ -1,6 +1,5 @@
 ﻿using FurnitureShop.Application.common;
 using FurnitureShop.Application.Common;
-using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,54 +13,73 @@ namespace FurnitureShop.API.Controllers
     {
         private readonly IUserService _userService;
 
-        public UsersController(IUserService userService)
+        public UsersController(
+            IUserService userService)
         {
             _userService = userService;
         }
-        private Guid GetUserId()
+
+        private Guid GetCurrentAdminId()
         {
             var userId = User.FindFirst("UID")?.Value;
 
             if (string.IsNullOrWhiteSpace(userId))
+            {
                 throw new UnauthorizedAccessException();
+            }
 
             return Guid.Parse(userId);
         }
 
-        [HttpGet("All")]
-        public async Task<IActionResult> GetAll()
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _userService
+                .GetAllUsersAsync(
+                    pageNumber,
+                    pageSize);
+
             return Ok(users);
         }
 
-        [HttpGet("Individual/{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [HttpGet("{userId:guid}")]
+        public async Task<IActionResult> GetById(
+            Guid userId)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-
-            if (user == null)
-                return NotFound();
+            var user =
+                await _userService
+                    .GetUserByIdAsync(userId);
 
             return Ok(user);
         }
 
-        [HttpPut("Block/{id:guid}")]
-        public async Task<IActionResult> BlockUser(Guid id)
+        [HttpPatch("{userId:guid}/block")]
+        public async Task<IActionResult> Block(
+            Guid userId)
         {
-            var success = await _userService.BlockUserAsync(id,GetUserId());
-            if (!success) return NotFound();
+            await _userService.BlockUserAsync(
+                userId,
+                GetCurrentAdminId());
 
-            return Ok(ApiResponse<object>.Success(null, "User blocked"));
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    "User blocked successfully."));
         }
 
-        [HttpPut("Unblock/{id:guid}")]
-        public async Task<IActionResult> UnblockUser(Guid id)
+        [HttpPatch("{userId:guid}/unblock")]
+        public async Task<IActionResult> Unblock(
+            Guid userId)
         {
-            var success = await _userService.UnblockUserAsync(id);
-            if (!success) return NotFound();
+            await _userService
+                .UnblockUserAsync(userId);
 
-            return Ok(ApiResponse<object>.Success(null, "User unblocked"));
+            return Ok(
+                ApiResponse<object>.Success(
+                    null,
+                    "User unblocked successfully."));
         }
     }
 }

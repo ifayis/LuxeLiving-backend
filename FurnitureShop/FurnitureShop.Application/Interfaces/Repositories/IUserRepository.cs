@@ -9,7 +9,9 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<User?> GetByRefreshTokenAsync(string refreshToken);
         Task<User?> GetByPasswordResetTokenAsync(string resetToken);
         Task<User?> GetByEmailVerificationTokenAsync(string verificationToken);
-        Task<List<User>> GetAllAsync();
+        Task<List<User>> GetPagedAsync(
+            int pageNumber,
+            int pageSize);
         Task<int> CountAsync();
         Task AddAsync(User user);
         Task UpdateAsync(User user);

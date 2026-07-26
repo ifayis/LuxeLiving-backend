@@ -1,4 +1,5 @@
-﻿using FurnitureShop.Application.DTOs.User;
+﻿using FurnitureShop.Application.DTOs.Common;
+using FurnitureShop.Application.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,13 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<List<UserResponseDto>> GetAllUsersAsync();
+        Task<PagedResponseDto<UserResponseDto>>GetAllUsersAsync(
+                int pageNumber,
+                int pageSize); 
         Task<SingleUserResponseDto> GetUserByIdAsync(Guid id);
-        Task<bool> BlockUserAsync(
+        Task BlockUserAsync(
             Guid userId,
             Guid currentAdminId);
-        Task<bool> UnblockUserAsync(Guid id);
+        Task UnblockUserAsync(Guid id);
     }
 }
