@@ -35,6 +35,11 @@ namespace FurnitureShop.Application.Interfaces.Repositories
 
         Task UpdateAsync(Order order);
 
+        Task<bool> HasPurchasedProductAsync(
+            Guid userId,
+            Guid orderId,
+            Guid productId);
+
         #endregion
 
         #region Analytics

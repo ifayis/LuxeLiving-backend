@@ -1,4 +1,6 @@
-﻿namespace FurnitureShop.Domain.Enitities
+﻿using FurnitureShop.Domain.Entities;
+
+namespace FurnitureShop.Domain.Enitities
 {
     public class User
     {
@@ -37,5 +39,8 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<Review> Reviews { get; set; } = 
+            new List<Review>();
     }
 }

@@ -35,5 +35,9 @@
         public bool IsBestSeller { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public decimal AverageRating { get; set; }
+
+        public int ReviewCount { get; set; }
     }
 }

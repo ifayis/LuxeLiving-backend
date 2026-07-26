@@ -151,6 +151,10 @@ builder.Services.AddScoped<IShippingAddressRepository, ShippingAddressRepository
 
 builder.Services.AddScoped<IShippingAddressService, ShippingAddressService>();
 
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
 
 
 var app = builder.Build();

@@ -51,5 +51,12 @@ namespace FurnitureShop.Domain.Enitities
 
         [Timestamp]
         public byte[]? RowVersion { get; set; }
+
+        public decimal AverageRating { get; set; }
+
+        public int ReviewCount { get; set; }
+
+        public ICollection<Review> Reviews { get; set; }
+            = new List<Review>();
     }
 }

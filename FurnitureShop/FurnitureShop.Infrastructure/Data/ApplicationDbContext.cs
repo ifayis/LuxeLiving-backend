@@ -32,6 +32,8 @@ namespace FurnitureShop.Infrastructure.Data
 
         public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
 
+        public DbSet<Review> Reviews => Set<Review>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -44,6 +46,8 @@ namespace FurnitureShop.Infrastructure.Data
             ConfigureShippingAddresses(modelBuilder);
             ConfigureOrders(modelBuilder);
             ConfigureOrderItems(modelBuilder);
+            ConfigureReview(modelBuilder);
+
         }
 
         private static void ConfigureUsers(ModelBuilder modelBuilder)
@@ -442,6 +446,44 @@ namespace FurnitureShop.Infrastructure.Data
 
                 entity.Property(x => x.LineTotal)
                     .HasColumnType("decimal(18,2)");
+            });
+        }
+
+        private static void ConfigureReview(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Rating)
+                    .IsRequired();
+
+                entity.Property(x => x.Comment)
+                    .HasMaxLength(1000);
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(x => x.Product)
+                    .WithMany(x => x.Reviews)
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.User)
+                    .WithMany(x => x.Reviews)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Order)
+                    .WithMany(x => x.Reviews)
+                    .HasForeignKey(x => x.OrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.ProductId
+                }).IsUnique();
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Domain.Enitities;
+using FurnitureShop.Domain.Enums;
 using FurnitureShop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -95,6 +96,19 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context.Orders.Update(order);
 
             return Task.CompletedTask;
+        }
+
+        public async Task<bool> HasPurchasedProductAsync(
+            Guid userId,
+            Guid orderId,
+            Guid productId)
+        {
+            return await _context.Orders
+                .AnyAsync(o =>
+                    o.Id == orderId &&
+                    o.UserId == userId &&
+                    o.Status == OrderStatus.Delivered &&
+                    o.Items.Any(i => i.ProductId == productId));
         }
 
         #endregion

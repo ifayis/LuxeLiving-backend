@@ -41,5 +41,8 @@ namespace FurnitureShop.Domain.Enitities
 
         public ICollection<OrderItem> Items { get; set; }
             = new List<OrderItem>();
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
     }
 }

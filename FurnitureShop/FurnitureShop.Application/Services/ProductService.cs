@@ -90,7 +90,7 @@ namespace FurnitureShop.Application.Services
 
                 CreatedAt = DateTime.UtcNow,
 
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             };
 
             await _productRepository.AddAsync(product);
@@ -250,8 +250,8 @@ namespace FurnitureShop.Application.Services
         }
 
         public async Task<ProductResponseDto> UpdateAsync(
-    Guid productId,
-    UpdateProductRequestDto request)
+            Guid productId,
+            UpdateProductRequestDto request)
         {
             var product = await _productRepository.GetByIdAsync(productId);
 
@@ -319,6 +319,7 @@ namespace FurnitureShop.Application.Services
             product.IsActive = request.IsActive;
 
             product.UpdatedAt = DateTime.UtcNow;
+
 
             await _productRepository.UpdateAsync(product);
 
@@ -410,7 +411,11 @@ namespace FurnitureShop.Application.Services
 
                 IsBestSeller = product.IsBestSeller,
 
-                CreatedAt = product.CreatedAt
+                CreatedAt = product.CreatedAt,
+
+                AverageRating = product.AverageRating,
+
+                ReviewCount = product.ReviewCount,
             };
         }
     }
