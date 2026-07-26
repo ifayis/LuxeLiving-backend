@@ -30,6 +30,10 @@ namespace FurnitureShop.Domain.Enitities
 
         public decimal GrandTotal { get; set; }
 
+        public string? CancellationReason { get; set; }
+
+        public DateTime? CancelledAt { get; set; }
+
         public DateTime CreatedAt { get; set; }
             = DateTime.UtcNow;
 

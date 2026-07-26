@@ -1,5 +1,6 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Checkout;
+using FurnitureShop.Application.Interfaces.Common;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
@@ -13,17 +14,20 @@ namespace FurnitureShop.Application.Services
         private readonly IProductRepository _productRepository;
         private readonly IShippingAddressRepository _shippingAddressRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CheckoutService(
             ICartRepository cartRepository,
             IProductRepository productRepository,
             IShippingAddressRepository shippingAddressRepository,
-            IOrderRepository orderRepository)
+            IOrderRepository orderRepository,
+            IUnitOfWork unitOfWork)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _shippingAddressRepository = shippingAddressRepository;
             _orderRepository = orderRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CheckoutSummaryDto> GetSummaryAsync(
@@ -120,147 +124,157 @@ namespace FurnitureShop.Application.Services
             Guid userId,
             CheckoutRequestDto request)
         {
-            var cart = await _cartRepository
-                .GetByUserIdAsync(userId);
+            await _unitOfWork.BeginTransactionAsync();
 
-            if (cart == null || !cart.Items.Any())
+            try
             {
-                throw new InvalidOperationException(
-                    ErrorMessages.CartEmpty);
-            }
+                var cart = await _cartRepository.GetByUserIdAsync(userId);
 
-            var shippingAddress =
-                await _shippingAddressRepository
-                    .GetUserAddressAsync(
+                if (cart == null || !cart.Items.Any())
+                {
+                    throw new InvalidOperationException(
+                        ErrorMessages.CartEmpty);
+                }
+
+                var shippingAddress =
+                    await _shippingAddressRepository.GetUserAddressAsync(
                         userId,
                         request.ShippingAddressId);
 
-            if (shippingAddress == null)
-            {
-                throw new KeyNotFoundException(
-                    ErrorMessages.AddressNotFound);
-            }
-
-            decimal grandTotal = 0;
-
-            var orderItems = new List<OrderItem>();
-
-            foreach (var cartItem in cart.Items)
-            {
-                var product = await _productRepository
-                    .GetByIdAsync(cartItem.ProductId);
-
-                if (product == null)
+                if (shippingAddress == null)
                 {
-                    throw new InvalidOperationException(
-                        ErrorMessages.ProductNotFound);
+                    throw new KeyNotFoundException(
+                        ErrorMessages.AddressNotFound);
                 }
 
-                if (!product.IsActive)
+                decimal subTotal = 0m;
+
+                const decimal shippingCharge = 0m;
+                const decimal discount = 0m;
+                const decimal tax = 0m;
+
+                var orderItems = new List<OrderItem>();
+
+                foreach (var cartItem in cart.Items)
                 {
-                    throw new InvalidOperationException(
-                        $"{product.Name} is unavailable.");
+                    var product = await _productRepository
+                        .GetByIdAsync(cartItem.ProductId);
+
+                    if (product == null)
+                    {
+                        throw new InvalidOperationException(
+                            ErrorMessages.ProductNotFound);
+                    }
+
+                    if (!product.IsActive)
+                    {
+                        throw new InvalidOperationException(
+                            $"{product.Name} is unavailable.");
+                    }
+
+                    if (product.StockQuantity < cartItem.Quantity)
+                    {
+                        throw new InvalidOperationException(
+                            $"{product.Name} has only {product.StockQuantity} item(s) remaining.");
+                    }
+
+                    var lineTotal =
+                        product.Price * cartItem.Quantity;
+
+                    subTotal += lineTotal;
+
+                    orderItems.Add(new OrderItem
+                    {
+                        Id = Guid.NewGuid(),
+
+                        ProductId = product.Id,
+
+                        ProductName = product.Name,
+
+                        ProductImageUrl = product.ImageUrl,
+
+                        Quantity = cartItem.Quantity,
+
+                        UnitPrice = product.Price,
+
+                        LineTotal = lineTotal
+                    });
+
+                    product.StockQuantity -= cartItem.Quantity;
                 }
 
-                if (product.StockQuantity < cartItem.Quantity)
+                string orderNumber;
+
+                do
                 {
-                    throw new InvalidOperationException(
-                        $"{product.Name} has only {product.StockQuantity} item(s) remaining.");
+                    orderNumber = OrderNumberGenerator.Generate();
                 }
+                while (await _orderRepository.ExistsOrderNumberAsync(orderNumber));
 
-                grandTotal +=
-                    product.Price * cartItem.Quantity;
-
-                var lineTotal =
-                    product.Price * cartItem.Quantity;
-
-                grandTotal += lineTotal;
-
-                orderItems.Add(new OrderItem
+                var order = new Order
                 {
                     Id = Guid.NewGuid(),
 
-                    ProductId = product.Id,
+                    OrderNumber = orderNumber,
 
-                    ProductName = product.Name,
+                    UserId = userId,
 
-                    ProductImageUrl = product.ImageUrl,
+                    ShippingAddressId = shippingAddress.Id,
 
-                    Quantity = cartItem.Quantity,
+                    PaymentMethod = request.PaymentMethod,
 
-                    UnitPrice = product.Price,
+                    Status = OrderStatus.Pending,
 
-                    LineTotal = lineTotal
-                });
+                    SubTotal = subTotal,
 
-                product.StockQuantity -= cartItem.Quantity;
+                    ShippingCharge = shippingCharge,
+
+                    Discount = discount,
+
+                    Tax = tax,
+
+                    GrandTotal =
+                        subTotal +
+                        shippingCharge +
+                        tax -
+                        discount,
+
+                    CreatedAt = DateTime.UtcNow,
+
+                    Items = orderItems
+                };
+
+                await _orderRepository.AddAsync(order);
+
+                await _cartRepository.ClearCartAsync(userId);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new PaymentResponseDto
+                {
+                    OrderId = order.Id,
+
+                    OrderNumber = order.OrderNumber,
+
+                    Amount = order.GrandTotal,
+
+                    PaymentMethod = request.PaymentMethod,
+
+                    Message =
+                        request.PaymentMethod ==
+                        PaymentMethod.CashOnDelivery
+                            ? "Order placed successfully."
+                            : "Proceed to online payment."
+                };
             }
-
-            string orderNumber;
-
-            do
+            catch
             {
-                orderNumber =
-                    OrderNumberGenerator.Generate();
+                await _unitOfWork.RollbackTransactionAsync();
+
+                throw;
             }
-            while (await _orderRepository
-                .ExistsOrderNumberAsync(orderNumber));
-
-            var order = new Order
-            {
-                Id = Guid.NewGuid(),
-
-                OrderNumber = orderNumber,
-
-                UserId = userId,
-
-                ShippingAddressId = shippingAddress.Id,
-
-                Status = OrderStatus.Pending,
-
-                PaymentMethod = request.PaymentMethod,
-
-                SubTotal = grandTotal,
-
-                ShippingCharge = 0,
-
-                Discount = 0,
-
-                Tax = 0,
-
-                GrandTotal = grandTotal,
-
-                Items = orderItems,
-
-                CreatedAt = DateTime.UtcNow,
-            };
-
-            await _orderRepository.AddAsync(order);
-
-            await _productRepository.SaveChangesAsync();
-
-            await _cartRepository.ClearCartAsync(userId);
-
-            await _cartRepository.SaveChangesAsync();
-
-            await _orderRepository.SaveChangesAsync();
-
-            return new PaymentResponseDto
-            {
-                OrderId = order.Id,
-
-                OrderNumber = order.OrderNumber,
-
-                Amount = grandTotal,
-
-                PaymentMethod = request.PaymentMethod,
-
-                Message =
-                    request.PaymentMethod ==
-                    PaymentMethod.CashOnDelivery
-                        ? "Order placed successfully."
-                        : "Proceed to online payment."
-            };
         }
     }
 }

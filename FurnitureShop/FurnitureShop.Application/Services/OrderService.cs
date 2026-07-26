@@ -1,6 +1,7 @@
 ﻿using FurnitureShop.Application.Common;
 using FurnitureShop.Application.DTOs.Order;
 using FurnitureShop.Application.DTOs.ShippingAddress;
+using FurnitureShop.Application.Interfaces.Common;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
 using FurnitureShop.Domain.Enitities;
@@ -12,16 +13,20 @@ namespace FurnitureShop.Application.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly ICartRepository _cartRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public OrderService(
+            ICartRepository cartRepository,
             IOrderRepository orderRepository,
-            IProductRepository productRepository)
+            IProductRepository productRepository,
+            IUnitOfWork unitOfWork)
         {
+            _cartRepository = cartRepository;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
-
+            _unitOfWork = unitOfWork;
         }
-
         #region Customer
 
         public async Task<List<OrderResponseDto>>
@@ -110,6 +115,10 @@ namespace FurnitureShop.Application.Services
 
                 GrandTotal = order.GrandTotal,
 
+                CancellationReason = order.CancellationReason,
+
+                CancelledAt = order.CancelledAt,
+
                 CreatedAt = order.CreatedAt,
 
                 ShippingAddress = new ShippingAddressResponseDto
@@ -155,66 +164,81 @@ namespace FurnitureShop.Application.Services
                     .ToList()
             };
         }
-        #region Business Operations
 
         public async Task<OrderResponseDto?> CancelOrderAsync(
             Guid userId,
             Guid orderId,
             CancelOrderRequestDto request)
         {
-            var order = await _orderRepository
-                .GetByIdAsync(orderId, userId);
+            await _unitOfWork.BeginTransactionAsync();
 
-            if (order == null)
+            try
             {
-                return null;
-            }
+                var order =
+                    await _orderRepository.GetByIdAsync(
+                        orderId,
+                        userId);
 
-            if (order.Status == OrderStatus.Delivered)
-            {
-                throw new InvalidOperationException(
-                    "Delivered orders cannot be cancelled.");
-            }
-
-            if (order.Status == OrderStatus.Cancelled)
-            {
-                throw new InvalidOperationException(
-                    "Order has already been cancelled.");
-            }
-
-            if (order.Status == OrderStatus.Refunded)
-            {
-                throw new InvalidOperationException(
-                    "Refunded orders cannot be cancelled.");
-            }
-
-            if (order.Status == OrderStatus.Shipped ||
-                order.Status == OrderStatus.OutForDelivery)
-            {
-                throw new InvalidOperationException(
-                    "Shipped orders cannot be cancelled.");
-            }
-
-            foreach (var item in order.Items)
-            {
-                var product = await _productRepository
-                    .GetByIdAsync(item.ProductId);
-
-                if (product != null)
+                if (order == null)
                 {
+                    return null;
+                }
+
+                if (order.Status == OrderStatus.Delivered)
+                {
+                    throw new InvalidOperationException(
+                        "Delivered orders cannot be cancelled.");
+                }
+
+                if (order.Status == OrderStatus.Cancelled)
+                {
+                    throw new InvalidOperationException(
+                        "Order is already cancelled.");
+                }
+
+                if (order.Status == OrderStatus.Refunded)
+                {
+                    throw new InvalidOperationException(
+                        "Refunded orders cannot be cancelled.");
+                }
+
+                foreach (var item in order.Items)
+                {
+                    var product =
+                        await _productRepository.GetByIdAsync(
+                            item.ProductId);
+
+                    if (product == null)
+                    {
+                        continue;
+                    }
+
                     product.StockQuantity += item.Quantity;
                 }
+
+                order.Status = OrderStatus.Cancelled;
+
+                order.CancellationReason = string.IsNullOrWhiteSpace(request.Reason)
+                    ? null
+                    : request.Reason.Trim();
+
+                order.CancelledAt = DateTime.UtcNow;
+
+                order.UpdatedAt = DateTime.UtcNow;
+
+                await _orderRepository.UpdateAsync(order);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return Map(order);
             }
-
-            order.Status = OrderStatus.Cancelled;
-
-            await _productRepository.SaveChangesAsync();
-
-            await _orderRepository.UpdateAsync(order);
-
-            await _orderRepository.SaveChangesAsync();
-
-            return Map(order);
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
 
         public async Task<OrderResponseDto> UpdateStatusAsync(
@@ -243,7 +267,6 @@ namespace FurnitureShop.Application.Services
             return Map(order);
         }
 
-        #endregion
 
         private static void ValidateStatusTransition(
             OrderStatus currentStatus,
@@ -319,8 +342,6 @@ namespace FurnitureShop.Application.Services
             }
         }
 
-        #region Dashboard
-
         public async Task<int> GetTotalProductsPurchasedAsync()
         {
             return await _orderRepository
@@ -332,7 +353,5 @@ namespace FurnitureShop.Application.Services
             return await _orderRepository
                 .GetTotalRevenueAsync();
         }
-
-        #endregion
     }
 }

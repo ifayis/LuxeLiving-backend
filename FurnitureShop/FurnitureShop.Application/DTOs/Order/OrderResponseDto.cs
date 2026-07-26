@@ -23,12 +23,14 @@ namespace FurnitureShop.Application.DTOs.Order
 
         public decimal GrandTotal { get; set; }
 
+        public string? CancellationReason { get; set; }
+
+        public DateTime? CancelledAt { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
-        public ShippingAddressResponseDto ShippingAddress { get; set; }
-            = null!;
+        public ShippingAddressResponseDto ShippingAddress { get; set; } = null!;
 
-        public List<OrderItemResponseDto> Items { get; set; }
-            = new();
+        public List<OrderItemResponseDto> Items { get; set; } = new();
     }
 }

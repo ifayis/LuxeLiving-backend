@@ -381,6 +381,11 @@ namespace FurnitureShop.Infrastructure.Data
                     .HasMaxLength(30)
                     .IsRequired();
 
+                entity.Property(x => x.CancellationReason)
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.CancelledAt);
+
                 entity.HasIndex(x => x.OrderNumber)
                     .IsUnique();
 
