@@ -13,13 +13,6 @@ namespace FurnitureShop.Domain.Enitities
 
         public Guid ShippingAddressId { get; set; }
 
-        public ShippingAddress ShippingAddress { get; set; } = null!;
-
-        public PaymentMethod PaymentMethod { get; set; }
-
-        public OrderStatus Status { get; set; }
-            = OrderStatus.Pending;
-
         public decimal SubTotal { get; set; }
 
         public decimal ShippingCharge { get; set; }
@@ -34,13 +27,18 @@ namespace FurnitureShop.Domain.Enitities
 
         public DateTime? CancelledAt { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-            = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
 
-        public ICollection<OrderItem> Items { get; set; }
-            = new List<OrderItem>();
+        public ShippingAddress ShippingAddress { get; set; } = null!;
+
+        public PaymentMethod PaymentMethod { get; set; }
+
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
+
+
+        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
 

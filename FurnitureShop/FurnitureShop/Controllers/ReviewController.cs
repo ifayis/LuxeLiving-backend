@@ -20,6 +20,7 @@ namespace FurnitureShop.API.Controllers
             _reviewService = reviewService;
         }
 
+
         private Guid GetUserId()
         {
             var userId = User.FindFirstValue("UID");
@@ -33,7 +34,6 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
-        #region Customer
 
         [Authorize(Roles = Roles.User)]
         [HttpPost]
@@ -42,13 +42,17 @@ namespace FurnitureShop.API.Controllers
         {
             await _reviewService.CreateAsync(
                 GetUserId(),
-                request);
+                request
+            );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "Review added successfully."));
+                    "Review added successfully."
+                )
+            );
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpPut("{reviewId:guid}")]
@@ -59,13 +63,17 @@ namespace FurnitureShop.API.Controllers
             await _reviewService.UpdateAsync(
                 GetUserId(),
                 reviewId,
-                request);
+                request
+            );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "Review updated successfully."));
+                    "Review updated successfully."
+                )
+            );
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpDelete("{reviewId:guid}")]
@@ -74,48 +82,41 @@ namespace FurnitureShop.API.Controllers
         {
             await _reviewService.DeleteAsync(
                 GetUserId(),
-                reviewId);
+                reviewId
+            );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "Review deleted successfully."));
+                    "Review deleted successfully."
+                )
+            );
         }
 
-        #endregion
-
-        #region Public
 
         [AllowAnonymous]
         [HttpGet("product/{productId:guid}")]
-        public async Task<IActionResult> GetProductReviews(
-            Guid productId)
+        public async Task<IActionResult> GetProductReviews(Guid productId)
         {
-            var reviews =
-                await _reviewService
-                    .GetProductReviewsAsync(productId);
+            var reviews = await _reviewService
+               .GetProductReviewsAsync(productId);
 
             return Ok(reviews);
         }
 
-        #endregion
-
-        #region Admin
 
         [Authorize(Roles = Roles.Admin)]
         [HttpDelete("admin/{reviewId:guid}")]
-        public async Task<IActionResult> DeleteByAdmin(
-            Guid reviewId)
+        public async Task<IActionResult> DeleteByAdmin(Guid reviewId)
         {
-            await _reviewService.DeleteByAdminAsync(
-                reviewId);
+            await _reviewService.DeleteByAdminAsync(reviewId);
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "Review deleted successfully."));
+                    "Review deleted successfully."
+                )
+            );
         }
-
-        #endregion
     }
 }

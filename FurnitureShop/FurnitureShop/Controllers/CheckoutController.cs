@@ -21,6 +21,7 @@ namespace FurnitureShop.API.Controllers
             _checkoutService = checkoutService;
         }
 
+
         private Guid GetUserId()
         {
             var id = User.FindFirstValue("UID");
@@ -34,6 +35,7 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(id);
         }
 
+
         [HttpGet("summary")]
         public async Task<IActionResult> GetSummary()
         {
@@ -43,6 +45,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(result);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Checkout(
             CheckoutRequestDto request)
@@ -50,11 +53,13 @@ namespace FurnitureShop.API.Controllers
             var result = await _checkoutService
                 .CheckoutAsync(
                     GetUserId(),
-                    request);
+                    request
+                );
 
             return Ok(ApiResponse<PaymentResponseDto>.Success(
                 result,
-                ResponseMessages.ExecutePayment));
+                ResponseMessages.ExecutePayment)
+            );
         }
     }
 }

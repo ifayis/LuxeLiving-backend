@@ -42,8 +42,7 @@ namespace FurnitureShop.Application.Services
                 throw new InvalidOperationException(
                     ErrorMessages.CategoryInactive);
 
-            var wishlist = await _wishlistRepository
-                .GetByUserIdAsync(userId);
+            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
 
             if (wishlist == null)
             {
@@ -56,7 +55,6 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _wishlistRepository.AddAsync(wishlist);
-
                 await _wishlistRepository.SaveChangesAsync();
             }
 
@@ -75,22 +73,20 @@ namespace FurnitureShop.Application.Services
                     WishlistId = wishlist.Id,
                     ProductId = request.ProductId,
                     CreatedAt = DateTime.UtcNow
-                });
+                }
+            );
 
             wishlist.UpdatedAt = DateTime.UtcNow;
 
             await _wishlistRepository.UpdateAsync(wishlist);
-
             await _wishlistRepository.SaveChangesAsync();
 
-            var updatedWishlist =
-                await _wishlistRepository.GetByUserIdAsync(userId);
+            var updatedWishlist = await _wishlistRepository.GetByUserIdAsync(userId);
 
             return Map(updatedWishlist!);
         }
 
-        public async Task<WishlistResponseDto?> GetMyWishlistAsync(
-            Guid userId)
+        public async Task<WishlistResponseDto?> GetMyWishlistAsync(Guid userId)
         {
             var wishlist =
                 await _wishlistRepository.GetByUserIdAsync(userId);
@@ -101,11 +97,9 @@ namespace FurnitureShop.Application.Services
             return Map(wishlist);
         }
 
-        public async Task<WishlistResponseDto?> GetWishlistByUserIdAsync(
-            Guid userId)
+        public async Task<WishlistResponseDto?> GetWishlistByUserIdAsync(Guid userId)
         {
-            var wishlist =
-                await _wishlistRepository.GetByUserIdAsync(userId);
+            var wishlist = await _wishlistRepository.GetByUserIdAsync(userId);
 
             if (wishlist == null)
                 return null;
@@ -113,11 +107,9 @@ namespace FurnitureShop.Application.Services
             return Map(wishlist);
         }
 
-        public async Task<WishlistResponseDto?> GetWishlistByIdAsync(
-            Guid wishlistId)
+        public async Task<WishlistResponseDto?> GetWishlistByIdAsync(Guid wishlistId)
         {
-            var wishlist =
-                await _wishlistRepository.GetByIdAsync(wishlistId);
+            var wishlist = await _wishlistRepository.GetByIdAsync(wishlistId);
 
             if (wishlist == null)
                 return null;
@@ -125,9 +117,7 @@ namespace FurnitureShop.Application.Services
             return Map(wishlist);
         }
 
-        public async Task RemoveItemAsync(
-    Guid userId,
-    Guid wishlistItemId)
+        public async Task RemoveItemAsync(Guid userId, Guid wishlistItemId)
         {
             var wishlist = await _wishlistRepository
                 .GetByUserIdAsync(userId);
@@ -152,7 +142,6 @@ namespace FurnitureShop.Application.Services
             wishlist.UpdatedAt = DateTime.UtcNow;
 
             await _wishlistRepository.UpdateAsync(wishlist);
-
             await _wishlistRepository.SaveChangesAsync();
         }
 
@@ -169,12 +158,10 @@ namespace FurnitureShop.Application.Services
                 .ClearWishlistAsync(wishlist);
 
             await _wishlistRepository.UpdateAsync(wishlist);
-
             await _wishlistRepository.SaveChangesAsync();
         }
 
-        private static WishlistResponseDto Map(
-            Wishlist wishlist)
+        private static WishlistResponseDto Map(Wishlist wishlist)
         {
             var items = wishlist.Items
                 .Where(x =>
@@ -187,35 +174,22 @@ namespace FurnitureShop.Application.Services
             return new WishlistResponseDto
             {
                 WishlistId = wishlist.Id,
-
                 TotalItems = items.Count,
 
                 Items = items
                     .Select(x => new WishlistItemResponseDto
                     {
                         WishlistItemId = x.Id,
-
                         ProductId = x.ProductId,
-
                         ProductName = x.Product.Name,
-
                         Slug = x.Product.Slug,
-
                         SKU = x.Product.SKU,
-
                         CategoryName = x.Product.Category.Name,
-
                         OriginalPrice = x.Product.OriginalPrice,
-
                         Price = x.Product.Price,
-
-                        DiscountPercentage =
-                            x.Product.DiscountPercentage,
-
+                        DiscountPercentage = x.Product.DiscountPercentage,
                         ImageUrl = x.Product.ImageUrl,
-
-                        StockQuantity =
-                            x.Product.StockQuantity,
+                        StockQuantity = x.Product.StockQuantity,
 
                         IsAvailable =
                             x.Product.StockQuantity > 0 &&
@@ -249,7 +223,6 @@ namespace FurnitureShop.Application.Services
                 };
 
                 await _cartRepository.AddAsync(cart);
-
                 await _cartRepository.SaveChangesAsync();
             }
 
@@ -275,7 +248,8 @@ namespace FurnitureShop.Application.Services
                 var cartItem = await _cartRepository
                     .GetCartItemAsync(
                         cart.Id,
-                        product.Id);
+                        product.Id
+                    );
 
                 if (cartItem == null)
                 {
@@ -308,9 +282,7 @@ namespace FurnitureShop.Application.Services
             wishlist.UpdatedAt = DateTime.UtcNow;
 
             await _wishlistRepository.UpdateAsync(wishlist);
-
             await _cartRepository.SaveChangesAsync();
-
             await _wishlistRepository.SaveChangesAsync();
         }
     }

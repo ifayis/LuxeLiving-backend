@@ -21,6 +21,7 @@ namespace FurnitureShop.API.Controllers
             _productService = productService;
         }
 
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetActive()
@@ -28,12 +29,14 @@ namespace FurnitureShop.API.Controllers
             return Ok(await _productService.GetActiveAsync());
         }
 
+
         [AllowAnonymous]
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _productService.GetAllAsync());
         }
+
 
         [AllowAnonymous]
         [HttpGet("{id:guid}")]
@@ -46,11 +49,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.ProductNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(product);
         }
+
 
         [AllowAnonymous]
         [HttpGet("slug/{slug}")]
@@ -63,11 +69,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.ProductNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(product);
         }
+
 
         [AllowAnonymous]
         [HttpGet("category/{categoryId:guid}")]
@@ -77,6 +86,7 @@ namespace FurnitureShop.API.Controllers
                 await _productService.GetByCategoryAsync(categoryId));
         }
 
+
         [AllowAnonymous]
         [HttpGet("featured")]
         public async Task<IActionResult> Featured()
@@ -84,6 +94,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 await _productService.GetFeaturedProductsAsync());
         }
+
 
         [AllowAnonymous]
         [HttpGet("new-arrivals")]
@@ -93,6 +104,7 @@ namespace FurnitureShop.API.Controllers
                 await _productService.GetNewArrivalProductsAsync());
         }
 
+
         [AllowAnonymous]
         [HttpGet("best-sellers")]
         public async Task<IActionResult> BestSellers()
@@ -100,6 +112,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 await _productService.GetBestSellerProductsAsync());
         }
+
 
         [AllowAnonymous]
         [HttpGet("search")]
@@ -122,22 +135,24 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
-            var product =
-                await _productService.CreateAsync(request);
+            var product = await _productService.CreateAsync(request);
 
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = product.Id },
-                product);
+                product
+            );
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(
-            Guid id,
+        public async Task<IActionResult> Update(Guid id,
             [FromBody] UpdateProductRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -146,14 +161,19 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             return Ok(
                 await _productService.UpdateAsync(
                     id,
-                    request));
+                    request
+                )
+            );
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPatch("{id:guid}/activate")]
@@ -164,8 +184,11 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.ProductActivated));
+                    ResponseMessages.ProductActivated
+                )
+            );
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPatch("{id:guid}/deactivate")]
@@ -176,8 +199,11 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.ProductDeactivated));
+                    ResponseMessages.ProductDeactivated
+                )
+            );
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id:guid}")]
@@ -188,7 +214,9 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.ProductDeleted));
+                    ResponseMessages.ProductDeleted
+                )
+            );
         }
     }
 }

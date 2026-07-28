@@ -6,7 +6,6 @@
 
         public int TotalItems { get; set; }
 
-        public List<WishlistItemResponseDto> Items { get; set; }
-            = new();
+        public List<WishlistItemResponseDto> Items { get; set; } = new();
     }
 }

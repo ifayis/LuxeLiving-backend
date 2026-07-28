@@ -9,16 +9,16 @@ namespace FurnitureShop.Domain.Entities
 
         public Guid WishlistId { get; set; }
 
-        public Wishlist Wishlist { get; set; } = null!;
-
         public Guid ProductId { get; set; }
 
-        public Product Product { get; set; } = null!;
-
-        public DateTime CreatedAt { get; set; }
-            = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Timestamp]
         public byte[]? RowVersion { get; set; }
+
+
+        public Wishlist Wishlist { get; set; } = null!;
+
+        public Product Product { get; set; } = null!;
     }
 }

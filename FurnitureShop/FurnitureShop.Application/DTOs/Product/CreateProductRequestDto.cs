@@ -5,15 +5,10 @@ namespace FurnitureShop.Application.DTOs.Product
     public class CreateProductRequestDto
     {
         [Required(ErrorMessage = "Product name is required.")]
-        [StringLength(
-            150,
-            MinimumLength = 2,
-            ErrorMessage = "Product name must be between 2 and 150 characters.")]
+        [StringLength(150, MinimumLength = 2, ErrorMessage = "Product name must be between 2 and 150 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(
-            3000,
-            ErrorMessage = "Description cannot exceed 3000 characters.")]
+        [StringLength(3000, ErrorMessage = "Description cannot exceed 3000 characters.")]
         public string Description { get; set; } = string.Empty;
 
         [Required]

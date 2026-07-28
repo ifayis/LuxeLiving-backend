@@ -45,7 +45,6 @@ namespace FurnitureShop.Application.Services
                     ErrorMessages.InvalidProductPrice);
 
             var slug = await GenerateUniqueSlugAsync(productName);
-
             var sku = await GenerateSkuAsync();
 
             var discountPercentage =
@@ -54,47 +53,31 @@ namespace FurnitureShop.Application.Services
                     : Math.Round(
                         ((request.OriginalPrice - request.Price)
                         / request.OriginalPrice) * 100,
-                        2);
+                        2
+                    );
 
             var product = new Product
             {
                 Id = Guid.NewGuid(),
-
                 Name = productName,
-
                 Slug = slug,
-
                 SKU = sku,
-
                 Description = request.Description.Trim(),
-
                 OriginalPrice = request.OriginalPrice,
-
                 Price = request.Price,
-
                 DiscountPercentage = discountPercentage,
-
                 ImageUrl = request.ImageUrl?.Trim(),
-
                 CategoryId = request.CategoryId,
-
                 StockQuantity = request.StockQuantity,
-
                 IsFeatured = request.IsFeatured,
-
                 IsNewArrival = request.IsNewArrival,
-
                 IsBestSeller = request.IsBestSeller,
-
                 IsActive = true,
-
                 CreatedAt = DateTime.UtcNow,
-
                 UpdatedAt = DateTime.UtcNow,
             };
 
             await _productRepository.AddAsync(product);
-
             await _productRepository.SaveChangesAsync();
 
             product.Category = category;
@@ -102,13 +85,10 @@ namespace FurnitureShop.Application.Services
             return Map(product);
         }
 
-        private async Task<string> GenerateUniqueSlugAsync(
-            string name)
+        private async Task<string> GenerateUniqueSlugAsync(string name)
         {
             var slug = GenerateSlug(name);
-
             var originalSlug = slug;
-
             var counter = 1;
 
             while (await _productRepository.ExistsBySlugAsync(slug))
@@ -122,11 +102,8 @@ namespace FurnitureShop.Application.Services
         private static string GenerateSlug(string text)
         {
             text = text.Trim().ToLowerInvariant();
-
             text = Regex.Replace(text, @"[^a-z0-9\s-]", "");
-
             text = Regex.Replace(text, @"\s+", "-");
-
             text = Regex.Replace(text, @"-+", "-");
 
             return text;
@@ -305,24 +282,15 @@ namespace FurnitureShop.Application.Services
                         2);
 
             product.ImageUrl = request.ImageUrl?.Trim();
-
             product.CategoryId = request.CategoryId;
-
             product.StockQuantity = request.StockQuantity;
-
             product.IsFeatured = request.IsFeatured;
-
             product.IsNewArrival = request.IsNewArrival;
-
             product.IsBestSeller = request.IsBestSeller;
-
             product.IsActive = request.IsActive;
-
             product.UpdatedAt = DateTime.UtcNow;
 
-
             await _productRepository.UpdateAsync(product);
-
             await _productRepository.SaveChangesAsync();
 
             product.Category = category;
@@ -342,7 +310,6 @@ namespace FurnitureShop.Application.Services
             product.UpdatedAt = DateTime.UtcNow;
 
             await _productRepository.UpdateAsync(product);
-
             await _productRepository.SaveChangesAsync();
         }
 
@@ -358,7 +325,6 @@ namespace FurnitureShop.Application.Services
             product.UpdatedAt = DateTime.UtcNow;
 
             await _productRepository.UpdateAsync(product);
-
             await _productRepository.SaveChangesAsync();
         }
 
@@ -371,7 +337,6 @@ namespace FurnitureShop.Application.Services
                     ErrorMessages.ProductNotFound);
 
             await _productRepository.DeleteAsync(product);
-
             await _productRepository.SaveChangesAsync();
         }
 
@@ -380,41 +345,23 @@ namespace FurnitureShop.Application.Services
             return new ProductResponseDto
             {
                 Id = product.Id,
-
                 Name = product.Name,
-
                 Slug = product.Slug,
-
                 SKU = product.SKU,
-
                 Description = product.Description,
-
                 OriginalPrice = product.OriginalPrice,
-
                 Price = product.Price,
-
                 DiscountPercentage = product.DiscountPercentage,
-
                 ImageUrl = product.ImageUrl,
-
                 CategoryId = product.CategoryId,
-
                 CategoryName = product.Category?.Name ?? string.Empty,
-
                 StockQuantity = product.StockQuantity,
-
                 IsActive = product.IsActive,
-
                 IsFeatured = product.IsFeatured,
-
                 IsNewArrival = product.IsNewArrival,
-
                 IsBestSeller = product.IsBestSeller,
-
                 CreatedAt = product.CreatedAt,
-
                 AverageRating = product.AverageRating,
-
                 ReviewCount = product.ReviewCount,
             };
         }

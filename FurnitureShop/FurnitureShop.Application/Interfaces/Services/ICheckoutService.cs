@@ -4,19 +4,7 @@ namespace FurnitureShop.Application.Interfaces.Services
 {
     public interface ICheckoutService
     {
-        #region Checkout Summary
-
-        Task<CheckoutSummaryDto> GetSummaryAsync(
-            Guid userId);
-
-        #endregion
-
-        #region Checkout
-
-        Task<PaymentResponseDto> CheckoutAsync(
-            Guid userId,
-            CheckoutRequestDto request);
-
-        #endregion
+        Task<CheckoutSummaryDto> GetSummaryAsync(Guid userId);
+        Task<PaymentResponseDto> CheckoutAsync(Guid userId, CheckoutRequestDto request);
     }
 }

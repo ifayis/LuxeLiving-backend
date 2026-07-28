@@ -41,19 +41,15 @@ namespace FurnitureShop.Application.Services
             };
 
             await _categoryRepository.AddAsync(category);
-
             await _categoryRepository.SaveChangesAsync();
 
             return Map(category);
         }
 
-        private async Task<string> GenerateUniqueSlugAsync(
-            string name)
+        private async Task<string> GenerateUniqueSlugAsync(string name)
         {
             var slug = GenerateSlug(name);
-
             var originalSlug = slug;
-
             var count = 1;
 
             while (await _categoryRepository.ExistsBySlugAsync(slug))
@@ -67,19 +63,16 @@ namespace FurnitureShop.Application.Services
         private static string GenerateSlug(string text)
         {
             text = text.Trim().ToLowerInvariant();
-
             text = Regex.Replace(text, @"[^a-z0-9\s-]", "");
-
             text = Regex.Replace(text, @"\s+", "-");
-
             text = Regex.Replace(text, @"-+", "-");
 
             return text;
         }
 
         public async Task<CategoryResponseDto> UpdateAsync(
-    Guid categoryId,
-    UpdateCategoryRequestDto request)
+            Guid categoryId,
+            UpdateCategoryRequestDto request)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
 
@@ -113,7 +106,6 @@ namespace FurnitureShop.Application.Services
             category.UpdatedAt = DateTime.UtcNow;
 
             await _categoryRepository.UpdateAsync(category);
-
             await _categoryRepository.SaveChangesAsync();
 
             return Map(category);
@@ -128,7 +120,6 @@ namespace FurnitureShop.Application.Services
                     ErrorMessages.CategoryNotFound);
 
             await _categoryRepository.DeleteAsync(category);
-
             await _categoryRepository.SaveChangesAsync();
         }
 

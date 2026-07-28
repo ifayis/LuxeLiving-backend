@@ -23,6 +23,7 @@ namespace FurnitureShop.API.Controllers
             _wishlistService = wishlistService;
         }
 
+
         private Guid GetUserId()
         {
             var userId = User.FindFirstValue("UID");
@@ -34,10 +35,9 @@ namespace FurnitureShop.API.Controllers
         }
 
 
+
         [HttpPost]
-        [ProducesResponseType(
-            typeof(WishlistResponseDto),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WishlistResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Add(
             [FromBody] AddToWishlistRequestDto request)
         {
@@ -47,7 +47,9 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             var wishlist = await _wishlistService
@@ -56,10 +58,9 @@ namespace FurnitureShop.API.Controllers
             return Ok(wishlist);
         }
 
+
         [HttpGet]
-        [ProducesResponseType(
-            typeof(WishlistResponseDto),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WishlistResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMyWishlist()
         {
             var wishlist = await _wishlistService
@@ -68,20 +69,24 @@ namespace FurnitureShop.API.Controllers
             return Ok(wishlist);
         }
 
+
         [HttpDelete("items/{wishlistItemId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> RemoveItem(
-            Guid wishlistItemId)
+        public async Task<IActionResult> RemoveItem(Guid wishlistItemId)
         {
             await _wishlistService.RemoveItemAsync(
                 GetUserId(),
-                wishlistItemId);
+                wishlistItemId
+            );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.WishlistItemRemoved));
+                    ResponseMessages.WishlistItemRemoved
+                )
+            );
         }
+
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -93,8 +98,11 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.WishlistCleared));
+                    ResponseMessages.WishlistCleared
+                )
+            );
         }
+
 
         [HttpPost("move-to-cart")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -106,21 +114,19 @@ namespace FurnitureShop.API.Controllers
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.WishlistItemsMoved));
+                    ResponseMessages.WishlistItemsMoved
+                )
+            );
         }
 
 
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("users/{userId:guid}")]
-        [ProducesResponseType(
-            typeof(WishlistResponseDto),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WishlistResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUserId(
-            Guid userId)
+        public async Task<IActionResult> GetByUserId(Guid userId)
         {
-            var wishlist =
-                await _wishlistService
+            var wishlist = await _wishlistService
                     .GetWishlistByUserIdAsync(userId);
 
             if (wishlist == null)
@@ -128,23 +134,22 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.WishlistNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(wishlist);
         }
 
+
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("{wishlistId:guid}")]
-        [ProducesResponseType(
-            typeof(WishlistResponseDto),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WishlistResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(
-            Guid wishlistId)
+        public async Task<IActionResult> GetById(Guid wishlistId)
         {
-            var wishlist =
-                await _wishlistService
+            var wishlist = await _wishlistService
                     .GetWishlistByIdAsync(wishlistId);
 
             if (wishlist == null)
@@ -152,7 +157,9 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.WishlistNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(wishlist);

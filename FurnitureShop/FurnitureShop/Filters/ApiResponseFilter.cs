@@ -22,21 +22,24 @@ namespace FurnitureShop.API.Filters
             if (context.Result is ObjectResult objectResult2 &&
                 objectResult2.StatusCode is >= 200 and < 300)
             {
-                context.Result = new ObjectResult(
-                    ApiResponse<object>.Success(objectResult2.Value)
-                )
-                {
-                    StatusCode = objectResult2.StatusCode
-                };
+                context.Result = 
+                    new ObjectResult(
+                      ApiResponse<object>.Success(objectResult2.Value)
+                    )
+                    {
+                      StatusCode = objectResult2.StatusCode
+                    };
             }
+
             else if (context.Result is EmptyResult)
             {
-                context.Result = new ObjectResult(
-                    ApiResponse<object>.Success(null)
-                )
-                {
-                    StatusCode = StatusCodes.Status200OK
-                };
+                context.Result = 
+                    new ObjectResult(
+                       ApiResponse<object>.Success(null)
+                    )
+                    {
+                      StatusCode = StatusCodes.Status200OK
+                    };
             }
 
             await next();

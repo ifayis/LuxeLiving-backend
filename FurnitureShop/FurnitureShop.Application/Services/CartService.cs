@@ -92,11 +92,9 @@ namespace FurnitureShop.Application.Services
             cart.LastActivityAt = DateTime.UtcNow;
 
             await _cartRepository.UpdateAsync(cart);
-
             await _cartRepository.SaveChangesAsync();
 
             var itemCount = await _cartRepository.GetCartItemCountAsync(cart.Id);
-
             var refreshedCart = await _cartRepository.GetByUserIdAsync(userId);
 
             var cartTotal = refreshedCart?.Items
@@ -106,9 +104,7 @@ namespace FurnitureShop.Application.Services
             return new AddToCartResponseDto
             {
                 CartId = cart.Id,
-
                 CartItemCount = itemCount,
-
                 CartTotal = cartTotal,
 
                 Product = new AddedCartProductDto
@@ -156,8 +152,7 @@ namespace FurnitureShop.Application.Services
             if (item == null)
                 return false;
 
-            var product = await _productRepository.GetByIdAsync(
-                request.ProductId);
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
 
             if (product == null)
                 throw new KeyNotFoundException(
@@ -181,7 +176,6 @@ namespace FurnitureShop.Application.Services
             cart.LastActivityAt = DateTime.UtcNow;
 
             await _cartRepository.UpdateAsync(cart);
-
             await _cartRepository.SaveChangesAsync();
 
             return true;
@@ -209,7 +203,6 @@ namespace FurnitureShop.Application.Services
             cart.LastActivityAt = DateTime.UtcNow;
 
             await _cartRepository.UpdateAsync(cart);
-
             await _cartRepository.SaveChangesAsync();
         }
 
@@ -226,7 +219,6 @@ namespace FurnitureShop.Application.Services
             cart.LastActivityAt = DateTime.UtcNow;
 
             await _cartRepository.UpdateAsync(cart);
-
             await _cartRepository.SaveChangesAsync();
         }
 
@@ -297,17 +289,11 @@ namespace FurnitureShop.Application.Services
                 }).ToList(),
 
                 TotalUniqueItems = items.Count,
-
                 TotalQuantity = items.Sum(x => x.Quantity),
-
                 SubTotal = subTotal,
-
                 Discount = 0,
-
                 ShippingCharge = 0,
-
                 Tax = 0,
-
                 GrandTotal = subTotal
             };
         }

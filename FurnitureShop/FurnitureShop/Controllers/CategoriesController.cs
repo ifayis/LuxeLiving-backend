@@ -20,6 +20,7 @@ namespace FurnitureShop.API.Controllers
             _categoryService = categoryService;
         }
 
+
         [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(typeof(List<CategoryResponseDto>), StatusCodes.Status200OK)]
@@ -28,6 +29,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(await _categoryService.GetActiveAsync());
         }
 
+
         [AllowAnonymous]
         [HttpGet("all")]
         [ProducesResponseType(typeof(List<CategoryResponseDto>), StatusCodes.Status200OK)]
@@ -35,6 +37,7 @@ namespace FurnitureShop.API.Controllers
         {
             return Ok(await _categoryService.GetAllAsync());
         }
+
 
         [AllowAnonymous]
         [HttpGet("{id:guid}")]
@@ -49,11 +52,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.CategoryNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(category);
         }
+
 
         [AllowAnonymous]
         [HttpGet("slug/{slug}")]
@@ -68,11 +74,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.CategoryNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(category);
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPost]
@@ -87,7 +96,9 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             var category = await _categoryService.CreateAsync(request);
@@ -95,16 +106,17 @@ namespace FurnitureShop.API.Controllers
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = category.Id },
-                category);
+                category
+            );
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(CategoryResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(
-            Guid id,
+        public async Task<IActionResult> Update(Guid id,
             [FromBody] UpdateCategoryRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -113,11 +125,14 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             return Ok(await _categoryService.UpdateAsync(id, request));
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id:guid}")]

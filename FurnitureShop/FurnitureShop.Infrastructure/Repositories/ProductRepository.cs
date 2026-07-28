@@ -14,16 +14,10 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        #region Create
-
         public async Task AddAsync(Product product)
         {
             await _context.Products.AddAsync(product);
         }
-
-        #endregion
-
-        #region Read
 
         public async Task<Product?> GetByIdAsync(Guid id)
         {
@@ -133,10 +127,6 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        #endregion
-
-        #region Validation
-
         public async Task<bool> ExistsByNameAsync(string name)
         {
             name = name.Trim().ToLower();
@@ -155,7 +145,8 @@ namespace FurnitureShop.Infrastructure.Repositories
             return await _context.Products
                 .AnyAsync(x =>
                     x.Id != excludeProductId &&
-                    x.Name.ToLower() == name);
+                    x.Name.ToLower() == name
+                );
         }
 
         public async Task<bool> ExistsBySlugAsync(string slug)
@@ -174,10 +165,6 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .AnyAsync(x => x.SKU == sku);
         }
 
-        #endregion
-
-        #region Update
-
         public Task UpdateAsync(Product product)
         {
             product.UpdatedAt = DateTime.UtcNow;
@@ -186,10 +173,6 @@ namespace FurnitureShop.Infrastructure.Repositories
 
             return Task.CompletedTask;
         }
-
-        #endregion
-
-        #region Delete
 
         public Task DeleteAsync(Product product)
         {
@@ -201,15 +184,9 @@ namespace FurnitureShop.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-        #endregion
-
-        #region Save
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
-
-        #endregion
     }
 }

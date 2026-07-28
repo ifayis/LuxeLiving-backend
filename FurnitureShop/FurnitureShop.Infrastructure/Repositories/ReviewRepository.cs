@@ -21,8 +21,7 @@ namespace FurnitureShop.Infrastructure.Repositories
             await _context.Reviews.AddAsync(review);
         }
 
-        public async Task<Review?> GetByIdAsync(
-            Guid reviewId)
+        public async Task<Review?> GetByIdAsync(Guid reviewId)
         {
             return await _context.Reviews
                 .Include(x => x.User)
@@ -38,11 +37,11 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x =>
                     x.UserId == userId &&
-                    x.ProductId == productId);
+                    x.ProductId == productId
+                );
         }
 
-        public async Task<List<Review>> GetProductReviewsAsync(
-            Guid productId)
+        public async Task<List<Review>> GetProductReviewsAsync(Guid productId)
         {
             return await _context.Reviews
                 .Include(x => x.User)
@@ -72,21 +71,20 @@ namespace FurnitureShop.Infrastructure.Repositories
                     : Math.Round(
                         reviews.Average(x => (decimal)x.Rating),
                         1,
-                        MidpointRounding.AwayFromZero);
+                        MidpointRounding.AwayFromZero
+                    );
 
             product.UpdatedAt = DateTime.UtcNow;
         }
 
-        public async Task<Product?> GetProductWithRatingAsync(
-            Guid productId)
+        public async Task<Product?> GetProductWithRatingAsync(Guid productId)
         {
             return await _context.Products
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == productId);
         }
 
-        public Task RemoveAsync(
-            Review review)
+        public Task RemoveAsync(Review review)
         {
             _context.Reviews.Remove(review);
 

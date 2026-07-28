@@ -40,7 +40,7 @@ namespace FurnitureShop.Domain.Enitities
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Review> Reviews { get; set; } = 
-            new List<Review>();
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

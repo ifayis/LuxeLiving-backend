@@ -32,6 +32,7 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
+
         [Authorize(Roles = Roles.User)]
         [HttpPost("items")]
         public async Task<IActionResult> AddToCart(
@@ -43,25 +44,29 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             var response = await _cartService.AddToCartAsync(
                 GetCurrentUserId(),
-                request);
+                request
+            );
 
             return Ok(response);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpGet]
         public async Task<IActionResult> GetMyCart()
         {
-            var cart = await _cartService.GetMyCartAsync(
-                GetCurrentUserId());
+            var cart = await _cartService.GetMyCartAsync(GetCurrentUserId());
 
             return Ok(cart);
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("users/{userId:guid}")]
@@ -74,11 +79,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.CartNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(cart);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpPut("items")]
@@ -91,23 +99,29 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             var updated = await _cartService.UpdateItemAsync(
                 GetCurrentUserId(),
-                request);
+                request
+            );
 
             if (!updated)
             {
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.CartItemNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(ResponseMessages.CartUpdated);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpDelete("items/{productId:guid}")]
@@ -115,10 +129,12 @@ namespace FurnitureShop.API.Controllers
         {
             await _cartService.RemoveItemAsync(
                 GetCurrentUserId(),
-                productId);
+                productId
+            );
 
             return Ok(ResponseMessages.CartRemoved);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpDelete]

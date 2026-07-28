@@ -14,8 +14,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        #region Create
-
         public async Task AddAsync(Wishlist wishlist)
         {
             await _context.Wishlists.AddAsync(wishlist);
@@ -26,10 +24,6 @@ namespace FurnitureShop.Infrastructure.Repositories
         {
             await _context.WishlistItems.AddAsync(wishlistItem);
         }
-
-        #endregion
-
-        #region Read
 
         public async Task<Wishlist?> GetByIdAsync(Guid wishlistId)
         {
@@ -58,11 +52,11 @@ namespace FurnitureShop.Infrastructure.Repositories
                     .ThenInclude(x => x.Category)
                 .FirstOrDefaultAsync(x =>
                     x.WishlistId == wishlistId &&
-                    x.ProductId == productId);
+                    x.ProductId == productId
+                );
         }
 
-        public async Task<WishlistItem?> GetWishlistItemByIdAsync(
-            Guid wishlistItemId)
+        public async Task<WishlistItem?> GetWishlistItemByIdAsync(Guid wishlistItemId)
         {
             return await _context.WishlistItems
                 .Include(x => x.Product)
@@ -70,10 +64,6 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x =>
                     x.Id == wishlistItemId);
         }
-
-        #endregion
-
-        #region Validation
 
         public async Task<bool> ExistsAsync(
             Guid wishlistId,
@@ -85,10 +75,6 @@ namespace FurnitureShop.Infrastructure.Repositories
                     x.ProductId == productId);
         }
 
-        #endregion
-
-        #region Update
-
         public Task UpdateAsync(Wishlist wishlist)
         {
             wishlist.UpdatedAt = DateTime.UtcNow;
@@ -98,12 +84,7 @@ namespace FurnitureShop.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-        #endregion
-
-        #region Delete
-
-        public Task RemoveWishlistItemAsync(
-            WishlistItem wishlistItem)
+        public Task RemoveWishlistItemAsync(WishlistItem wishlistItem)
         {
             _context.WishlistItems.Remove(wishlistItem);
 
@@ -119,15 +100,9 @@ namespace FurnitureShop.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-        #endregion
-
-        #region Save
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
-
-        #endregion
     }
 }

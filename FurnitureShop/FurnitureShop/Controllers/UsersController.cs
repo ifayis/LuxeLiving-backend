@@ -19,6 +19,7 @@ namespace FurnitureShop.API.Controllers
             _userService = userService;
         }
 
+
         private Guid GetCurrentAdminId()
         {
             var userId = User.FindFirst("UID")?.Value;
@@ -31,6 +32,7 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] int pageNumber = 1,
@@ -39,21 +41,22 @@ namespace FurnitureShop.API.Controllers
             var users = await _userService
                 .GetAllUsersAsync(
                     pageNumber,
-                    pageSize);
+                    pageSize
+                );
 
             return Ok(users);
         }
+        
 
         [HttpGet("{userId:guid}")]
-        public async Task<IActionResult> GetById(
-            Guid userId)
+        public async Task<IActionResult> GetById(Guid userId)
         {
-            var user =
-                await _userService
-                    .GetUserByIdAsync(userId);
+            var user = await _userService
+                 .GetUserByIdAsync(userId);
 
             return Ok(user);
         }
+
 
         [HttpPatch("{userId:guid}/block")]
         public async Task<IActionResult> Block(
@@ -61,25 +64,29 @@ namespace FurnitureShop.API.Controllers
         {
             await _userService.BlockUserAsync(
                 userId,
-                GetCurrentAdminId());
+                GetCurrentAdminId()
+            );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "User blocked successfully."));
+                    "User blocked successfully."
+                )
+            );
         }
 
+
         [HttpPatch("{userId:guid}/unblock")]
-        public async Task<IActionResult> Unblock(
-            Guid userId)
+        public async Task<IActionResult> Unblock(Guid userId)
         {
-            await _userService
-                .UnblockUserAsync(userId);
+            await _userService.UnblockUserAsync(userId);
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    "User unblocked successfully."));
+                    "User unblocked successfully."
+                )
+            );
         }
     }
 }

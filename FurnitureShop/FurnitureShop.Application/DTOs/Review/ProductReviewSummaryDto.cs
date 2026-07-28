@@ -6,7 +6,6 @@
 
         public int ReviewCount { get; set; }
 
-        public List<ReviewResponseDto> Reviews { get; set; }
-            = new();
+        public List<ReviewResponseDto> Reviews { get; set; } = new();
     }
 }

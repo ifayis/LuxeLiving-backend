@@ -38,8 +38,7 @@ namespace FurnitureShop.Application.Services
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-            var verificationToken =
-                _tokenService.GenerateEmailVerificationToken();
+            var verificationToken = _tokenService.GenerateEmailVerificationToken();
 
             var user = new User
             {
@@ -61,7 +60,8 @@ namespace FurnitureShop.Application.Services
                 await _emailService.SendEmailVerificationAsync(
                     user.Email,
                     user.FullName,
-                    verificationToken);
+                    verificationToken
+                );
             }
             catch
             {
@@ -118,9 +118,7 @@ namespace FurnitureShop.Application.Services
                 _configuration.GetValue<int>("JwtSettings:AccessTokenMinutes");
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime =
-                DateTime.UtcNow.AddDays(refreshTokenDays);
-
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenDays);
             user.FailedLoginAttempts = 0;
             user.LockoutEnd = null;
             user.LastLoginAt = DateTime.UtcNow;
@@ -170,8 +168,7 @@ namespace FurnitureShop.Application.Services
             var newRefreshToken = _tokenService.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiryTime =
-                DateTime.UtcNow.AddDays(refreshTokenDays);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenDays);
 
             await _userRepository.SaveChangesAsync();
 
@@ -239,20 +236,16 @@ namespace FurnitureShop.Application.Services
                     ErrorMessages.PasswordCannotBeSame);
             }
 
-            user.PasswordHash =
-                BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             user.UpdatedAt = DateTime.UtcNow;
             user.RefreshToken = null;
             user.RefreshTokenExpiryTime = null;
 
             await _userRepository.UpdateAsync(user);
-
             await _userRepository.SaveChangesAsync();
         }
 
-        public async Task ForgotPasswordAsync(
-            ForgotPasswordRequestDto request)
+        public async Task ForgotPasswordAsync(ForgotPasswordRequestDto request)
         {
             var email = request.Email.Trim().ToLowerInvariant();
 
@@ -276,8 +269,7 @@ namespace FurnitureShop.Application.Services
                 token);
         }
 
-        public async Task ResetPasswordAsync(
-            ResetPasswordRequestDto request)
+        public async Task ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             var user = await _userRepository
                 .GetByPasswordResetTokenAsync(request.Token);
@@ -293,9 +285,7 @@ namespace FurnitureShop.Application.Services
                     ErrorMessages.ResetTokenExpired);
             }
 
-            user.PasswordHash =
-                BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-
+            user.PasswordHash =BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             user.PasswordResetToken = null;
             user.PasswordResetTokenExpiry = null;
             user.RefreshToken = null;
@@ -306,8 +296,7 @@ namespace FurnitureShop.Application.Services
             await _userRepository.SaveChangesAsync();
         }
 
-        public async Task VerifyEmailAsync(
-            VerifyEmailRequestDto request)
+        public async Task VerifyEmailAsync(VerifyEmailRequestDto request)
         {
             var user = await _userRepository
                 .GetByEmailVerificationTokenAsync(request.Token);
@@ -339,8 +328,7 @@ namespace FurnitureShop.Application.Services
                 user.FullName);
         }
 
-        public async Task ResendVerificationEmailAsync(
-            ResendVerificationRequestDto request)
+        public async Task ResendVerificationEmailAsync(ResendVerificationRequestDto request)
         {
             var email = request.Email.Trim().ToLowerInvariant();
 
@@ -364,7 +352,8 @@ namespace FurnitureShop.Application.Services
             await _emailService.SendEmailVerificationAsync(
                 user.Email,
                 user.FullName,
-                token);
+                token
+            );
         }
     }
 }

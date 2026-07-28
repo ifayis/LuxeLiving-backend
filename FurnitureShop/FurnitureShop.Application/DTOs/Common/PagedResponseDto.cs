@@ -2,8 +2,7 @@
 {
     public class PagedResponseDto<T>
     {
-        public IReadOnlyList<T> Items { get; set; }
-            = new List<T>();
+        public IReadOnlyList<T> Items { get; set; } = new List<T>();
 
         public int PageNumber { get; set; }
 
@@ -13,10 +12,8 @@
 
         public int TotalPages { get; set; }
 
-        public bool HasPrevious =>
-            PageNumber > 1;
+        public bool HasPrevious => PageNumber > 1;
 
-        public bool HasNext =>
-            PageNumber < TotalPages;
+        public bool HasNext => PageNumber < TotalPages;
     }
 }

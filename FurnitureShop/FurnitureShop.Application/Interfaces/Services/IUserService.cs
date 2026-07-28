@@ -1,10 +1,5 @@
 ﻿using FurnitureShop.Application.DTOs.Common;
 using FurnitureShop.Application.DTOs.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Interfaces.Services
 {
@@ -14,9 +9,7 @@ namespace FurnitureShop.Application.Interfaces.Services
                 int pageNumber,
                 int pageSize); 
         Task<SingleUserResponseDto> GetUserByIdAsync(Guid id);
-        Task BlockUserAsync(
-            Guid userId,
-            Guid currentAdminId);
+        Task BlockUserAsync(Guid userId, Guid currentAdminId);
         Task UnblockUserAsync(Guid id);
     }
 }

@@ -19,32 +19,37 @@ namespace FurnitureShop.API.Middlewares
             {
                 await _next(context);
             }
+
             catch (DbUpdateException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
                 await WriteResponse(context, "Database operation failed.");
             }
+
             catch (ArgumentException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await WriteResponse(context, ex.Message);
             }
+
             catch (InvalidOperationException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await WriteResponse(context, ex.Message);
             }
+
             catch (UnauthorizedAccessException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await WriteResponse(context, ex.Message);
             }
+
             catch (KeyNotFoundException ex)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 await WriteResponse(context, ex.Message);
             }
+
             catch (Exception)
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;

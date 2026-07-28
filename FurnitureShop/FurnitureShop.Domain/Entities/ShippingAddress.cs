@@ -25,17 +25,17 @@ namespace FurnitureShop.Domain.Entities
 
         public string PinCode { get; set; } = string.Empty;
 
-        public AddressType AddressType { get; set; }
+        [Timestamp]
+        public byte[]? RowVersion { get; set; }
 
         public bool IsDefault { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-            = DateTime.UtcNow;
+        public AddressType AddressType { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
-            = DateTime.UtcNow;
 
-        [Timestamp]
-        public byte[]? RowVersion { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
     }
 }

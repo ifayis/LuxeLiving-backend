@@ -10,22 +10,15 @@ namespace FurnitureShop.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public OrderRepository(
-            ApplicationDbContext context)
+        public OrderRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-
-        #region Create
 
         public async Task AddAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
         }
-
-        #endregion
-
-        #region Read
 
         public async Task<Order?> GetByIdAsync(
             Guid orderId)
@@ -37,8 +30,7 @@ namespace FurnitureShop.Infrastructure.Repositories
                     x.Id == orderId);
         }
 
-        public async Task<Order?> GetByOrderNumberAsync(
-            string orderNumber)
+        public async Task<Order?> GetByOrderNumberAsync(string orderNumber)
         {
             return await _context.Orders
                 .Include(x => x.Items)
@@ -56,19 +48,18 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .Include(x => x.ShippingAddress)
                 .FirstOrDefaultAsync(x =>
                     x.Id == orderId &&
-                    x.UserId == userId);
+                    x.UserId == userId
+                );
         }
 
-        public async Task<bool> ExistsOrderNumberAsync(
-            string orderNumber)
+        public async Task<bool> ExistsOrderNumberAsync(string orderNumber)
         {
             return await _context.Orders
                 .AnyAsync(x =>
                     x.OrderNumber == orderNumber);
         }
 
-        public async Task<List<Order>> GetByUserIdAsync(
-            Guid userId)
+        public async Task<List<Order>> GetByUserIdAsync(Guid userId)
         {
             return await _context.Orders
                 .Include(x => x.Items)
@@ -87,10 +78,6 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        #endregion
-
-        #region Update
-
         public Task UpdateAsync(Order order)
         {
             _context.Orders.Update(order);
@@ -108,12 +95,9 @@ namespace FurnitureShop.Infrastructure.Repositories
                     o.Id == orderId &&
                     o.UserId == userId &&
                     o.Status == OrderStatus.Delivered &&
-                    o.Items.Any(i => i.ProductId == productId));
+                    o.Items.Any(i => i.ProductId == productId)
+                );
         }
-
-        #endregion
-
-        #region Analytics
 
         public async Task<int> GetTotalProductsPurchasedAsync()
         {
@@ -130,15 +114,9 @@ namespace FurnitureShop.Infrastructure.Repositories
                 .SumAsync(x => x.GrandTotal);
         }
 
-        #endregion
-
-        #region Persistence
-
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
-
-        #endregion
     }
 }

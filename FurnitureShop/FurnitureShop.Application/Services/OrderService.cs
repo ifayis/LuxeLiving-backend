@@ -27,10 +27,8 @@ namespace FurnitureShop.Application.Services
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
         }
-        #region Customer
 
-        public async Task<List<OrderResponseDto>>
-            GetMyOrdersAsync(Guid userId)
+        public async Task<List<OrderResponseDto>>GetMyOrdersAsync(Guid userId)
         {
             var orders = await _orderRepository
                 .GetByUserIdAsync(userId);
@@ -40,10 +38,9 @@ namespace FurnitureShop.Application.Services
                 .ToList();
         }
 
-        public async Task<OrderResponseDto?>
-            GetMyOrderAsync(
-                Guid userId,
-                Guid orderId)
+        public async Task<OrderResponseDto?>GetMyOrderAsync(
+            Guid userId,
+            Guid orderId)
         {
             var order = await _orderRepository
                 .GetByIdAsync(orderId, userId);
@@ -53,12 +50,7 @@ namespace FurnitureShop.Application.Services
                 : Map(order);
         }
 
-        #endregion
-
-        #region Admin
-
-        public async Task<List<OrderResponseDto>>
-            GetAllOrdersAsync()
+        public async Task<List<OrderResponseDto>>GetAllOrdersAsync()
         {
             var orders = await _orderRepository
                 .GetAllAsync();
@@ -68,8 +60,7 @@ namespace FurnitureShop.Application.Services
                 .ToList();
         }
 
-        public async Task<List<OrderResponseDto>>
-            GetOrdersByUserAsync(Guid userId)
+        public async Task<List<OrderResponseDto>>GetOrdersByUserAsync(Guid userId)
         {
             var orders = await _orderRepository
                 .GetByUserIdAsync(userId);
@@ -79,8 +70,7 @@ namespace FurnitureShop.Application.Services
                 .ToList();
         }
 
-        public async Task<OrderResponseDto?>
-            GetOrderAsync(Guid orderId)
+        public async Task<OrderResponseDto?>GetOrderAsync(Guid orderId)
         {
             var order = await _orderRepository
                 .GetByIdAsync(orderId);
@@ -90,59 +80,35 @@ namespace FurnitureShop.Application.Services
                 : Map(order);
         }
 
-        #endregion
-
-        private static OrderResponseDto Map(
-            Order order)
+        private static OrderResponseDto Map(Order order)
         {
             return new OrderResponseDto
             {
                 OrderId = order.Id,
-
                 OrderNumber = order.OrderNumber,
-
                 Status = order.Status,
-
                 PaymentMethod = order.PaymentMethod,
-
                 SubTotal = order.SubTotal,
-
                 ShippingCharge = order.ShippingCharge,
-
                 Discount = order.Discount,
-
                 Tax = order.Tax,
-
                 GrandTotal = order.GrandTotal,
-
                 CancellationReason = order.CancellationReason,
-
                 CancelledAt = order.CancelledAt,
-
                 CreatedAt = order.CreatedAt,
 
                 ShippingAddress = new ShippingAddressResponseDto
                 {
                     Id = order.ShippingAddress.Id,
-
                     FullName = order.ShippingAddress.FullName,
-
                     PhoneNumber = order.ShippingAddress.PhoneNumber,
-
                     AddressLine1 = order.ShippingAddress.AddressLine1,
-
                     AddressLine2 = order.ShippingAddress.AddressLine2,
-
                     City = order.ShippingAddress.City,
-
                     State = order.ShippingAddress.State,
-
                     Country = order.ShippingAddress.Country,
-
                     PinCode = order.ShippingAddress.PinCode,
-
                     AddressType = order.ShippingAddress.AddressType,
-
                     IsDefault = order.ShippingAddress.IsDefault
                 },
 
@@ -150,15 +116,10 @@ namespace FurnitureShop.Application.Services
                     .Select(item => new OrderItemResponseDto
                     {
                         ProductId = item.ProductId,
-
                         ProductName = item.ProductName,
-
                         ProductImageUrl = item.ProductImageUrl,
-
                         UnitPrice = item.UnitPrice,
-
                         Quantity = item.Quantity,
-
                         LineTotal = item.LineTotal
                     })
                     .ToList()
@@ -177,7 +138,8 @@ namespace FurnitureShop.Application.Services
                 var order =
                     await _orderRepository.GetByIdAsync(
                         orderId,
-                        userId);
+                        userId
+                    );
 
                 if (order == null)
                 {
@@ -204,9 +166,8 @@ namespace FurnitureShop.Application.Services
 
                 foreach (var item in order.Items)
                 {
-                    var product =
-                        await _productRepository.GetByIdAsync(
-                            item.ProductId);
+                    var product = await _productRepository.GetByIdAsync(
+                                    item.ProductId);
 
                     if (product == null)
                     {
@@ -223,13 +184,10 @@ namespace FurnitureShop.Application.Services
                     : request.Reason.Trim();
 
                 order.CancelledAt = DateTime.UtcNow;
-
                 order.UpdatedAt = DateTime.UtcNow;
 
                 await _orderRepository.UpdateAsync(order);
-
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
 
                 return Map(order);
@@ -256,12 +214,12 @@ namespace FurnitureShop.Application.Services
 
             ValidateStatusTransition(
                 order.Status,
-                request.Status);
+                request.Status
+            );
 
             order.Status = request.Status;
 
             await _orderRepository.UpdateAsync(order);
-
             await _orderRepository.SaveChangesAsync();
 
             return Map(order);
@@ -288,7 +246,7 @@ namespace FurnitureShop.Application.Services
                             "Invalid order status transition.");
                     }
 
-                    break;
+                break;
 
                 case OrderStatus.Confirmed:
 
@@ -299,7 +257,7 @@ namespace FurnitureShop.Application.Services
                             "Invalid order status transition.");
                     }
 
-                    break;
+                break;
 
                 case OrderStatus.Processing:
 
@@ -309,7 +267,7 @@ namespace FurnitureShop.Application.Services
                             "Invalid order status transition.");
                     }
 
-                    break;
+                break;
 
                 case OrderStatus.Shipped:
 
@@ -319,7 +277,7 @@ namespace FurnitureShop.Application.Services
                             "Invalid order status transition.");
                     }
 
-                    break;
+                break;
 
                 case OrderStatus.OutForDelivery:
 
@@ -329,12 +287,10 @@ namespace FurnitureShop.Application.Services
                             "Invalid order status transition.");
                     }
 
-                    break;
+                break;
 
                 case OrderStatus.Delivered:
-
                 case OrderStatus.Cancelled:
-
                 case OrderStatus.Refunded:
 
                     throw new InvalidOperationException(

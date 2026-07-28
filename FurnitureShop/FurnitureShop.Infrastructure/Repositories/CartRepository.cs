@@ -15,7 +15,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             _context = context;
         }
 
-        #region Cart
 
         public async Task<Cart?> GetByUserIdAsync(Guid userId)
         {
@@ -65,10 +64,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             return Task.CompletedTask;
         }
 
-        #endregion
-
-        #region Cart Items
-
         public async Task<CartItem?> GetCartItemAsync(
             Guid cartId,
             Guid productId)
@@ -76,7 +71,8 @@ namespace FurnitureShop.Infrastructure.Repositories
             return await _context.CartItems
                 .FirstOrDefaultAsync(x =>
                     x.CartId == cartId &&
-                    x.ProductId == productId);
+                    x.ProductId == productId
+                );
         }
 
         public async Task AddCartItemAsync(CartItem item)
@@ -96,8 +92,6 @@ namespace FurnitureShop.Infrastructure.Repositories
             return await _context.CartItems
                 .CountAsync(x => x.CartId == cartId);
         }
-
-        #endregion
 
         public async Task ClearCartAsync(Guid userId)
         {

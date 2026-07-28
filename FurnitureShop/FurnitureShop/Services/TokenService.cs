@@ -26,7 +26,8 @@ namespace FurnitureShop.API.Services
 
             var credentials = new SigningCredentials(
                 key,
-                SecurityAlgorithms.HmacSha256);
+                SecurityAlgorithms.HmacSha256
+            );
 
             var claims = new List<Claim>
             {
@@ -45,7 +46,8 @@ namespace FurnitureShop.API.Services
                 audience: jwtSettings["Audience"],
                 claims: claims,
                 expires: expires,
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

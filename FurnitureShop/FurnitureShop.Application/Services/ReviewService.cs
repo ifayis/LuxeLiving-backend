@@ -50,7 +50,8 @@ namespace FurnitureShop.Application.Services
             var existingReview =
                 await _reviewRepository.GetUserReviewAsync(
                     userId,
-                    request.ProductId);
+                    request.ProductId
+                );
 
             if (existingReview != null)
             {
@@ -65,17 +66,11 @@ namespace FurnitureShop.Application.Services
                 var review = new Review
                 {
                     Id = Guid.NewGuid(),
-
                     ProductId = request.ProductId,
-
                     UserId = userId,
-
                     OrderId = request.OrderId,
-
                     Rating = request.Rating,
-
                     Comment = request.Comment.Trim(),
-
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -86,13 +81,11 @@ namespace FurnitureShop.Application.Services
                         request.ProductId);
 
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync();
-
                 throw;
             }
         }
@@ -110,8 +103,7 @@ namespace FurnitureShop.Application.Services
                     "Rating must be between 1 and 5.");
             }
 
-            var review =
-                await _reviewRepository.GetByIdAsync(reviewId);
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
 
             if (review == null)
             {
@@ -130,9 +122,7 @@ namespace FurnitureShop.Application.Services
             try
             {
                 review.Rating = request.Rating;
-
                 review.Comment = request.Comment.Trim();
-
                 review.UpdatedAt = DateTime.UtcNow;
 
                 await _reviewRepository
@@ -140,13 +130,11 @@ namespace FurnitureShop.Application.Services
                         review.ProductId);
 
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync();
-
                 throw;
             }
         }
@@ -155,8 +143,7 @@ namespace FurnitureShop.Application.Services
             Guid userId,
             Guid reviewId)
         {
-            var review =
-                await _reviewRepository.GetByIdAsync(reviewId);
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
 
             if (review == null)
             {
@@ -181,22 +168,18 @@ namespace FurnitureShop.Application.Services
                         review.ProductId);
 
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync();
-
                 throw;
             }
         }
 
-        public async Task DeleteByAdminAsync(
-            Guid reviewId)
+        public async Task DeleteByAdminAsync(Guid reviewId)
         {
-            var review =
-                await _reviewRepository.GetByIdAsync(reviewId);
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
 
             if (review == null)
             {
@@ -215,13 +198,11 @@ namespace FurnitureShop.Application.Services
                         review.ProductId);
 
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync();
-
                 throw;
             }
         }
@@ -251,7 +232,6 @@ namespace FurnitureShop.Application.Services
             return new ProductReviewSummaryDto
             {
                 AverageRating = product.AverageRating,
-
                 ReviewCount = product.ReviewCount,
 
                 Reviews = reviews
@@ -269,7 +249,8 @@ namespace FurnitureShop.Application.Services
                 await _orderRepository.HasPurchasedProductAsync(
                     userId,
                     orderId,
-                    productId);
+                    productId
+                );
 
             if (!purchased)
             {
@@ -278,11 +259,9 @@ namespace FurnitureShop.Application.Services
             }
         }
 
-        private async Task<Product> ValidateProductAsync(
-            Guid productId)
+        private async Task<Product> ValidateProductAsync(Guid productId)
         {
-            var product =
-                await _productRepository.GetByIdAsync(productId);
+            var product = await _productRepository.GetByIdAsync(productId);
 
             if (product == null)
             {

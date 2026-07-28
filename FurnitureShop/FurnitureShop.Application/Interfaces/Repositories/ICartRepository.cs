@@ -11,16 +11,10 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task AddAsync(Cart cart);
         Task UpdateAsync(Cart cart);
         Task DeleteAsync(Cart cart);
-
-        
-        Task<CartItem?> GetCartItemAsync(
-            Guid cartId,
-            Guid productId);
+        Task<CartItem?> GetCartItemAsync(Guid cartId, Guid productId);
         Task AddCartItemAsync(CartItem item);
         Task RemoveCartItemAsync(CartItem item);
         Task<int> GetCartItemCountAsync(Guid cartId);
-
-        
         Task ClearCartAsync(Guid userId);
         Task SaveChangesAsync();
     }

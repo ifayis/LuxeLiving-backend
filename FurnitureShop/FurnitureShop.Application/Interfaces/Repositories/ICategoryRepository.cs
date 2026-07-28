@@ -10,11 +10,7 @@ namespace FurnitureShop.Application.Interfaces.Repositories
         Task<List<Category>> GetAllAsync();
         Task<List<Category>> GetActiveAsync();
         Task<bool> ExistsByNameAsync(string name);
-
-        Task<bool> ExistsByNameAsync(
-            string name,
-            Guid excludeCategoryId);
-
+        Task<bool> ExistsByNameAsync(string name, Guid excludeCategoryId);
         Task<bool> ExistsBySlugAsync(string slug);
         Task UpdateAsync(Category category);
         Task DeleteAsync(Category category);

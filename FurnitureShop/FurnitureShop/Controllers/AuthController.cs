@@ -20,6 +20,7 @@ namespace FurnitureShop.API.Controllers
             _authService = authService;
         }
 
+
         [AllowAnonymous]
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -33,15 +34,19 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
             await _authService.RegisterAsync(request);
 
             return StatusCode(
                 StatusCodes.Status201Created,
-                ResponseMessages.UserRegistered);
+                ResponseMessages.UserRegistered
+            );
         }
+
 
         [AllowAnonymous]
         [HttpPost("login")]
@@ -53,6 +58,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(await _authService.LoginAsync(request));
         }
 
+
         [AllowAnonymous]
         [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
@@ -61,6 +67,7 @@ namespace FurnitureShop.API.Controllers
         {
             return Ok(await _authService.RefreshTokenAsync(request.RefreshToken));
         }
+
 
         [Authorize]
         [HttpPost("logout")]
@@ -73,6 +80,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ResponseMessages.LogoutSuccessful);
         }
 
+
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
@@ -81,6 +89,7 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(await _authService.GetCurrentUserAsync(userId));
         }
+
 
         [Authorize]
         [HttpPost("change-password")]
@@ -94,6 +103,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ResponseMessages.PasswordChangedSuccessfully);
         }
 
+
         [AllowAnonymous]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(
@@ -103,6 +113,7 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(ResponseMessages.PasswordResetEmailSent);
         }
+
 
         [AllowAnonymous]
         [HttpPost("reset-password")]
@@ -114,6 +125,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ResponseMessages.PasswordResetSuccessful);
         }
 
+
         [AllowAnonymous]
         [HttpPost("verify-email")]
         public async Task<IActionResult> VerifyEmail(
@@ -124,6 +136,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(ResponseMessages.EmailVerifiedSuccessfully);
         }
 
+
         [AllowAnonymous]
         [HttpPost("resend-verification-email")]
         public async Task<IActionResult> ResendVerificationEmail(
@@ -133,6 +146,7 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(ResponseMessages.VerificationEmailSent);
         }
+
 
         private Guid GetCurrentUserId()
         {

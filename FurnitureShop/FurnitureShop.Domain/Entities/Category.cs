@@ -32,7 +32,7 @@ namespace FurnitureShop.Domain.Entities
         [Timestamp]
         public byte[]? RowVersion { get; set; }
 
-        public ICollection<Product> Products { get; set; }
-            = new List<Product>();
+
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

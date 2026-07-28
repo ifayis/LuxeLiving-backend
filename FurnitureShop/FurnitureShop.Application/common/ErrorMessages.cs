@@ -3,13 +3,10 @@
     public static class ErrorMessages
     {
         // Common
-        public const string NotFound = "Resource not found";
         public const string ValidationFailed = "Validation failed";
-        public const string AlreadyExists = "Resource already exists";
-        public const string Unauthorized = "Unauthorized access";
 
         // Category
-        public const string InvalidId = "Enter a valid Id";
+        public const string CategoryInactive = "Selected category is inactive.";
         public const string CategoryAlreadyExists = "Category already exists.";
         public const string CategoryNotFound = "Category not found.";
 
@@ -33,19 +30,19 @@
         // Cart
         public const string CartNotFound = "Cart not found.";
         public const string CartItemNotFound = "Cart item not found.";
-        public const string InvalidProduct = "Invalid product.";
-        public const string InvalidQuantity = "Invalid quantity.";
-        public const string OutOfStock = "Product is out of stock.";
+        public const string CartEmpty = "Your cart is empty.";
 
         // Products
         public const string ProductAlreadyExists = "Product already exists.";
-        public const string CategoryInactive = "Selected category is inactive.";
         public const string ProductNotFound = "product not found";
         public const string ProductUnavailable = "This product is currently unavailable.";
         public const string InvalidProductPrice = "Selling price cannot be greater than the original price.";
+        public const string InvalidProduct = "Invalid product.";
+        public const string InvalidQuantity = "Invalid quantity.";
+        public const string OutOfStock = "Product is out of stock.";
+        public const string ProductInactive = "Product is inactive.";
 
         // Wishlist
-        public const string ProductInactive = "Product is inactive.";
         public const string ProductAlreadyInWishlist = "Product already exists in your wishlist.";
         public const string WishlistNotFound = "Wishlist not found.";
         public const string WishlistItemNotFound = "Wishlist item not found.";
@@ -54,9 +51,6 @@
         // Shipping Address
         public const string MaximumShippingAddressesReached = "You can add a maximum of 5 shipping addresses.";
         public const string AddressNotFound = "Shipping address not found.";
-
-        // Checkout
-        public const string CartEmpty ="Your cart is empty.";
 
         //Order
         public const string OrderNotFound = "Order not found.";

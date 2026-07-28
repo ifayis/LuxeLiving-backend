@@ -6,17 +6,13 @@ using FurnitureShop.Domain.Entities;
 
 namespace FurnitureShop.Application.Services
 {
-    public partial class ShippingAddressService
-        : IShippingAddressService
+    public partial class ShippingAddressService : IShippingAddressService
     {
-        private readonly IShippingAddressRepository
-            _shippingAddressRepository;
+        private readonly IShippingAddressRepository _shippingAddressRepository;
 
-        public ShippingAddressService(
-            IShippingAddressRepository shippingAddressRepository)
+        public ShippingAddressService(IShippingAddressRepository shippingAddressRepository)
         {
-            _shippingAddressRepository =
-                shippingAddressRepository;
+            _shippingAddressRepository = shippingAddressRepository;
         }
 
         public async Task<ShippingAddressResponseDto> AddAsync(
@@ -36,31 +32,18 @@ namespace FurnitureShop.Application.Services
             var address = new ShippingAddress
             {
                 Id = Guid.NewGuid(),
-
                 UserId = userId,
-
                 FullName = request.FullName.Trim(),
-
                 PhoneNumber = request.PhoneNumber.Trim(),
-
                 AddressLine1 = request.AddressLine1.Trim(),
-
                 AddressLine2 = request.AddressLine2?.Trim(),
-
                 City = request.City.Trim(),
-
                 State = request.State.Trim(),
-
                 Country = request.Country.Trim(),
-
                 PinCode = request.PinCode.Trim(),
-
                 AddressType = request.AddressType,
-
                 IsDefault = !existingAddresses.Any(),
-
                 CreatedAt = DateTime.UtcNow,
-
                 UpdatedAt = DateTime.UtcNow
             };
 
@@ -92,7 +75,8 @@ namespace FurnitureShop.Application.Services
                 await _shippingAddressRepository
                     .GetUserAddressAsync(
                         userId,
-                        addressId);
+                        addressId
+                    );
 
             if (address == null)
                 return null;
@@ -127,23 +111,14 @@ namespace FurnitureShop.Application.Services
             }
 
             address.FullName = request.FullName.Trim();
-
             address.PhoneNumber = request.PhoneNumber.Trim();
-
             address.AddressLine1 = request.AddressLine1.Trim();
-
             address.AddressLine2 = request.AddressLine2?.Trim();
-
             address.City = request.City.Trim();
-
             address.State = request.State.Trim();
-
             address.Country = request.Country.Trim();
-
             address.PinCode = request.PinCode.Trim();
-
             address.AddressType = request.AddressType;
-
             address.UpdatedAt = DateTime.UtcNow;
 
             await _shippingAddressRepository
@@ -229,35 +204,22 @@ namespace FurnitureShop.Application.Services
                 .SaveChangesAsync();
         }
 
-        private static ShippingAddressResponseDto Map(
-            ShippingAddress address)
+        private static ShippingAddressResponseDto Map(ShippingAddress address)
         {
             return new ShippingAddressResponseDto
             {
                 Id = address.Id,
-
                 FullName = address.FullName,
-
                 PhoneNumber = address.PhoneNumber,
-
                 AddressLine1 = address.AddressLine1,
-
                 AddressLine2 = address.AddressLine2,
-
                 City = address.City,
-
                 State = address.State,
-
                 Country = address.Country,
-
                 PinCode = address.PinCode,
-
                 AddressType = address.AddressType,
-
                 IsDefault = address.IsDefault,
-
                 CreatedAt = address.CreatedAt,
-
                 UpdatedAt = address.UpdatedAt
             };
         }

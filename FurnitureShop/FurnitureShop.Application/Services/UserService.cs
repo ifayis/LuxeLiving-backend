@@ -4,12 +4,6 @@ using FurnitureShop.Application.DTOs.Common;
 using FurnitureShop.Application.DTOs.User;
 using FurnitureShop.Application.Interfaces.Repositories;
 using FurnitureShop.Application.Interfaces.Services;
-using FurnitureShop.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FurnitureShop.Application.Services
 {
@@ -35,7 +29,6 @@ namespace FurnitureShop.Application.Services
                 int pageSize)
         {
             pageNumber = Math.Max(pageNumber, 1);
-
             pageSize = Math.Clamp(pageSize, 1, 100);
 
             var totalRecords =
@@ -44,7 +37,8 @@ namespace FurnitureShop.Application.Services
             var users =
                 await _userRepository.GetPagedAsync(
                     pageNumber,
-                    pageSize);
+                    pageSize
+                );
 
             return new PagedResponseDto<UserResponseDto>
             {
@@ -60,15 +54,14 @@ namespace FurnitureShop.Application.Services
                     .ToList(),
 
                 PageNumber = pageNumber,
-
                 PageSize = pageSize,
-
                 TotalRecords = totalRecords,
 
                 TotalPages =
                     (int)Math.Ceiling(
                         totalRecords /
-                        (double)pageSize)
+                        (double)pageSize
+                    )
             };
         }
 
@@ -100,9 +93,7 @@ namespace FurnitureShop.Application.Services
             };
         }
 
-        public async Task BlockUserAsync(
-            Guid userId,
-            Guid currentAdminId)
+        public async Task BlockUserAsync(Guid userId, Guid currentAdminId)
         {
 
             if (userId == currentAdminId)

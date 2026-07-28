@@ -25,6 +25,7 @@ namespace FurnitureShop.API.Controllers
                 shippingAddressService;
         }
 
+
         private Guid GetUserId()
         {
             var userId = User.FindFirstValue("UID");
@@ -36,10 +37,9 @@ namespace FurnitureShop.API.Controllers
         }
 
 
+
         [HttpPost]
-        [ProducesResponseType(
-            typeof(ShippingAddressResponseDto),
-            StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ShippingAddressResponseDto), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(
             [FromBody] ShippingAddressRequestDto request)
         {
@@ -49,84 +49,82 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
-            var address =
-                await _shippingAddressService
-                    .AddAsync(GetUserId(), request);
+            var address = await _shippingAddressService
+                .AddAsync(GetUserId(), request);
 
             return CreatedAtAction(
                 nameof(GetById),
                 new { addressId = address.Id },
-                address);
+                address
+            );
         }
 
+
         [HttpGet]
-        [ProducesResponseType(
-            typeof(List<ShippingAddressResponseDto>),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ShippingAddressResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMyAddresses()
         {
             return Ok(
                 await _shippingAddressService
-                    .GetMyAddressesAsync(GetUserId()));
+                    .GetMyAddressesAsync(GetUserId())
+            );
         }
+
 
         [HttpGet("{addressId:guid}")]
-        [ProducesResponseType(
-            typeof(ShippingAddressResponseDto),
-            StatusCodes.Status200OK)]
-        [ProducesResponseType(
-            StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(
-            Guid addressId)
+        [ProducesResponseType(typeof(ShippingAddressResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(Guid addressId)
         {
-            var address =
-                await _shippingAddressService
-                    .GetByIdAsync(
-                        GetUserId(),
-                        addressId);
+            var address = await _shippingAddressService
+                .GetByIdAsync(
+                  GetUserId(),
+                  addressId
+                );
 
             if (address == null)
             {
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.AddressNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(address);
         }
+
 
         [HttpGet("default")]
-        [ProducesResponseType(
-            typeof(ShippingAddressResponseDto),
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ShippingAddressResponseDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDefault()
         {
-            var address =
-                await _shippingAddressService
-                    .GetDefaultAddressAsync(
-                        GetUserId());
+            var address = await _shippingAddressService
+                .GetDefaultAddressAsync(GetUserId());
 
             if (address == null)
             {
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.AddressNotFound,
-                        StatusCodes.Status404NotFound));
+                        StatusCodes.Status404NotFound
+                    )
+                );
             }
 
             return Ok(address);
         }
 
+
         [HttpPut("{addressId:guid}")]
-        [ProducesResponseType(
-            typeof(ShippingAddressResponseDto),
-            StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update(
-            Guid addressId,
+        [ProducesResponseType(typeof(ShippingAddressResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(Guid addressId,
             [FromBody] ShippingAddressRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -135,51 +133,58 @@ namespace FurnitureShop.API.Controllers
                     ApiResponse<object>.Fail(
                         ErrorMessages.ValidationFailed,
                         StatusCodes.Status400BadRequest,
-                        ModelState.ToErrorDictionary()));
+                        ModelState.ToErrorDictionary()
+                    )
+                );
             }
 
-            var address =
-                await _shippingAddressService
-                    .UpdateAsync(
-                        GetUserId(),
-                        addressId,
-                        request);
+            var address = await _shippingAddressService
+                .UpdateAsync(
+                   GetUserId(),
+                   addressId,
+                   request
+                );
 
             return Ok(address);
         }
 
+
         [HttpPatch("{addressId:guid}/default")]
-        [ProducesResponseType(
-            StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SetDefault(
             Guid addressId)
         {
             await _shippingAddressService
                 .SetDefaultAsync(
                     GetUserId(),
-                    addressId);
+                    addressId
+                );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.DefaultAddressUpdated));
+                    ResponseMessages.DefaultAddressUpdated
+                )
+            );
         }
 
+
         [HttpDelete("{addressId:guid}")]
-        [ProducesResponseType(
-            StatusCodes.Status200OK)]
-        public async Task<IActionResult> Delete(
-            Guid addressId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(Guid addressId)
         {
             await _shippingAddressService
                 .DeleteAsync(
                     GetUserId(),
-                    addressId);
+                    addressId
+                );
 
             return Ok(
                 ApiResponse<object>.Success(
                     null,
-                    ResponseMessages.AddressDeleted));
+                    ResponseMessages.AddressDeleted
+                )
+            );
         }
 
 
@@ -188,9 +193,9 @@ namespace FurnitureShop.API.Controllers
         public async Task<IActionResult> GetUserAddresses(
             Guid userId)
         {
-            return Ok(
-                await _shippingAddressService
-                    .GetMyAddressesAsync(userId));
+            return Ok(await _shippingAddressService
+                    .GetMyAddressesAsync(userId)
+            );
         }
     }
 }

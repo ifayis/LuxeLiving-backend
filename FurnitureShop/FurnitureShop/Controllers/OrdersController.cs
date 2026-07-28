@@ -20,6 +20,7 @@ namespace FurnitureShop.API.Controllers
             _orderService = orderService;
         }
 
+
         private Guid GetUserId()
         {
             var userId = User.FindFirstValue("UID");
@@ -33,7 +34,6 @@ namespace FurnitureShop.API.Controllers
             return Guid.Parse(userId);
         }
 
-        #region Customer
 
         [Authorize(Roles = Roles.User)]
         [HttpGet("my-orders")]
@@ -45,6 +45,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(orders);
         }
 
+
         [Authorize(Roles = Roles.User)]
         [HttpGet("my-orders/{orderId:guid}")]
         public async Task<IActionResult> GetMyOrder(
@@ -53,18 +54,22 @@ namespace FurnitureShop.API.Controllers
             var order = await _orderService
                 .GetMyOrderAsync(
                     GetUserId(),
-                    orderId);
+                    orderId
+                );
 
             if (order == null)
             {
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.OrderNotFound,
-                        404));
+                        404
+                    )
+                );
             }
 
             return Ok(order);
         }
+
 
         [Authorize(Roles = Roles.User)]
         [HttpPatch("{orderId:guid}/cancel")]
@@ -76,24 +81,25 @@ namespace FurnitureShop.API.Controllers
                 .CancelOrderAsync(
                     GetUserId(),
                     orderId,
-                    request);
+                    request
+                );
 
             if (order == null)
             {
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.OrderNotFound,
-                        404));
+                        404
+                    )
+                );
             }
 
             return Ok(ApiResponse<OrderResponseDto>.Success(
                 order,
-                "Order cancelled successfully."));
+                "Order cancelled successfully.")
+            );
         }
 
-        #endregion
-
-        #region Admin
 
         [Authorize(Roles = Roles.Admin)]
         [HttpGet]
@@ -105,6 +111,7 @@ namespace FurnitureShop.API.Controllers
             return Ok(orders);
         }
 
+
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("users/{userId:guid}")]
         public async Task<IActionResult> GetOrdersByUser(
@@ -115,6 +122,7 @@ namespace FurnitureShop.API.Controllers
 
             return Ok(orders);
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("{orderId:guid}")]
@@ -129,11 +137,14 @@ namespace FurnitureShop.API.Controllers
                 return NotFound(
                     ApiResponse<object>.Fail(
                         ErrorMessages.OrderNotFound,
-                        404));
+                        404
+                    )
+                );
             }
 
             return Ok(order);
         }
+
 
         [Authorize(Roles = Roles.Admin)]
         [HttpPatch("{orderId:guid}/status")]
@@ -144,16 +155,15 @@ namespace FurnitureShop.API.Controllers
             var order = await _orderService
                 .UpdateStatusAsync(
                     orderId,
-                    request);
+                    request
+                );
 
             return Ok(ApiResponse<OrderResponseDto>.Success(
                 order,
-                "Order status updated successfully."));
+                "Order status updated successfully.")
+            );
         }
 
-        #endregion
-
-        #region Dashboard
 
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("dashboard/total-products")]
@@ -168,6 +178,7 @@ namespace FurnitureShop.API.Controllers
             });
         }
 
+
         [Authorize(Roles = Roles.Admin)]
         [HttpGet("dashboard/total-revenue")]
         public async Task<IActionResult> TotalRevenue()
@@ -180,7 +191,5 @@ namespace FurnitureShop.API.Controllers
                 TotalRevenue = revenue
             });
         }
-
-        #endregion
     }
 }

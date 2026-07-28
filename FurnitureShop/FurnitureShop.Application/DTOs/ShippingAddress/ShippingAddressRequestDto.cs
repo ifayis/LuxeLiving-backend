@@ -10,9 +10,7 @@ namespace FurnitureShop.Application.DTOs.ShippingAddress
         public string FullName { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(
-            @"^[6-9]\d{9}$",
-            ErrorMessage = "Enter a valid Indian mobile number.")]
+        [RegularExpression(@"^[6-9]\d{9}$", ErrorMessage = "Enter a valid Indian mobile number.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
@@ -35,9 +33,7 @@ namespace FurnitureShop.Application.DTOs.ShippingAddress
         public string Country { get; set; } = "India";
 
         [Required]
-        [RegularExpression(
-            @"^\d{6}$",
-            ErrorMessage = "PIN code must contain exactly 6 digits.")]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "PIN code must contain exactly 6 digits.")]
         public string PinCode { get; set; } = string.Empty;
 
         [Required]

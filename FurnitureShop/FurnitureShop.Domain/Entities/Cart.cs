@@ -9,8 +9,6 @@ namespace FurnitureShop.Domain.Entities
 
         public Guid UserId { get; set; }
 
-        public ICollection<CartItem> Items { get; set; } = new List<CartItem>();
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
@@ -21,5 +19,8 @@ namespace FurnitureShop.Domain.Entities
 
         [Timestamp]
         public byte[]? RowVersion { get; set; }
+
+
+        public ICollection<CartItem> Items { get; set; } = new List<CartItem>();
     }
 }

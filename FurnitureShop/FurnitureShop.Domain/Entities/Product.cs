@@ -33,8 +33,6 @@ namespace FurnitureShop.Domain.Enitities
 
         public Guid CategoryId { get; set; }
 
-        public Category Category { get; set; } = null!;
-
         public int StockQuantity { get; set; }
 
         public bool IsActive { get; set; } = true;
@@ -56,7 +54,9 @@ namespace FurnitureShop.Domain.Enitities
 
         public int ReviewCount { get; set; }
 
-        public ICollection<Review> Reviews { get; set; }
-            = new List<Review>();
+        public Category Category { get; set; } = null!;
+
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
